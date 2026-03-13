@@ -95,12 +95,19 @@ export default function Header() {
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    document.documentElement.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    };
   }, [mobileOpen]);
 
   useEffect(() => {
+    setMobileOpen(false);
     setLanguageOpen(false);
-  }, [pathname, mobileOpen]);
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+  }, [pathname]);
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -121,6 +128,23 @@ export default function Header() {
     return () => {
       document.removeEventListener("mousedown", handlePointerDown);
       document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
+  useEffect(() => {
+    const releaseOverlayLock = () => {
+      setMobileOpen(false);
+      setLanguageOpen(false);
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    };
+
+    window.addEventListener("hashchange", releaseOverlayLock);
+    window.addEventListener("popstate", releaseOverlayLock);
+
+    return () => {
+      window.removeEventListener("hashchange", releaseOverlayLock);
+      window.removeEventListener("popstate", releaseOverlayLock);
     };
   }, []);
 
@@ -164,11 +188,20 @@ export default function Header() {
     }
   };
 
+  const closeMobileMenu = () => {
+    setMobileOpen(false);
+    setLanguageOpen(false);
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+  };
+
   return (
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 px-[clamp(1.5rem,4vw,4rem)] h-20 flex items-center justify-between transition-all duration-500",
-        scrolled
+        mobileOpen
+          ? "bg-transparent h-[70px]"
+          : scrolled
           ? "bg-cream/95 backdrop-blur-xl shadow-[0_1px_0_rgba(0,0,0,0.06)] h-[70px]"
           : "bg-transparent"
       )}
@@ -306,7 +339,13 @@ export default function Header() {
       {/* Mobile Toggle */}
       <button
         className="lg:hidden flex flex-col gap-[5px] p-2 z-[1001]"
-        onClick={() => setMobileOpen(!mobileOpen)}
+        onClick={() => {
+          if (mobileOpen) {
+            closeMobileMenu();
+            return;
+          }
+          setMobileOpen(true);
+        }}
         aria-label={mobileOpen ? "Menü schließen" : "Menü öffnen"}
       >
         <span
@@ -339,63 +378,90 @@ export default function Header() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-charcoal flex flex-col items-center justify-center gap-8 z-[999]"
+            transition={{ duration: 0.24 }}
+            className="mobile-menu-shell"
+            onClick={(event) => {
+              if (event.target === event.currentTarget) {
+                closeMobileMenu();
+              }
+            }}
           >
-            {navLinks.map((link, i) => (
-              <motion.a
-                key={link.href}
-                href={link.href}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 + 0.1 }}
-                className="header-script text-[2rem] leading-none text-white sm:text-[2.3rem]"
-                onClick={() => setMobileOpen(false)}
-              >
-                {link.label}
-              </motion.a>
-            ))}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.38 }}
-              className="flex items-center gap-3"
+              initial={{ opacity: 0, scale: 0.96, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98, y: 12 }}
+              transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
+              className="mobile-menu-panel"
+              onClick={(event) => event.stopPropagation()}
             >
-              {languageOptions.map((option) => {
-                const isActive = option.value === activeLocale;
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.08 }}
+                className="mobile-menu-kicker"
+              >
+                Menu
+              </motion.p>
 
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    className={cn("language-chip", isActive && "language-chip-active")}
-                    onClick={() => {
-                      setMobileOpen(false);
-                      handleLocaleChange(option.value);
-                    }}
+              <div className="mobile-menu-links">
+                {navLinks.map((link, i) => (
+                  <motion.a
+                    key={link.href}
+                    href={link.href}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 + 0.1 }}
+                    className="mobile-menu-link header-script"
+                    onClick={closeMobileMenu}
                   >
-                    <span className="language-chip-row">
-                      <span
-                        className={cn("language-flag", option.flagClassName)}
-                        aria-hidden="true"
-                      />
-                      <span className="language-chip-title">{option.shortLabel}</span>
-                    </span>
-                    <span className="language-chip-subtitle">{option.label}</span>
-                  </button>
-                );
-              })}
+                    {link.label}
+                  </motion.a>
+                ))}
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.34 }}
+                className="mobile-language-row"
+              >
+                {languageOptions.map((option) => {
+                  const isActive = option.value === activeLocale;
+
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      className={cn("language-chip", isActive && "language-chip-active")}
+                      onClick={() => {
+                        closeMobileMenu();
+                        handleLocaleChange(option.value);
+                      }}
+                    >
+                      <span className="language-chip-row">
+                        <span
+                          className={cn("language-flag", option.flagClassName)}
+                          aria-hidden="true"
+                        />
+                        <span className="language-chip-title">{option.shortLabel}</span>
+                      </span>
+                      <span className="language-chip-subtitle">{option.label}</span>
+                    </button>
+                  );
+                })}
+              </motion.div>
+
+              <motion.a
+                href="#buchen"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="btn-primary mobile-menu-book"
+                onClick={closeMobileMenu}
+              >
+                {t("book")}
+              </motion.a>
             </motion.div>
-            <motion.a
-              href="#buchen"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="btn-primary mt-4 px-8 text-[0.78rem] font-semibold tracking-[0.16em]"
-              onClick={() => setMobileOpen(false)}
-            >
-              {t("book")}
-            </motion.a>
           </motion.nav>
         )}
       </AnimatePresence>
