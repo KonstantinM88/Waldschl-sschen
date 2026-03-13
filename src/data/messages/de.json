@@ -1,0 +1,175 @@
+{
+  "meta": {
+    "title": "Hotel & Restaurant Waldschlösschen | Saale-Unstrut",
+    "description": "Ihr Boutique-Hotel & Restaurant im Herzen des Naturparks Saale-Unstrut-Triasland. Genuss, Gastfreundschaft und unvergessliche Momente – direkt an der Arche Nebra."
+  },
+  "nav": {
+    "hotel": "Hotel",
+    "restaurant": "Restaurant",
+    "events": "Feiern & Events",
+    "destinations": "Ausflugsziele",
+    "contact": "Kontakt",
+    "book": "Jetzt Buchen"
+  },
+  "hero": {
+    "badge": "Hotel & Restaurant · Saale-Unstrut",
+    "title": "Willkommen im",
+    "titleEmphasis": "Waldschlösschen",
+    "subtitle": "Wo Tradition und Natur sich vereinen — Ihr Rückzugsort für Genuss, Gastfreundschaft und unvergessliche Momente im Herzen des Naturparks Saale-Unstrut-Triasland.",
+    "ctaBook": "Zimmer Buchen",
+    "ctaTable": "Tisch Reservieren",
+    "scroll": "Entdecken"
+  },
+  "welcome": {
+    "label": "Herzlich Willkommen",
+    "title": "Ein Ort, an dem die Zeit",
+    "titleEmphasis": "stehen bleibt",
+    "text1": "Direkt an der Arche Nebra und am Fuße des Mittelberges gelegen, empfängt Sie unser Waldschlösschen in einer landschaftlich einzigartigen Lage mitten im Naturpark Saale-Unstrut-Triasland. Im altehrwürdigen Verwaltungsgebäude der Kaligewerkschaft Kleinwangen — mit viel Liebe zum Detail restauriert — finden Sie Ruhe, Genuss und herzliche Gastfreundschaft.",
+    "text2": "Hier, wo der Blick über satte grüne Wiesen schweift und unser Küchenteam kulinarische Gedichte serviert, gerät der Alltag schnell in Vergessenheit. Denn in allem, was wir unseren Gästen bieten, steckt neben unserem hohen Anspruch vor allem viel Herz und Leidenschaft.",
+    "signature": "Ihr Sebastian Sieber & das Waldschlösschen-Team"
+  },
+  "directions": {
+    "label": "Unsere Welt",
+    "title": "Entdecken Sie das",
+    "titleEmphasis": "Waldschlösschen",
+    "hotel": {
+      "label": "Übernachten",
+      "title": "Hotel",
+      "desc": "24 individuell gestaltete Zimmer, in denen sich Tradition und moderner Komfort harmonisch verbinden. Ruhige Lage am Unstrutradweg."
+    },
+    "restaurant": {
+      "label": "Genießen",
+      "title": "Restaurant & Café",
+      "desc": "Regionale Küche in moderner Interpretation — saisonale Spezialitäten aus besten Zutaten in einzigartigem Ambiente."
+    },
+    "weddings": {
+      "label": "Feiern",
+      "title": "Hochzeiten & Events",
+      "desc": "Der schönste Tag Ihres Lebens verdient eine besondere Kulisse. Unvergessliche Feiern in historischem Ambiente."
+    },
+    "family": {
+      "label": "Zusammenkommen",
+      "title": "Familienfeiern",
+      "desc": "Verbringen Sie unvergessliche Stunden im Kreis Ihrer Lieben — in einer warmen, gastlichen Atmosphäre."
+    },
+    "discover": "Entdecken"
+  },
+  "spaces": {
+    "label": "Unsere Räume",
+    "title": "Charakter in jedem",
+    "titleEmphasis": "Detail",
+    "text": "Jeder Raum im Waldschlösschen erzählt seine eigene Geschichte. Mit viel Liebe restauriert, verbinden unsere Räumlichkeiten den Charme der Vergangenheit mit dem Komfort der Gegenwart.",
+    "foyer": { "label": "Empfangsbereich", "name": "Foyer" },
+    "lobby": { "label": "Kaminzimmer", "name": "Lobby" },
+    "schachtstube": { "label": "Veranstaltungsraum", "name": "Schachtstube" },
+    "sommergarten": { "label": "Biergarten", "name": "Sommergarten" },
+    "bergmannszimmer": { "label": "Privatbereich", "name": "Bergmannszimmer" }
+  },
+  "culinary": {
+    "label": "Kulinarik",
+    "title": "Wo der Genuss",
+    "titleEmphasis": "zu Hause ist",
+    "text1": "Unsere Küche verwöhnt Sie mit saisonalen Spezialitäten aus der Region. Wir setzen auf beste Zutaten und eine ehrliche, liebevolle Zubereitung — traditionelle Rezepte in moderner Interpretation. Genießen Sie dazu erlesene Weine aus dem Anbaugebiet Saale-Unstrut.",
+    "text2": "Ob Aperitif am Kamin, ein Abendessen bei Kerzenschein oder ein entspannter Nachmittag im Sommergarten — bei uns erwartet Sie Genuss mit allen Sinnen.",
+    "hours": "Öffnungszeiten Restaurant",
+    "daily": "Montag – Sonntag",
+    "dailyTime": "12:00 – 21:00 Uhr",
+    "kitchen": "Küchenschluss",
+    "kitchenTime": "20:00 Uhr",
+    "breakfastWeek": "Frühstück (Mo–Fr)",
+    "breakfastWeekTime": "07:00 – 10:00 Uhr",
+    "breakfastWeekend": "Frühstück (Sa–So)",
+    "breakfastWeekendTime": "08:00 – 10:00 Uhr",
+    "ctaTable": "Tisch Reservieren"
+  },
+  "events": {
+    "label": "Feiern mit Charakter",
+    "title": "Ihr besonderer Anlass,",
+    "titleEmphasis": "unser Versprechen",
+    "text": "Ob Hochzeit, Jubiläum, Firmenveranstaltung oder Familienfeier — im Waldschlösschen wird jedes Fest zu einem unvergesslichen Erlebnis in besonderem Ambiente.",
+    "weddings": {
+      "title": "Hochzeiten",
+      "desc": "Der schönste Tag Ihres Lebens verdient eine außergewöhnliche Kulisse. Von der Trauung bis zur Feier — wir begleiten Sie mit Herz und Erfahrung und schaffen für Sie und Ihre Gäste unvergessliche Momente."
+    },
+    "family": {
+      "title": "Familienfeiern",
+      "desc": "Geburtstage, Taufen, Kommunion oder einfach ein besonderer Abend im Kreis der Familie. Unsere liebevoll gestalteten Räume bieten den perfekten Rahmen für gemeinsame Stunden voller Freude."
+    },
+    "meetings": {
+      "title": "Tagungen & Seminare",
+      "desc": "Kreative Ideen brauchen inspirierende Orte. Unser Veranstaltungsraum bietet Platz für bis zu 40 Personen — ausgestattet mit moderner Technik inmitten historischer Atmosphäre."
+    },
+    "arrangements": {
+      "title": "Arrangements",
+      "desc": "Entdecken Sie unsere sorgfältig zusammengestellten Erlebnispakete: Romantische Zeit zu Zweit, Kulturentdeckungen mit Arche Nebra oder genussvolle Tage mit Halbpension und regionalem Wein."
+    },
+    "more": "Mehr erfahren"
+  },
+  "testimonials": {
+    "label": "Gästestimmen",
+    "title": "Was unsere Gäste",
+    "titleEmphasis": "sagen"
+  },
+  "voucher": {
+    "label": "Gutscheine",
+    "title": "Freude",
+    "titleEmphasis": "verschenken",
+    "text1": "Überraschen Sie Ihre Liebsten mit einem Gutschein für unvergessliche Stunden im Waldschlösschen. Ob ein genussvolles Dinner, eine romantische Übernachtung oder ein komplettes Wochenendarrangement — schenken Sie Erholung und Genuss in einer einzigartigen Umgebung.",
+    "text2": "Unsere Gutscheine sind individuell gestaltbar und für jeden Anlass das perfekte Geschenk. Kontaktieren Sie uns — wir beraten Sie gern.",
+    "cta": "Gutschein Anfragen",
+    "visualLabel": "Geschenkidee",
+    "visualTitle": "Gutschein schenken"
+  },
+  "destinations": {
+    "label": "Die Region entdecken",
+    "title": "Ausflugsziele in der",
+    "titleEmphasis": "Umgebung",
+    "text": "Das Waldschlösschen ist der ideale Ausgangspunkt für Entdeckungen in der faszinierenden Region Saale-Unstrut — einer der nördlichsten Weinregionen Europas mit reicher Geschichte und atemberaubender Natur."
+  },
+  "cta": {
+    "label": "Wir freuen uns auf Sie",
+    "title": "Ihr Aufenthalt im",
+    "titleEmphasis": "Waldschlösschen",
+    "text": "Buchen Sie Ihr Zimmer, reservieren Sie einen Tisch oder planen Sie Ihre Feier mit uns. Wir beraten Sie gern persönlich und machen Ihren Aufenthalt zu etwas ganz Besonderem.",
+    "phone": "+49 34461 / 255 360",
+    "email": "E-Mail Schreiben"
+  },
+  "contact": {
+    "label": "Kontakt & Anfahrt",
+    "title": "Wir sind",
+    "titleEmphasis": "für Sie da",
+    "address": "Adresse",
+    "contactTitle": "Kontakt",
+    "hours": "Öffnungszeiten",
+    "formTitle": "Schreiben Sie uns",
+    "formName": "Name",
+    "formEmail": "E-Mail",
+    "formPhone": "Telefon",
+    "formSubject": "Betreff",
+    "formMessage": "Ihre Nachricht",
+    "formSend": "Nachricht Senden",
+    "subjectOptions": {
+      "placeholder": "Bitte wählen",
+      "room": "Zimmer buchen",
+      "table": "Tisch reservieren",
+      "wedding": "Hochzeit anfragen",
+      "family": "Familienfeier planen",
+      "meeting": "Tagung organisieren",
+      "voucher": "Gutschein bestellen",
+      "other": "Sonstige Anfrage"
+    }
+  },
+  "footer": {
+    "tagline": "Ihr Boutique-Hotel & Restaurant im Naturpark Saale-Unstrut-Triasland. Genuss, Gastfreundschaft und unvergessliche Momente — direkt an der Arche Nebra.",
+    "discover": "Entdecken",
+    "service": "Service",
+    "bookRoom": "Zimmer buchen",
+    "reserveTable": "Tisch reservieren",
+    "vouchers": "Gutscheine",
+    "arrangements": "Arrangements",
+    "copyright": "© 2026 Hotel & Restaurant Waldschlösschen. Alle Rechte vorbehalten.",
+    "privacy": "Datenschutz",
+    "imprint": "Impressum",
+    "terms": "AGB"
+  }
+}

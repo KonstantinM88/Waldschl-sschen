@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  locale    String   @default("de")
+  createdAt DateTime @default(now())
+  readAt    DateTime?
+}
+
+model GiftVoucher {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  amount    Float
+  buyerName String
+  buyerEmail String
+  recipient String?
+  message   String?
+  isRedeemed Boolean @default(false)
+  createdAt  DateTime @default(now())
+  redeemedAt DateTime?
+}
+
+model Booking {
+  id          String   @id @default(cuid())
+  guestName   String
+  guestEmail  String
+  guestPhone  String?
+  checkIn     DateTime
+  checkOut    DateTime
+  roomType    String
+  guests      Int      @default(2)
+  notes       String?
+  status      BookingStatus @default(PENDING)
+  locale      String   @default("de")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  titleEn     String?
+  date        DateTime
+  description String?
+  descriptionEn String?
+  imageUrl    String?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
