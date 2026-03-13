@@ -149,13 +149,13 @@ export default function Header() {
       </Link>
 
       {/* Desktop Nav */}
-      <nav className="hidden lg:flex items-center gap-6 xl:gap-8" role="navigation" aria-label="Hauptnavigation">
+      <nav className="hidden lg:flex items-center gap-5 xl:gap-6" role="navigation" aria-label="Hauptnavigation">
         {navLinks.map((link) => (
           <a
             key={link.href}
             href={link.href}
             className={cn(
-              "header-script relative whitespace-nowrap text-[1.18rem] leading-none transition-colors duration-300 group xl:text-[1.28rem]",
+              "header-script relative whitespace-nowrap text-[1.28rem] leading-none transition-colors duration-300 group xl:text-[1.4rem]",
               scrolled ? "text-text-secondary" : "text-white/85"
             )}
           >
@@ -166,7 +166,7 @@ export default function Header() {
         <a
           href="/en"
           className={cn(
-            "header-script text-[1.05rem] leading-none opacity-60 transition-opacity hover:opacity-100 xl:text-[1.14rem]",
+            "header-script text-[1.16rem] leading-none opacity-60 transition-opacity hover:opacity-100 xl:text-[1.22rem]",
             scrolled ? "text-text-secondary" : "text-white/85"
           )}
         >
