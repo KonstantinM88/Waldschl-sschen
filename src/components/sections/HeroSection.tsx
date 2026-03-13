@@ -17,9 +17,35 @@ export default function HeroSection() {
     animate: { opacity: 1, y: 0, filter: "blur(0px)" },
   };
 
+  const renderScrollIndicator = (className: string) => (
+    <motion.a
+      href="#about"
+      className={className}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 1.5, duration: 1 }}
+      whileHover={{ y: 2 }}
+    >
+      <div className="relative flex h-[52px] w-[30px] items-start justify-center rounded-full border border-white/30 bg-white/8 p-1 shadow-[0_14px_40px_rgba(0,0,0,0.18)] backdrop-blur-md sm:h-[56px] sm:w-[32px]">
+        <motion.span
+          className="block h-2.5 w-2.5 rounded-full bg-gold-light shadow-[0_0_16px_rgba(212,188,142,0.8)]"
+          animate={{ y: [0, 18, 0], opacity: [1, 0.35, 1], scale: [1, 0.86, 1] }}
+          transition={{ duration: 1.9, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
+        />
+      </div>
+      <motion.span
+        className="text-[0.58rem] tracking-[0.22em] uppercase sm:text-[0.62rem] sm:tracking-[0.24em]"
+        animate={{ opacity: [0.55, 0.95, 0.55], y: [0, 2, 0] }}
+        transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+      >
+        {t("scroll")}
+      </motion.span>
+    </motion.a>
+  );
+
   return (
     <section
-      className="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-4 pb-20 pt-28 sm:px-6 sm:pb-24 sm:pt-32"
+      className="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-4 pb-16 pt-28 sm:px-6 sm:pb-20 sm:pt-32 lg:pb-28 lg:pt-36"
     >
       {/* Background */}
       <div className="absolute inset-0">
@@ -43,7 +69,7 @@ export default function HeroSection() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 mx-auto w-full max-w-[960px] px-2 text-center text-white sm:px-8">
+      <div className="relative z-10 mx-auto w-full max-w-[960px] px-2 text-center text-white sm:px-8 lg:pb-24">
         <motion.div
           className="mb-6 inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-2 font-[var(--font-body)] text-[0.62rem] font-normal tracking-[0.28em] uppercase text-gold-light sm:mb-8 sm:text-[0.7rem] sm:tracking-[0.35em]"
           {...reveal}
@@ -73,43 +99,23 @@ export default function HeroSection() {
         </motion.p>
 
         <motion.div
-          className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:gap-5"
+          className="mx-auto flex w-full max-w-[22rem] flex-col items-stretch justify-center gap-3 sm:max-w-none sm:flex-row sm:items-center sm:gap-5"
           {...reveal}
           transition={{ duration: 1, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
         >
-          <a href="#buchen" className="btn-primary justify-center sm:min-w-[220px]">
+          <a href="#buchen" className="btn-primary w-full justify-center sm:w-auto sm:min-w-[220px]">
             {t("ctaBook")}
           </a>
-          <a href="#restaurant" className="btn-outline-light justify-center sm:min-w-[220px]">
+          <a href="#restaurant" className="btn-outline-light w-full justify-center sm:w-auto sm:min-w-[220px]">
             {t("ctaTable")}
           </a>
         </motion.div>
+
+        {renderScrollIndicator("mt-8 inline-flex flex-col items-center gap-2 text-white/55 lg:hidden")}
       </div>
 
       {/* Scroll indicator */}
-      <motion.a
-        href="#about"
-        className="absolute bottom-8 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-3 text-white/55 sm:flex"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
-        whileHover={{ y: 2 }}
-      >
-        <motion.span
-          className="text-[0.65rem] tracking-[0.24em] uppercase"
-          animate={{ opacity: [0.55, 0.95, 0.55], y: [0, 2, 0] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-        >
-          {t("scroll")}
-        </motion.span>
-        <div className="relative flex h-[56px] w-[32px] items-start justify-center rounded-full border border-white/30 bg-white/8 p-1 shadow-[0_14px_40px_rgba(0,0,0,0.18)] backdrop-blur-md">
-          <motion.span
-            className="block h-2.5 w-2.5 rounded-full bg-gold-light shadow-[0_0_16px_rgba(212,188,142,0.8)]"
-            animate={{ y: [0, 20, 0], opacity: [1, 0.35, 1], scale: [1, 0.86, 1] }}
-            transition={{ duration: 1.9, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
-          />
-        </div>
-      </motion.a>
+      {renderScrollIndicator("absolute bottom-10 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 text-white/55 lg:flex")}
     </section>
   );
 }

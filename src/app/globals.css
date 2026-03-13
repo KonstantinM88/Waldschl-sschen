@@ -79,14 +79,14 @@
     align-items: center;
     justify-content: center;
     gap: 0.625rem;
-    min-height: 3.5rem;
-    padding: 0.95rem 2.1rem;
+    min-height: 3.2rem;
+    padding: 0.85rem 1.45rem;
     border-radius: 999px;
     font-family: var(--font-body);
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     line-height: 1;
     font-weight: 500;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     text-decoration: none;
     white-space: nowrap;
@@ -167,6 +167,17 @@
   .btn-outline-light:active,
   .btn-dark:active {
     transform: translateY(0) scale(0.985);
+  }
+
+  @media (min-width: 640px) {
+    .btn-primary,
+    .btn-outline-light,
+    .btn-dark {
+      min-height: 3.5rem;
+      padding: 0.95rem 2.1rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+    }
   }
 
   .gold-divider {
