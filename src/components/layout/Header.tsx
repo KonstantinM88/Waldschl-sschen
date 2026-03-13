@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
+import NextLink from "next/link";
+import {usePathname as useNextPathname} from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { Check, ChevronDown, Globe2 } from "lucide-react";
+import {locales} from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
 
 function CastleMark({ className }: { className?: string }) {
@@ -77,9 +80,12 @@ function CastleMark({ className }: { className?: string }) {
 }
 
 export default function Header() {
+  const pathname = useNextPathname();
   const t = useTranslations("nav");
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [languageOpen, setLanguageOpen] = useState(false);
+  const languageMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);
@@ -92,6 +98,32 @@ export default function Header() {
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
+  useEffect(() => {
+    setLanguageOpen(false);
+  }, [pathname, mobileOpen]);
+
+  useEffect(() => {
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!languageMenuRef.current?.contains(event.target as Node)) {
+        setLanguageOpen(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setLanguageOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
   const navLinks = [
     { href: "#hotel", label: t("hotel") },
     { href: "#restaurant", label: t("restaurant") },
@@ -99,6 +131,38 @@ export default function Header() {
     { href: "#ausflugsziele", label: t("destinations") },
     { href: "#kontakt", label: t("contact") },
   ];
+
+  const activeLocale = pathname.startsWith("/en") ? "en" : "de";
+  const localePrefixPattern = new RegExp(`^/(${locales.join("|")})(?=/|$)`);
+  const currentPath = pathname.replace(localePrefixPattern, "") || "/";
+  const homeHref = `/${activeLocale}`;
+  const languageOptions = [
+    {
+      value: "de" as const,
+      shortLabel: "DE",
+      label: "Deutsch",
+      subtitle: "German",
+      flagClassName: "language-flag-de",
+    },
+    {
+      value: "en" as const,
+      shortLabel: "EN",
+      label: "English",
+      subtitle: "English",
+      flagClassName: "language-flag-en",
+    },
+  ];
+
+  const buildLocaleHref = (nextLocale: "de" | "en") =>
+    `/${nextLocale}${currentPath === "/" ? "" : currentPath}`;
+
+  const handleLocaleChange = (nextLocale: "de" | "en") => {
+    const nextHref = buildLocaleHref(nextLocale);
+
+    if (nextHref !== pathname) {
+      window.location.assign(nextHref);
+    }
+  };
 
   return (
     <header
@@ -110,8 +174,8 @@ export default function Header() {
       )}
       role="banner"
     >
-      <Link
-        href="/"
+      <NextLink
+        href={homeHref}
         className={cn(
           "flex min-w-0 items-center gap-2 transition-colors duration-500 sm:gap-2.5",
           scrolled ? "text-charcoal" : "text-white"
@@ -146,7 +210,7 @@ export default function Header() {
             Saale-Unstrut
           </span>
         </span>
-      </Link>
+      </NextLink>
 
       {/* Desktop Nav */}
       <nav className="hidden lg:flex items-center gap-5 xl:gap-6" role="navigation" aria-label="Hauptnavigation">
@@ -163,15 +227,74 @@ export default function Header() {
             <span className="absolute -bottom-1 left-0 w-0 h-px bg-gold transition-all duration-300 group-hover:w-full" />
           </a>
         ))}
-        <a
-          href="/en"
-          className={cn(
-            "header-script header-nav-readable text-[1.16rem] leading-none opacity-75 transition-opacity hover:opacity-100 xl:text-[1.22rem]",
-            scrolled ? "header-nav-readable-scrolled text-charcoal" : "text-white/90"
-          )}
-        >
-          EN
-        </a>
+        <div className="relative" ref={languageMenuRef}>
+          <button
+            type="button"
+            aria-label="Sprache wählen"
+            aria-haspopup="menu"
+            aria-expanded={languageOpen}
+            onClick={() => setLanguageOpen((open) => !open)}
+            className={cn("language-trigger", scrolled && "language-trigger-scrolled")}
+          >
+            <span className="language-trigger-icon" aria-hidden="true">
+              <Globe2 className="h-3.5 w-3.5 stroke-[1.8]" />
+            </span>
+            <span className="language-trigger-code">{activeLocale.toUpperCase()}</span>
+            <ChevronDown
+              className={cn(
+                "h-3.5 w-3.5 stroke-[1.8] transition-transform duration-300",
+                languageOpen && "rotate-180"
+              )}
+            />
+          </button>
+          <AnimatePresence>
+            {languageOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                className={cn("language-menu", scrolled && "language-menu-scrolled")}
+                role="menu"
+              >
+                {languageOptions.map((option) => {
+                  const isActive = option.value === activeLocale;
+
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      role="menuitemradio"
+                      aria-checked={isActive}
+                      className={cn("language-option", isActive && "language-option-active")}
+                      onClick={() => {
+                        setLanguageOpen(false);
+                        handleLocaleChange(option.value);
+                      }}
+                    >
+                      <span className="language-option-main">
+                        <span
+                          className={cn("language-flag", option.flagClassName)}
+                          aria-hidden="true"
+                        />
+                        <span className="language-option-copy">
+                          <span className="language-option-label">{option.label}</span>
+                          <span className="language-option-meta">{option.subtitle}</span>
+                        </span>
+                      </span>
+                      <Check
+                        className={cn(
+                          "h-4 w-4 stroke-[2] transition-opacity duration-200",
+                          isActive ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                    </button>
+                  );
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
         <a
           href="#buchen"
           className={cn("btn-primary btn-header", scrolled && "btn-header-scrolled")}
@@ -232,6 +355,37 @@ export default function Header() {
                 {link.label}
               </motion.a>
             ))}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.38 }}
+              className="flex items-center gap-3"
+            >
+              {languageOptions.map((option) => {
+                const isActive = option.value === activeLocale;
+
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={cn("language-chip", isActive && "language-chip-active")}
+                    onClick={() => {
+                      setMobileOpen(false);
+                      handleLocaleChange(option.value);
+                    }}
+                  >
+                    <span className="language-chip-row">
+                      <span
+                        className={cn("language-flag", option.flagClassName)}
+                        aria-hidden="true"
+                      />
+                      <span className="language-chip-title">{option.shortLabel}</span>
+                    </span>
+                    <span className="language-chip-subtitle">{option.label}</span>
+                  </button>
+                );
+              })}
+            </motion.div>
             <motion.a
               href="#buchen"
               initial={{ opacity: 0, y: 20 }}

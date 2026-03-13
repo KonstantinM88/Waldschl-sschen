@@ -29,9 +29,9 @@ export const metadata: Metadata = {
     follow: true,
   },
   alternates: {
-    canonical: "/",
+    canonical: "/de",
     languages: {
-      de: "/",
+      de: "/de",
       en: "/en",
     },
   },
@@ -60,7 +60,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="font-[var(--font-body)] bg-cream text-text-primary antialiased">
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
         </NextIntlClientProvider>
       </body>
