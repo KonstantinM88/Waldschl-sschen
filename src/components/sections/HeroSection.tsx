@@ -1,16 +1,43 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
+import {
+  motion,
+  useReducedMotion,
+} from "framer-motion";
 
 export default function HeroSection() {
+  const shouldReduceMotion = useReducedMotion();
+  const [isMobile, setIsMobile] = useState(false);
   const t = useTranslations("hero");
+  const mobileVideoSrc = "/video_mobile_noaudio.webm";
   const heroImageSrcSet = [
     "/restaurant_terrace_800w.webp 800w",
     "/restaurant_terrace_1200w.webp 1200w",
     "/restaurant_terrace_1600w.webp 1600w",
     "/restaurant_terrace_1920w.webp 1920w",
   ].join(", ");
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    const syncViewport = () => setIsMobile(mediaQuery.matches);
+
+    syncViewport();
+    mediaQuery.addEventListener("change", syncViewport);
+
+    return () => {
+      mediaQuery.removeEventListener("change", syncViewport);
+    };
+  }, []);
+
+  const lockMobileFrame = isMobile || shouldReduceMotion;
+  const useMobileVideo = isMobile && !shouldReduceMotion;
+  const cinematicScale = isMobile ? [1, 1] : [1.3, 1];
+  const cinematicX = isMobile ? [0, 0] : [0, -20];
+  const cinematicY = isMobile ? [0, 0] : [0, 14];
+  const cinematicDuration = 22;
+  const staticFrameDuration = 0.01;
 
   const reveal = {
     initial: { opacity: 0, y: 60, filter: "blur(4px)" },
@@ -49,16 +76,51 @@ export default function HeroSection() {
     >
       {/* Background */}
       <div className="absolute inset-0">
-        <img
-          src="/restaurant_terrace_1920w.webp"
-          srcSet={heroImageSrcSet}
-          sizes="100vw"
-          alt=""
-          aria-hidden="true"
-          className="h-full w-full object-cover object-center"
-          loading="eager"
-          fetchPriority="high"
-        />
+        <motion.div
+          className="absolute inset-0 will-change-transform"
+          initial={lockMobileFrame ? false : { scale: 1.3, x: 0, y: 0 }}
+          animate={
+            lockMobileFrame
+              ? { scale: 1, x: 0, y: 0 }
+              : { scale: cinematicScale, x: cinematicX, y: cinematicY }
+          }
+          transition={
+            lockMobileFrame
+              ? { duration: staticFrameDuration }
+              : {
+                  duration: cinematicDuration,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  ease: [0.42, 0, 0.58, 1],
+                }
+          }
+        >
+          {useMobileVideo ? (
+            <video
+              className="h-full w-full object-cover object-center"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              poster="/restaurant_terrace_1200w.webp"
+              aria-hidden="true"
+            >
+              <source src={mobileVideoSrc} type="video/webm" />
+            </video>
+          ) : (
+            <img
+              src="/restaurant_terrace_1920w.webp"
+              srcSet={heroImageSrcSet}
+              sizes="100vw"
+              alt=""
+              aria-hidden="true"
+              className="h-full w-full object-cover object-center"
+              loading="eager"
+              fetchPriority="high"
+            />
+          )}
+        </motion.div>
         <div
           className="absolute inset-0"
           style={{
