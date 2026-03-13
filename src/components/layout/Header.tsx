@@ -6,6 +6,76 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
+function CastleMark({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 72 72"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <path
+        d="M9 55.5H63"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M14 55.5V35.5L22.5 27.5L31 35.5V55.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M41 55.5V24L50 16L59 24V55.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M22.5 27.5H50"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M47 55.5V41.5H53V55.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M18.5 41H26.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M45.5 29.5H54.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M50 16V11.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M47 13.5H53"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export default function Header() {
   const t = useTranslations("nav");
   const [scrolled, setScrolled] = useState(false);
@@ -43,14 +113,38 @@ export default function Header() {
       <Link
         href="/"
         className={cn(
-          "font-[var(--font-display)] text-[1.35rem] font-medium tracking-[0.02em] transition-colors duration-500",
+          "flex min-w-0 items-center gap-2 transition-colors duration-500 sm:gap-2.5",
           scrolled ? "text-charcoal" : "text-white"
         )}
         aria-label="Waldschlösschen Startseite"
       >
-        Waldschlösschen
-        <span className="block text-[0.65rem] font-[var(--font-body)] font-light tracking-[0.25em] uppercase opacity-70 mt-0.5">
-          Saale-Unstrut
+        <span
+          className={cn(
+            "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors duration-500 sm:h-10 sm:w-10",
+            scrolled
+              ? "border-gold/35 bg-gold/8 text-gold-dark"
+              : "border-white/30 bg-white/8 text-gold-light"
+          )}
+        >
+          <CastleMark className="h-[1.6rem] w-[1.6rem] sm:h-[1.8rem] sm:w-[1.8rem]" />
+        </span>
+        <span className="flex min-w-0 flex-col items-center">
+          <span
+            className={cn(
+              "brand-script max-w-full truncate text-[clamp(1.52rem,4.2vw,2.32rem)] leading-[0.84] sm:text-[clamp(1.7rem,4.4vw,2.48rem)]",
+              scrolled ? "text-charcoal" : "text-white"
+            )}
+          >
+            Waldschlösschen
+          </span>
+          <span
+            className={cn(
+              "mt-0.5 pl-[0.18em] text-center text-[0.5rem] font-[var(--font-body)] font-light tracking-[0.31em] uppercase sm:text-[0.58rem] sm:tracking-[0.34em]",
+              scrolled ? "text-text-secondary" : "text-white/72"
+            )}
+          >
+            Saale-Unstrut
+          </span>
         </span>
       </Link>
 
@@ -80,10 +174,7 @@ export default function Header() {
         </a>
         <a
           href="#buchen"
-          className={cn(
-            "text-[0.75rem] font-medium tracking-[0.12em] uppercase px-6 py-2.5 border transition-all duration-300 hover:bg-gold hover:border-gold hover:text-white",
-            scrolled ? "border-charcoal text-charcoal" : "border-white/40 text-white"
-          )}
+          className={cn("btn-primary btn-header", scrolled && "btn-header-scrolled")}
         >
           {t("book")}
         </a>
@@ -146,7 +237,7 @@ export default function Header() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="text-gold text-lg tracking-[0.15em] uppercase border border-gold px-8 py-3 mt-4"
+              className="btn-primary mt-4"
               onClick={() => setMobileOpen(false)}
             >
               {t("book")}
