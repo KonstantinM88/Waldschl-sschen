@@ -139,7 +139,7 @@ export default function Header() {
           </span>
           <span
             className={cn(
-              "mt-0.5 pl-[0.18em] text-center text-[0.5rem] font-[var(--font-body)] font-light tracking-[0.31em] uppercase sm:text-[0.58rem] sm:tracking-[0.34em]",
+              "header-script mt-0.5 text-center text-[0.82rem] leading-none sm:text-[0.92rem]",
               scrolled ? "text-text-secondary" : "text-white/72"
             )}
           >
@@ -149,13 +149,13 @@ export default function Header() {
       </Link>
 
       {/* Desktop Nav */}
-      <nav className="hidden lg:flex items-center gap-10" role="navigation" aria-label="Hauptnavigation">
+      <nav className="hidden lg:flex items-center gap-6 xl:gap-8" role="navigation" aria-label="Hauptnavigation">
         {navLinks.map((link) => (
           <a
             key={link.href}
             href={link.href}
             className={cn(
-              "text-[0.8rem] font-normal tracking-[0.08em] uppercase transition-colors duration-300 relative group",
+              "header-script relative whitespace-nowrap text-[1.18rem] leading-none transition-colors duration-300 group xl:text-[1.28rem]",
               scrolled ? "text-text-secondary" : "text-white/85"
             )}
           >
@@ -166,7 +166,7 @@ export default function Header() {
         <a
           href="/en"
           className={cn(
-            "text-[0.7rem] tracking-[0.1em] uppercase opacity-60 hover:opacity-100 transition-opacity",
+            "header-script text-[1.05rem] leading-none opacity-60 transition-opacity hover:opacity-100 xl:text-[1.14rem]",
             scrolled ? "text-text-secondary" : "text-white/85"
           )}
         >
@@ -226,7 +226,7 @@ export default function Header() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 + 0.1 }}
-                className="text-white text-xl tracking-[0.15em] uppercase font-light"
+                className="header-script text-[2rem] leading-none text-white sm:text-[2.3rem]"
                 onClick={() => setMobileOpen(false)}
               >
                 {link.label}
@@ -237,7 +237,7 @@ export default function Header() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="btn-primary mt-4"
+              className="btn-primary mt-4 px-8 text-[0.78rem] font-semibold tracking-[0.16em]"
               onClick={() => setMobileOpen(false)}
             >
               {t("book")}
