@@ -109,6 +109,16 @@
     text-transform: none;
   }
 
+  .header-nav-readable {
+    text-shadow: 0 1px 10px rgba(8, 14, 22, 0.26);
+    -webkit-text-stroke: 0.18px rgba(255, 255, 255, 0.18);
+  }
+
+  .header-nav-readable-scrolled {
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.18);
+    -webkit-text-stroke: 0.18px rgba(26, 26, 26, 0.12);
+  }
+
   .label-caps {
     font-family: var(--font-body);
     font-size: 0.7rem;

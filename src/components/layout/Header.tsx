@@ -155,8 +155,8 @@ export default function Header() {
             key={link.href}
             href={link.href}
             className={cn(
-              "header-script relative whitespace-nowrap text-[1.28rem] leading-none transition-colors duration-300 group xl:text-[1.4rem]",
-              scrolled ? "text-text-secondary" : "text-white/85"
+              "header-script header-nav-readable relative whitespace-nowrap text-[1.28rem] leading-none transition-colors duration-300 group xl:text-[1.4rem]",
+              scrolled ? "header-nav-readable-scrolled text-charcoal" : "text-white/95"
             )}
           >
             {link.label}
@@ -166,8 +166,8 @@ export default function Header() {
         <a
           href="/en"
           className={cn(
-            "header-script text-[1.16rem] leading-none opacity-60 transition-opacity hover:opacity-100 xl:text-[1.22rem]",
-            scrolled ? "text-text-secondary" : "text-white/85"
+            "header-script header-nav-readable text-[1.16rem] leading-none opacity-75 transition-opacity hover:opacity-100 xl:text-[1.22rem]",
+            scrolled ? "header-nav-readable-scrolled text-charcoal" : "text-white/90"
           )}
         >
           EN
