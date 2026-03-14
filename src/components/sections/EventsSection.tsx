@@ -16,10 +16,11 @@ export default function EventsSection() {
 
   return (
     <section
-      className="py-[clamp(5rem,10vw,9rem)] px-[clamp(1.5rem,5vw,6rem)] bg-forest text-white relative overflow-hidden"
+      className="events-section py-[clamp(5rem,10vw,9rem)] px-[clamp(1.5rem,5vw,6rem)] text-white relative overflow-hidden"
       id="events"
     >
-      <div className="absolute -top-1/2 -right-[30%] w-[600px] h-[600px] rounded-full border border-gold/10" />
+      <div className="events-orb events-orb-right" />
+      <div className="events-orb events-orb-left" />
 
       <div className="max-w-[1400px] mx-auto relative z-10">
         <Reveal>
@@ -28,28 +29,29 @@ export default function EventsSection() {
             <h2 className="heading-display text-[clamp(2.2rem,4.5vw,3.8rem)] text-white mt-5 mb-6">
               {t("title")} <br /><em>{t("titleEmphasis")}</em>
             </h2>
+            <div className="gold-divider mx-auto mb-8" />
             <p className="body-text mx-auto max-w-[620px] text-white/70">{t("text")}</p>
           </div>
         </Reveal>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-16">
+        <div className="mt-14 grid grid-cols-1 gap-4 sm:mt-16 sm:gap-5 lg:grid-cols-2 lg:gap-6">
           {eventCards.map((card, i) => (
             <Reveal key={card.key} delay={i * 0.1}>
-              <div className="group p-10 border border-white/10 hover:border-gold/30 transition-all duration-500 relative overflow-hidden">
-                <div className="absolute inset-0 bg-white/[0.03] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <card.Icon className="w-8 h-8 text-gold-light stroke-[1.5] mb-6 relative z-10" />
-                <h3 className="font-[var(--font-display)] text-2xl font-normal mb-4 relative z-10">
-                  {t(`${card.key}.title`)}
-                </h3>
-                <p className="text-[0.95rem] font-light leading-relaxed opacity-75 relative z-10">
-                  {t(`${card.key}.desc`)}
-                </p>
-                <a
-                  href="#kontakt"
-                  className="inline-flex items-center gap-2 mt-6 text-xs font-medium tracking-[0.12em] uppercase text-gold-light group-hover:gap-3.5 transition-all relative z-10"
-                >
-                  {t("more")} →
-                </a>
+              <div className="events-card group relative">
+                <div className="events-card-surface">
+                  <div className="events-card-glow" />
+
+                  <span className="events-card-icon">
+                    <card.Icon className="h-4 w-4 stroke-[1.8]" />
+                  </span>
+
+                  <h3 className="events-card-title">{t(`${card.key}.title`)}</h3>
+                  <p className="events-card-desc">{t(`${card.key}.desc`)}</p>
+
+                  <a href="#kontakt" className="events-card-link">
+                    {t("more")} →
+                  </a>
+                </div>
               </div>
             </Reveal>
           ))}

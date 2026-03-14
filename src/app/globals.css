@@ -933,6 +933,203 @@
     border-bottom: 0;
   }
 
+  .events-section {
+    background:
+      radial-gradient(
+        110% 90% at 50% -26%,
+        rgba(88, 126, 96, 0.34) 0%,
+        rgba(44, 62, 45, 0.18) 44%,
+        rgba(35, 54, 36, 0.92) 100%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(34, 52, 36, 0.96) 0%,
+        rgba(29, 47, 33, 0.98) 100%
+      );
+  }
+
+  .events-orb {
+    position: absolute;
+    border-radius: 999px;
+    pointer-events: none;
+  }
+
+  .events-orb-right {
+    top: -38%;
+    right: -22%;
+    width: 36rem;
+    height: 36rem;
+    border: 1px solid rgba(212, 188, 142, 0.14);
+    background: radial-gradient(
+      58% 58% at 42% 42%,
+      rgba(212, 188, 142, 0.15) 0%,
+      rgba(212, 188, 142, 0) 100%
+    );
+  }
+
+  .events-orb-left {
+    bottom: -40%;
+    left: -24%;
+    width: 32rem;
+    height: 32rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: radial-gradient(
+      62% 62% at 56% 48%,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+
+  .events-card {
+    border-radius: 1.04rem;
+    padding: 1px;
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.22) 0%,
+      rgba(212, 188, 142, 0.32) 52%,
+      rgba(255, 255, 255, 0.14) 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      0 20px 42px rgba(10, 18, 14, 0.22);
+    transition:
+      transform 0.5s var(--ease-out-expo),
+      box-shadow 0.5s var(--ease-out-expo);
+  }
+
+  .events-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.24),
+      0 26px 50px rgba(10, 18, 14, 0.3);
+  }
+
+  .events-card-surface {
+    position: relative;
+    min-height: 16rem;
+    border-radius: calc(1.04rem - 1px);
+    padding: 1.5rem 1.2rem 1.18rem;
+    overflow: hidden;
+    background:
+      linear-gradient(
+        160deg,
+        rgba(255, 255, 255, 0.06) 0%,
+        rgba(255, 255, 255, 0.02) 100%
+      ),
+      rgba(35, 54, 36, 0.56);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    isolation: isolate;
+  }
+
+  .events-card-surface::before,
+  .events-card-surface::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .events-card-surface::before {
+    inset: 0.44rem;
+    border-radius: 0.68rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .events-card-surface::after {
+    inset: 0.74rem;
+    border-radius: 0.52rem;
+    border: 1px solid rgba(212, 188, 142, 0.24);
+  }
+
+  .events-card-glow {
+    position: absolute;
+    inset: -28%;
+    pointer-events: none;
+    z-index: 1;
+    background:
+      radial-gradient(
+        42% 42% at 16% 12%,
+        rgba(212, 188, 142, 0.28) 0%,
+        rgba(212, 188, 142, 0) 76%
+      ),
+      radial-gradient(
+        34% 34% at 88% 90%,
+        rgba(255, 255, 255, 0.14) 0%,
+        rgba(255, 255, 255, 0) 72%
+      );
+    opacity: 0.46;
+    transition: opacity 0.42s var(--ease-out-expo);
+  }
+
+  .events-card:hover .events-card-glow {
+    opacity: 0.88;
+  }
+
+  .events-card-icon {
+    position: relative;
+    z-index: 3;
+    display: inline-flex;
+    height: 2rem;
+    width: 2rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid rgba(212, 188, 142, 0.34);
+    color: var(--color-gold-light);
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(212, 188, 142, 0.08) 100%
+    );
+    margin-bottom: 1rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .events-card-title {
+    position: relative;
+    z-index: 3;
+    font-family: var(--font-display);
+    font-size: 1.9rem;
+    line-height: 1.12;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.96);
+    margin-bottom: 0.7rem;
+  }
+
+  .events-card-desc {
+    position: relative;
+    z-index: 3;
+    font-family: var(--font-body);
+    font-size: 0.93rem;
+    line-height: 1.72;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.76);
+  }
+
+  .events-card-link {
+    position: relative;
+    z-index: 3;
+    display: inline-flex;
+    margin-top: 1.1rem;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-gold-light);
+    transition:
+      gap 0.35s var(--ease-out-expo),
+      color 0.35s var(--ease-out-expo);
+  }
+
+  .events-card-link:hover {
+    gap: 0.75rem;
+    color: #e4cfa2;
+  }
+
   @media (max-width: 1024px) {
     .directions-card {
       border-radius: 1.06rem;
@@ -986,6 +1183,26 @@
     .culinary-card-surface::after {
       inset: 0.56rem;
       border-radius: 0.4rem;
+    }
+
+    .events-card {
+      border-radius: 0.95rem;
+    }
+
+    .events-card-surface {
+      min-height: 15.2rem;
+      border-radius: calc(0.95rem - 1px);
+      padding: 1.36rem 1.1rem 1.08rem;
+    }
+
+    .events-card-surface::before {
+      inset: 0.38rem;
+      border-radius: 0.58rem;
+    }
+
+    .events-card-surface::after {
+      inset: 0.62rem;
+      border-radius: 0.44rem;
     }
   }
 
@@ -1062,6 +1279,52 @@
     .culinary-hours-card::before {
       inset: 0.44rem;
       border-radius: 0.56rem;
+    }
+
+    .events-orb-right {
+      width: 20rem;
+      height: 20rem;
+      top: -24%;
+      right: -28%;
+    }
+
+    .events-orb-left {
+      width: 18rem;
+      height: 18rem;
+      bottom: -28%;
+      left: -30%;
+    }
+
+    .events-card {
+      border-radius: 0.86rem;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.16),
+        0 14px 26px rgba(10, 18, 14, 0.2);
+    }
+
+    .events-card-surface {
+      min-height: 14.2rem;
+      border-radius: calc(0.86rem - 1px);
+      padding: 1.2rem 0.96rem 0.98rem;
+    }
+
+    .events-card-surface::before {
+      inset: 0.3rem;
+      border-radius: 0.48rem;
+    }
+
+    .events-card-surface::after {
+      inset: 0.5rem;
+      border-radius: 0.34rem;
+    }
+
+    .events-card-title {
+      font-size: 1.68rem;
+    }
+
+    .events-card-desc {
+      font-size: 0.9rem;
+      line-height: 1.66;
     }
   }
 

@@ -32,7 +32,15 @@ const spaces = [
     colSpan: "col-span-6 lg:col-span-4",
     aspect: "aspect-square",
   },
-  { key: "sommergarten", image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500&q=80", colSpan: "col-span-6 lg:col-span-4", aspect: "aspect-square" },
+  {
+    key: "sommergarten",
+    image: "/restaurant_terrace_1920w.webp",
+    srcSet: "/restaurant_terrace_800w.webp 800w, /restaurant_terrace_1200w.webp 1200w, /restaurant_terrace_1600w.webp 1600w, /restaurant_terrace_1920w.webp 1920w",
+    responsiveSizes: "(max-width: 768px) 50vw, (max-width: 1280px) 34vw, 33vw",
+    imagePosition: "object-[center_52%] sm:object-center",
+    colSpan: "col-span-6 lg:col-span-4",
+    aspect: "aspect-square",
+  },
   {
     key: "bergmannszimmer",
     image: "/restaurant_private_room_1920w.webp",
