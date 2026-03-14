@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import Image from "next/image";
 import Reveal from "@/components/ui/Reveal";
 
 const spaces = [
@@ -75,24 +74,14 @@ export default function SpacesSection() {
               <div className={`spaces-card group relative cursor-pointer ${space.aspect}`}>
                 <div className="spaces-card-surface">
                   <div className="spaces-card-glow" />
-                  {"srcSet" in space ? (
-                    <img
-                      src={space.image}
-                      srcSet={space.srcSet}
-                      sizes={space.responsiveSizes}
-                      alt={t(`${space.key}.name`)}
-                      loading="lazy"
-                      className={`h-full w-full object-cover ${space.imagePosition} brightness-[0.82] transition-all duration-700 group-hover:brightness-[0.68] group-hover:scale-[1.06]`}
-                    />
-                  ) : (
-                    <Image
-                      src={space.image}
-                      alt={t(`${space.key}.name`)}
-                      fill
-                      className="object-cover brightness-[0.82] group-hover:brightness-[0.68] group-hover:scale-[1.06] transition-all duration-700"
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                    />
-                  )}
+                  <img
+                    src={space.image}
+                    srcSet={space.srcSet}
+                    sizes={space.responsiveSizes}
+                    alt={t(`${space.key}.name`)}
+                    loading="lazy"
+                    className={`h-full w-full object-cover ${space.imagePosition} brightness-[0.82] transition-all duration-700 group-hover:brightness-[0.68] group-hover:scale-[1.06]`}
+                  />
                   <div className="spaces-card-overlay flex items-end p-5 sm:p-7">
                     <div>
                       <span className="mb-2 block font-[var(--font-body)] text-[0.68rem] font-light tracking-[0.16em] uppercase text-white/76">
