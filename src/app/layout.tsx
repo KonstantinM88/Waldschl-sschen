@@ -4,8 +4,22 @@ import { getLocale, getMessages } from "next-intl/server";
 import { siteConfig } from "@/data/site";
 import "./globals.css";
 
+const resolvedSiteUrl = (() => {
+  const raw =
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+    process.env.VERCEL_URL?.trim() ||
+    siteConfig.url;
+  const withProtocol = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+
+  try {
+    return new URL(withProtocol);
+  } catch {
+    return new URL("http://localhost:3000");
+  }
+})();
+
 export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
+  metadataBase: resolvedSiteUrl,
   title: {
     default: "Hotel & Restaurant Waldschlösschen | Saale-Unstrut",
     template: "%s | Waldschlösschen",
@@ -27,13 +41,6 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-  },
-  alternates: {
-    canonical: "/de",
-    languages: {
-      de: "/de",
-      en: "/en",
-    },
   },
 };
 
