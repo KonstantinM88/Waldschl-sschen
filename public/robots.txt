@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Disallow: /api/
+
+Sitemap: https://waldschlosschen-07.vercel.app/sitemap.xml

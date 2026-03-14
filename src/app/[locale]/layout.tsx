@@ -47,19 +47,11 @@ export async function generateMetadata({
     ? (locale as Locale)
     : defaultLocale;
   const canonicalPath = `/${normalizedLocale}`;
-  const siteOrigin = resolvedSiteUrl.origin;
+  const openGraphUrl = `${resolvedSiteUrl.origin}${canonicalPath}`;
 
   return {
-    alternates: {
-      canonical: canonicalPath,
-      languages: {
-        de: `${siteOrigin}/de`,
-        en: `${siteOrigin}/en`,
-        "x-default": `${siteOrigin}/de`,
-      },
-    },
     openGraph: {
-      url: canonicalPath,
+      url: openGraphUrl,
       locale: normalizedLocale === "de" ? "de_DE" : "en_US",
       alternateLocale: normalizedLocale === "de" ? "en_US" : "de_DE",
     },
