@@ -5,11 +5,43 @@ import Image from "next/image";
 import Reveal from "@/components/ui/Reveal";
 
 const spaces = [
-  { key: "foyer", image: "https://images.unsplash.com/photo-1615874959474-d609969a20ed?w=800&q=80", colSpan: "col-span-12 lg:col-span-7", aspect: "aspect-[16/10]" },
-  { key: "lobby", image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&q=80", colSpan: "col-span-12 lg:col-span-5", aspect: "aspect-[4/3]" },
-  { key: "schachtstube", image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500&q=80", colSpan: "col-span-6 lg:col-span-4", aspect: "aspect-square" },
+  {
+    key: "foyer",
+    image: "/Foyer_1920w.webp",
+    srcSet: "/Foyer_800w%20.webp 800w, /Foyer_1200w%20.webp 1200w, /Foyer_1600w%20.webp 1600w, /Foyer_1920w.webp 1920w",
+    responsiveSizes: "(max-width: 768px) 100vw, (max-width: 1280px) 58vw, 50vw",
+    imagePosition: "object-[center_46%] sm:object-center",
+    colSpan: "col-span-12 lg:col-span-7",
+    aspect: "aspect-[16/10]",
+  },
+  {
+    key: "lobby",
+    image: "/library_room_1920w.webp",
+    srcSet: "/library_room_800w.webp 800w, /library_room_1200w.webp 1200w, /library_room_1600w.webp 1600w, /library_room_1920w.webp 1920w",
+    responsiveSizes: "(max-width: 768px) 100vw, (max-width: 1280px) 42vw, 50vw",
+    imagePosition: "object-[center_50%] sm:object-center",
+    colSpan: "col-span-12 lg:col-span-5",
+    aspect: "aspect-[4/3] lg:aspect-auto lg:h-full",
+  },
+  {
+    key: "schachtstube",
+    image: "/Schachtstube_mural_1920w.webp",
+    srcSet: "/Schachtstube_mural_800w.webp 800w, /Schachtstube_mural_1200w.webp 1200w, /Schachtstube_mural_1600w.webp 1600w, /Schachtstube_mural_1920w.webp 1920w",
+    responsiveSizes: "(max-width: 768px) 50vw, (max-width: 1280px) 34vw, 33vw",
+    imagePosition: "object-center",
+    colSpan: "col-span-6 lg:col-span-4",
+    aspect: "aspect-square",
+  },
   { key: "sommergarten", image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500&q=80", colSpan: "col-span-6 lg:col-span-4", aspect: "aspect-square" },
-  { key: "bergmannszimmer", image: "https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=500&q=80", colSpan: "col-span-12 lg:col-span-4", aspect: "aspect-square lg:aspect-square" },
+  {
+    key: "bergmannszimmer",
+    image: "/restaurant_private_room_1920w.webp",
+    srcSet: "/restaurant_private_room_800w.webp 800w, /restaurant_private_room_1200w.webp 1200w, /restaurant_private_room_1600w.webp 1600w, /restaurant_private_room_1920w.webp 1920w",
+    responsiveSizes: "(max-width: 768px) 100vw, (max-width: 1280px) 34vw, 33vw",
+    imagePosition: "object-[center_52%] sm:object-center",
+    colSpan: "col-span-12 lg:col-span-4",
+    aspect: "aspect-square lg:aspect-square",
+  },
 ] as const;
 
 export default function SpacesSection() {
@@ -35,13 +67,24 @@ export default function SpacesSection() {
               <div className={`spaces-card group relative cursor-pointer ${space.aspect}`}>
                 <div className="spaces-card-surface">
                   <div className="spaces-card-glow" />
-                  <Image
-                    src={space.image}
-                    alt={t(`${space.key}.name`)}
-                    fill
-                    className="object-cover brightness-[0.82] group-hover:brightness-[0.68] group-hover:scale-[1.06] transition-all duration-700"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
+                  {"srcSet" in space ? (
+                    <img
+                      src={space.image}
+                      srcSet={space.srcSet}
+                      sizes={space.responsiveSizes}
+                      alt={t(`${space.key}.name`)}
+                      loading="lazy"
+                      className={`h-full w-full object-cover ${space.imagePosition} brightness-[0.82] transition-all duration-700 group-hover:brightness-[0.68] group-hover:scale-[1.06]`}
+                    />
+                  ) : (
+                    <Image
+                      src={space.image}
+                      alt={t(`${space.key}.name`)}
+                      fill
+                      className="object-cover brightness-[0.82] group-hover:brightness-[0.68] group-hover:scale-[1.06] transition-all duration-700"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                  )}
                   <div className="spaces-card-overlay flex items-end p-5 sm:p-7">
                     <div>
                       <span className="mb-2 block font-[var(--font-body)] text-[0.68rem] font-light tracking-[0.16em] uppercase text-white/76">

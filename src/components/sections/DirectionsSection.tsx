@@ -7,11 +7,17 @@ import Reveal from "@/components/ui/Reveal";
 const cards = [
   {
     key: "hotel",
-    image: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=600&q=80",
+    image: "/hotel_room_1920w.webp",
+    srcSet: "/hotel_room_800w.webp 800w, /hotel_room_1200w.webp 1200w, /hotel_room_1600w.webp 1600w, /hotel_room_1920w.webp 1920w",
+    responsiveSizes: "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw",
+    imagePosition: "object-[center_52%] sm:object-center",
   },
   {
     key: "restaurant",
-    image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80",
+    image: "/restaurant_room_1920w.webp",
+    srcSet: "/restaurant_room_800w.webp 800w, /restaurant_room_1200w.webp 1200w, /restaurant_room_1600w.webp 1600w, /restaurant_room_1920w.webp 1920w",
+    responsiveSizes: "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw",
+    imagePosition: "object-[center_52%] sm:object-center",
   },
   {
     key: "weddings",
@@ -47,13 +53,24 @@ export default function DirectionsSection() {
               <div className="directions-card group relative aspect-[3/4] cursor-pointer">
                 <div className="directions-card-surface">
                   <div className="directions-card-glow" />
-                  <Image
-                    src={card.image}
-                    alt={t(`${card.key}.title`)}
-                    fill
-                    className="object-cover brightness-[0.72] group-hover:brightness-[0.58] group-hover:scale-[1.08] transition-all duration-700"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  />
+                  {"srcSet" in card ? (
+                    <img
+                      src={card.image}
+                      srcSet={card.srcSet}
+                      sizes={card.responsiveSizes}
+                      alt={t(`${card.key}.title`)}
+                      loading="lazy"
+                      className={`h-full w-full object-cover ${card.imagePosition} brightness-[0.72] transition-all duration-700 group-hover:brightness-[0.58] group-hover:scale-[1.08]`}
+                    />
+                  ) : (
+                    <Image
+                      src={card.image}
+                      alt={t(`${card.key}.title`)}
+                      fill
+                      className="object-cover brightness-[0.72] group-hover:brightness-[0.58] group-hover:scale-[1.08] transition-all duration-700"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    />
+                  )}
                   <div className="directions-card-overlay" />
 
                   <div className="absolute bottom-0 left-0 right-0 z-10 p-6 sm:p-8 lg:p-9 group-hover:-translate-y-2 transition-transform duration-500">
