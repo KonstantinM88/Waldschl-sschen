@@ -68,9 +68,9 @@ export default function CulinarySection() {
           <p className="body-text max-w-[620px] mt-4">{t("text2")}</p>
 
           <div className="culinary-hours-card mt-8 p-5 sm:p-8">
-            <h4 className="mb-4 font-[var(--font-display)] text-[1.26rem] font-medium text-charcoal">
+            <h3 className="mb-4 font-[var(--font-display)] text-[1.26rem] font-medium text-charcoal">
               {t("hours")}
-            </h4>
+            </h3>
             {hours.map((row, i) => (
               <div
                 key={i}

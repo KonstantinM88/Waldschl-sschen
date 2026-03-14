@@ -104,46 +104,69 @@ export default function ContactSection() {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col">
-                <label className="text-[0.7rem] font-medium tracking-[0.12em] uppercase text-white/50 mb-3">
+                <label
+                  htmlFor="contact-name"
+                  className="text-[0.7rem] font-medium tracking-[0.12em] uppercase text-white/50 mb-3"
+                >
                   {t("formName")}
                 </label>
                 <input
+                  id="contact-name"
+                  name="name"
                   type="text"
                   value={formState.name}
                   onChange={(e) => setFormState({ ...formState, name: e.target.value })}
                   className={inputClass}
                   placeholder="Max Mustermann"
+                  autoComplete="name"
                 />
               </div>
               <div className="flex flex-col">
-                <label className="text-[0.7rem] font-medium tracking-[0.12em] uppercase text-white/50 mb-3">
+                <label
+                  htmlFor="contact-email"
+                  className="text-[0.7rem] font-medium tracking-[0.12em] uppercase text-white/50 mb-3"
+                >
                   {t("formEmail")}
                 </label>
                 <input
+                  id="contact-email"
+                  name="email"
                   type="email"
                   value={formState.email}
                   onChange={(e) => setFormState({ ...formState, email: e.target.value })}
                   className={inputClass}
                   placeholder="ihre@email.de"
+                  autoComplete="email"
                 />
               </div>
               <div className="flex flex-col">
-                <label className="text-[0.7rem] font-medium tracking-[0.12em] uppercase text-white/50 mb-3">
+                <label
+                  htmlFor="contact-phone"
+                  className="text-[0.7rem] font-medium tracking-[0.12em] uppercase text-white/50 mb-3"
+                >
                   {t("formPhone")}
                 </label>
                 <input
+                  id="contact-phone"
+                  name="phone"
                   type="tel"
                   value={formState.phone}
                   onChange={(e) => setFormState({ ...formState, phone: e.target.value })}
                   className={inputClass}
                   placeholder="+49 ..."
+                  autoComplete="tel"
                 />
               </div>
               <div className="flex flex-col">
-                <label className="text-[0.7rem] font-medium tracking-[0.12em] uppercase text-white/50 mb-3">
+                <label
+                  htmlFor="contact-subject"
+                  className="text-[0.7rem] font-medium tracking-[0.12em] uppercase text-white/50 mb-3"
+                >
                   {t("formSubject")}
                 </label>
                 <select
+                  id="contact-subject"
+                  name="subject"
                   value={formState.subject}
                   onChange={(e) => setFormState({ ...formState, subject: e.target.value })}
                   className={`${inputClass} [&>option]:text-charcoal`}
@@ -154,14 +177,20 @@ export default function ContactSection() {
                 </select>
               </div>
               <div className="flex flex-col md:col-span-2">
-                <label className="text-[0.7rem] font-medium tracking-[0.12em] uppercase text-white/50 mb-3">
+                <label
+                  htmlFor="contact-message"
+                  className="text-[0.7rem] font-medium tracking-[0.12em] uppercase text-white/50 mb-3"
+                >
                   {t("formMessage")}
                 </label>
                 <textarea
+                  id="contact-message"
+                  name="message"
                   value={formState.message}
                   onChange={(e) => setFormState({ ...formState, message: e.target.value })}
                   className={`${inputClass} min-h-[120px] resize-y`}
                   placeholder="..."
+                  autoComplete="off"
                 />
               </div>
               <div className="md:col-span-2">
