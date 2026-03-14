@@ -41,30 +41,35 @@ export default function DirectionsSection() {
           </div>
         </Reveal>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0.5">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-4">
           {cards.map((card, i) => (
             <Reveal key={card.key} delay={i * 0.1}>
-              <div className="group relative aspect-[3/4] overflow-hidden cursor-pointer">
-                <Image
-                  src={card.image}
-                  alt={t(`${card.key}.title`)}
-                  fill
-                  className="object-cover brightness-[0.7] group-hover:brightness-50 group-hover:scale-[1.08] transition-all duration-700"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                />
-                <div className="absolute bottom-0 left-0 right-0 p-10 z-10 group-hover:-translate-y-2.5 transition-transform duration-500">
-                  <span className="text-[0.65rem] font-medium tracking-[0.25em] uppercase text-gold-light mb-3 block">
-                    {t(`${card.key}.label`)}
-                  </span>
-                  <h3 className="font-[var(--font-display)] text-[1.8rem] font-normal leading-tight mb-3">
-                    {t(`${card.key}.title`)}
-                  </h3>
-                  <p className="text-sm font-light leading-relaxed opacity-0 translate-y-2.5 group-hover:opacity-80 group-hover:translate-y-0 transition-all duration-500 delay-100">
-                    {t(`${card.key}.desc`)}
-                  </p>
-                  <span className="inline-flex items-center gap-2 text-[0.7rem] tracking-[0.15em] uppercase text-gold-light mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-200">
-                    {t("discover")} →
-                  </span>
+              <div className="directions-card group relative aspect-[3/4] cursor-pointer">
+                <div className="directions-card-surface">
+                  <div className="directions-card-glow" />
+                  <Image
+                    src={card.image}
+                    alt={t(`${card.key}.title`)}
+                    fill
+                    className="object-cover brightness-[0.72] group-hover:brightness-[0.58] group-hover:scale-[1.08] transition-all duration-700"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  />
+                  <div className="directions-card-overlay" />
+
+                  <div className="absolute bottom-0 left-0 right-0 z-10 p-6 sm:p-8 lg:p-9 group-hover:-translate-y-2 transition-transform duration-500">
+                    <span className="mb-3 block text-[0.64rem] font-medium tracking-[0.24em] uppercase text-gold-light">
+                      {t(`${card.key}.label`)}
+                    </span>
+                    <h3 className="mb-3 font-[var(--font-display)] text-[1.95rem] font-normal leading-tight sm:text-[2rem]">
+                      {t(`${card.key}.title`)}
+                    </h3>
+                    <p className="text-sm font-light leading-relaxed opacity-0 translate-y-2.5 group-hover:opacity-80 group-hover:translate-y-0 transition-all duration-500 delay-100">
+                      {t(`${card.key}.desc`)}
+                    </p>
+                    <span className="inline-flex items-center gap-2 mt-4 text-[0.7rem] tracking-[0.15em] uppercase text-gold-light opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-200">
+                      {t("discover")} →
+                    </span>
+                  </div>
                 </div>
               </div>
             </Reveal>

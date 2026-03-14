@@ -603,6 +603,468 @@
     letter-spacing: 0.15em;
   }
 
+  .directions-card {
+    position: relative;
+    border-radius: 1.18rem;
+    padding: 1px;
+    background: linear-gradient(
+      150deg,
+      rgba(255, 255, 255, 0.38) 0%,
+      rgba(212, 188, 142, 0.46) 45%,
+      rgba(255, 255, 255, 0.2) 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.24),
+      0 20px 44px rgba(0, 0, 0, 0.34);
+    transition:
+      transform 0.55s var(--ease-out-expo),
+      box-shadow 0.55s var(--ease-out-expo);
+  }
+
+  .directions-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      0 26px 52px rgba(0, 0, 0, 0.42);
+  }
+
+  .directions-card-surface {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    border-radius: calc(1.18rem - 1px);
+    overflow: hidden;
+    background: #0f1318;
+    isolation: isolate;
+  }
+
+  .directions-card-surface::before,
+  .directions-card-surface::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .directions-card-surface::before {
+    inset: 0.52rem;
+    border-radius: 0.78rem;
+    border: 1px solid rgba(255, 255, 255, 0.34);
+  }
+
+  .directions-card-surface::after {
+    inset: 0.88rem;
+    border-radius: 0.56rem;
+    border: 1px solid rgba(212, 188, 142, 0.34);
+  }
+
+  .directions-card-glow {
+    position: absolute;
+    inset: -24%;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        52% 52% at 16% 16%,
+        rgba(212, 188, 142, 0.28) 0%,
+        rgba(212, 188, 142, 0) 78%
+      ),
+      radial-gradient(
+        42% 42% at 88% 86%,
+        rgba(255, 255, 255, 0.14) 0%,
+        rgba(255, 255, 255, 0) 72%
+      );
+    opacity: 0.45;
+    transition: opacity 0.5s var(--ease-out-expo);
+  }
+
+  .directions-card:hover .directions-card-glow {
+    opacity: 0.86;
+  }
+
+  .directions-card-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(6, 10, 14, 0.08) 0%,
+        rgba(6, 10, 14, 0.18) 36%,
+        rgba(6, 10, 14, 0.76) 100%
+      ),
+      linear-gradient(
+        130deg,
+        rgba(255, 255, 255, 0.14) 0%,
+        rgba(255, 255, 255, 0) 30%
+      );
+  }
+
+  .spaces-card {
+    position: relative;
+    border-radius: 1.06rem;
+    padding: 1px;
+    background: linear-gradient(
+      150deg,
+      rgba(255, 255, 255, 0.42) 0%,
+      rgba(212, 188, 142, 0.42) 52%,
+      rgba(255, 255, 255, 0.2) 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.24),
+      0 18px 40px rgba(10, 16, 24, 0.18);
+    transition:
+      transform 0.5s var(--ease-out-expo),
+      box-shadow 0.5s var(--ease-out-expo);
+  }
+
+  .spaces-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      0 24px 48px rgba(10, 16, 24, 0.24);
+  }
+
+  .spaces-card-surface {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    border-radius: calc(1.06rem - 1px);
+    overflow: hidden;
+    background: #1a1f27;
+    isolation: isolate;
+  }
+
+  .spaces-card-surface::before,
+  .spaces-card-surface::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .spaces-card-surface::before {
+    inset: 0.42rem;
+    border-radius: 0.66rem;
+    border: 1px solid rgba(255, 255, 255, 0.36);
+  }
+
+  .spaces-card-surface::after {
+    inset: 0.72rem;
+    border-radius: 0.48rem;
+    border: 1px solid rgba(212, 188, 142, 0.32);
+  }
+
+  .spaces-card-glow {
+    position: absolute;
+    inset: -28%;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        46% 46% at 16% 14%,
+        rgba(212, 188, 142, 0.26) 0%,
+        rgba(212, 188, 142, 0) 78%
+      ),
+      radial-gradient(
+        38% 38% at 86% 84%,
+        rgba(255, 255, 255, 0.12) 0%,
+        rgba(255, 255, 255, 0) 72%
+      );
+    opacity: 0.44;
+    transition: opacity 0.42s var(--ease-out-expo);
+  }
+
+  .spaces-card:hover .spaces-card-glow {
+    opacity: 0.82;
+  }
+
+  .spaces-card-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(10, 12, 16, 0.08) 0%,
+        rgba(10, 12, 16, 0.22) 40%,
+        rgba(10, 12, 16, 0.72) 100%
+      ),
+      linear-gradient(
+        130deg,
+        rgba(255, 255, 255, 0.12) 0%,
+        rgba(255, 255, 255, 0) 36%
+      );
+  }
+
+  .culinary-mosaic {
+    position: relative;
+  }
+
+  .culinary-mosaic::before {
+    content: "";
+    position: absolute;
+    inset: -0.8rem;
+    pointer-events: none;
+    border-radius: 1.6rem;
+    background: radial-gradient(
+      68% 58% at 28% 20%,
+      rgba(212, 188, 142, 0.22) 0%,
+      rgba(212, 188, 142, 0) 86%
+    );
+    filter: blur(12px);
+    z-index: 0;
+  }
+
+  .culinary-card {
+    position: relative;
+    z-index: 1;
+    border-radius: 1.02rem;
+    padding: 1px;
+    background: linear-gradient(
+      150deg,
+      rgba(255, 255, 255, 0.46) 0%,
+      rgba(212, 188, 142, 0.42) 52%,
+      rgba(255, 255, 255, 0.22) 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.24),
+      0 18px 34px rgba(14, 22, 32, 0.2);
+    transition:
+      transform 0.5s var(--ease-out-expo),
+      box-shadow 0.5s var(--ease-out-expo);
+  }
+
+  .culinary-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      0 24px 42px rgba(14, 22, 32, 0.26);
+  }
+
+  .culinary-card-surface {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    border-radius: calc(1.02rem - 1px);
+    overflow: hidden;
+    background: #151a21;
+    isolation: isolate;
+  }
+
+  .culinary-card-surface::before,
+  .culinary-card-surface::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .culinary-card-surface::before {
+    inset: 0.38rem;
+    border-radius: 0.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.34);
+  }
+
+  .culinary-card-surface::after {
+    inset: 0.62rem;
+    border-radius: 0.46rem;
+    border: 1px solid rgba(212, 188, 142, 0.3);
+  }
+
+  .culinary-card-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(10, 12, 16, 0.1) 0%,
+        rgba(10, 12, 16, 0.26) 46%,
+        rgba(10, 12, 16, 0.58) 100%
+      ),
+      linear-gradient(
+        130deg,
+        rgba(255, 255, 255, 0.16) 0%,
+        rgba(255, 255, 255, 0) 34%
+      );
+    opacity: 0.92;
+    transition: opacity 0.4s var(--ease-out-expo);
+  }
+
+  .culinary-card:hover .culinary-card-overlay {
+    opacity: 0.78;
+  }
+
+  .culinary-hours-card {
+    position: relative;
+    border-radius: 1.06rem;
+    border: 1px solid rgba(255, 255, 255, 0.56);
+    background:
+      linear-gradient(
+        150deg,
+        rgba(255, 255, 255, 0.74) 0%,
+        rgba(242, 237, 230, 0.8) 100%
+      );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.55),
+      0 16px 34px rgba(24, 20, 14, 0.12);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .culinary-hours-card::before {
+    content: "";
+    position: absolute;
+    inset: 0.55rem;
+    border-radius: 0.66rem;
+    border: 1px solid rgba(212, 188, 142, 0.36);
+    pointer-events: none;
+  }
+
+  .culinary-hours-row {
+    border-bottom: 1px solid rgba(184, 175, 166, 0.46);
+  }
+
+  .culinary-hours-row:last-child {
+    border-bottom: 0;
+  }
+
+  @media (max-width: 1024px) {
+    .directions-card {
+      border-radius: 1.06rem;
+    }
+
+    .directions-card-surface {
+      border-radius: calc(1.06rem - 1px);
+    }
+
+    .directions-card-surface::before {
+      inset: 0.46rem;
+      border-radius: 0.68rem;
+    }
+
+    .directions-card-surface::after {
+      inset: 0.78rem;
+      border-radius: 0.5rem;
+    }
+
+    .spaces-card {
+      border-radius: 0.98rem;
+    }
+
+    .spaces-card-surface {
+      border-radius: calc(0.98rem - 1px);
+    }
+
+    .spaces-card-surface::before {
+      inset: 0.38rem;
+      border-radius: 0.58rem;
+    }
+
+    .spaces-card-surface::after {
+      inset: 0.62rem;
+      border-radius: 0.42rem;
+    }
+
+    .culinary-card {
+      border-radius: 0.95rem;
+    }
+
+    .culinary-card-surface {
+      border-radius: calc(0.95rem - 1px);
+    }
+
+    .culinary-card-surface::before {
+      inset: 0.34rem;
+      border-radius: 0.54rem;
+    }
+
+    .culinary-card-surface::after {
+      inset: 0.56rem;
+      border-radius: 0.4rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .directions-card {
+      border-radius: 0.96rem;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.22),
+        0 16px 34px rgba(0, 0, 0, 0.3);
+    }
+
+    .directions-card-surface {
+      border-radius: calc(0.96rem - 1px);
+    }
+
+    .directions-card-surface::before {
+      inset: 0.38rem;
+      border-radius: 0.56rem;
+    }
+
+    .directions-card-surface::after {
+      inset: 0.66rem;
+      border-radius: 0.42rem;
+      border-color: rgba(212, 188, 142, 0.3);
+    }
+
+    .spaces-card {
+      border-radius: 0.86rem;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 14px 30px rgba(10, 16, 24, 0.16);
+    }
+
+    .spaces-card-surface {
+      border-radius: calc(0.86rem - 1px);
+    }
+
+    .spaces-card-surface::before {
+      inset: 0.3rem;
+      border-radius: 0.48rem;
+    }
+
+    .spaces-card-surface::after {
+      inset: 0.52rem;
+      border-radius: 0.34rem;
+      border-color: rgba(212, 188, 142, 0.28);
+    }
+
+    .culinary-card {
+      border-radius: 0.84rem;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 14px 26px rgba(14, 22, 32, 0.16);
+    }
+
+    .culinary-card-surface {
+      border-radius: calc(0.84rem - 1px);
+    }
+
+    .culinary-card-surface::before {
+      inset: 0.28rem;
+      border-radius: 0.46rem;
+    }
+
+    .culinary-card-surface::after {
+      inset: 0.48rem;
+      border-radius: 0.34rem;
+    }
+
+    .culinary-hours-card {
+      border-radius: 0.92rem;
+    }
+
+    .culinary-hours-card::before {
+      inset: 0.44rem;
+      border-radius: 0.56rem;
+    }
+  }
+
   @media (max-width: 380px) {
     .mobile-menu-link {
       font-size: 1.72rem;

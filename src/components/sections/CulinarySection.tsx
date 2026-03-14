@@ -18,33 +18,42 @@ export default function CulinarySection() {
     <section className="py-[clamp(5rem,10vw,9rem)] px-[clamp(1.5rem,5vw,6rem)]" id="restaurant">
       <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-[clamp(3rem,6vw,8rem)] items-center">
         <Reveal>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2 aspect-[16/10] relative overflow-hidden">
-              <Image
-                src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80"
-                alt="Regionale Spezialitäten"
-                fill
-                className="object-cover hover:scale-105 transition-transform duration-700"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
+          <div className="culinary-mosaic grid grid-cols-2 gap-3 sm:gap-4">
+            <div className="culinary-card group col-span-2 aspect-[16/10]">
+              <div className="culinary-card-surface">
+                <Image
+                  src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80"
+                  alt="Regionale Spezialitäten"
+                  fill
+                  className="object-cover brightness-[0.9] transition-transform duration-700 group-hover:scale-[1.05]"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+                <div className="culinary-card-overlay" />
+              </div>
             </div>
-            <div className="aspect-square relative overflow-hidden">
-              <Image
-                src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&q=80"
-                alt="Dessert"
-                fill
-                className="object-cover hover:scale-105 transition-transform duration-700"
-                sizes="25vw"
-              />
+            <div className="culinary-card group aspect-square">
+              <div className="culinary-card-surface">
+                <Image
+                  src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&q=80"
+                  alt="Dessert"
+                  fill
+                  className="object-cover brightness-[0.94] transition-transform duration-700 group-hover:scale-[1.05]"
+                  sizes="25vw"
+                />
+                <div className="culinary-card-overlay" />
+              </div>
             </div>
-            <div className="aspect-square relative overflow-hidden">
-              <Image
-                src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&q=80"
-                alt="Wein aus Saale-Unstrut"
-                fill
-                className="object-cover hover:scale-105 transition-transform duration-700"
-                sizes="25vw"
-              />
+            <div className="culinary-card group aspect-square">
+              <div className="culinary-card-surface">
+                <Image
+                  src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&q=80"
+                  alt="Wein aus Saale-Unstrut"
+                  fill
+                  className="object-cover brightness-[0.94] transition-transform duration-700 group-hover:scale-[1.05]"
+                  sizes="25vw"
+                />
+                <div className="culinary-card-overlay" />
+              </div>
             </div>
           </div>
         </Reveal>
@@ -58,15 +67,17 @@ export default function CulinarySection() {
           <p className="body-text max-w-[620px]">{t("text1")}</p>
           <p className="body-text max-w-[620px] mt-4">{t("text2")}</p>
 
-          <div className="mt-8 p-8 bg-sand-light">
-            <h4 className="font-[var(--font-display)] text-lg font-medium mb-4">{t("hours")}</h4>
+          <div className="culinary-hours-card mt-8 p-5 sm:p-8">
+            <h4 className="mb-4 font-[var(--font-display)] text-[1.26rem] font-medium text-charcoal">
+              {t("hours")}
+            </h4>
             {hours.map((row, i) => (
               <div
                 key={i}
-                className="flex justify-between py-2 border-b border-sand last:border-b-0 text-sm font-light"
+                className="culinary-hours-row flex justify-between py-2.5 text-sm font-light"
               >
-                <span>{row.label}</span>
-                <span>{row.time}</span>
+                <span className="text-charcoal/78">{row.label}</span>
+                <span className="font-medium text-charcoal/86">{row.time}</span>
               </div>
             ))}
           </div>

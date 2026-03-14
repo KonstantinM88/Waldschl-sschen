@@ -24,29 +24,33 @@ export default function SpacesSection() {
             <h2 className="heading-display text-[clamp(2.2rem,4.5vw,3.8rem)] text-charcoal mt-5 mb-6">
               {t("title")} <em>{t("titleEmphasis")}</em>
             </h2>
+            <div className="gold-divider mx-auto mb-7" />
             <p className="body-text mx-auto max-w-[620px]">{t("text")}</p>
           </div>
         </Reveal>
 
-        <div className="grid grid-cols-12 gap-4">
+        <div className="grid grid-cols-12 gap-3 sm:gap-4">
           {spaces.map((space, i) => (
             <Reveal key={space.key} delay={i * 0.1} className={space.colSpan}>
-              <div className={`group relative overflow-hidden cursor-pointer ${space.aspect}`}>
-                <Image
-                  src={space.image}
-                  alt={t(`${space.key}.name`)}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-transparent to-transparent group-hover:from-charcoal/80 transition-all duration-500 flex items-end p-8">
-                  <div>
-                    <span className="block font-[var(--font-body)] text-[0.7rem] font-light tracking-[0.15em] uppercase text-white/70 mb-2">
-                      {t(`${space.key}.label`)}
-                    </span>
-                    <span className="font-[var(--font-display)] text-2xl font-normal text-white">
-                      {t(`${space.key}.name`)}
-                    </span>
+              <div className={`spaces-card group relative cursor-pointer ${space.aspect}`}>
+                <div className="spaces-card-surface">
+                  <div className="spaces-card-glow" />
+                  <Image
+                    src={space.image}
+                    alt={t(`${space.key}.name`)}
+                    fill
+                    className="object-cover brightness-[0.82] group-hover:brightness-[0.68] group-hover:scale-[1.06] transition-all duration-700"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  <div className="spaces-card-overlay flex items-end p-5 sm:p-7">
+                    <div>
+                      <span className="mb-2 block font-[var(--font-body)] text-[0.68rem] font-light tracking-[0.16em] uppercase text-white/76">
+                        {t(`${space.key}.label`)}
+                      </span>
+                      <span className="font-[var(--font-display)] text-[1.7rem] font-normal leading-tight text-white sm:text-[1.88rem]">
+                        {t(`${space.key}.name`)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
