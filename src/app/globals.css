@@ -18,9 +18,9 @@
   --color-text-secondary: #6B6560;
   --color-text-muted: #9A9490;
 
-  --font-display: "Cormorant Garamond", Georgia, serif;
-  --font-body: "Outfit", system-ui, sans-serif;
-  --font-script: "Alex Brush", cursive;
+  --font-display: var(--font-display-next), Georgia, serif;
+  --font-body: var(--font-body-next), system-ui, sans-serif;
+  --font-script: var(--font-script-next), cursive;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-custom: cubic-bezier(0.65, 0, 0.35, 1);

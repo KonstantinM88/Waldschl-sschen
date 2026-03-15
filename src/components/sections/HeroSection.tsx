@@ -40,8 +40,8 @@ export default function HeroSection() {
   const staticFrameDuration = 0.01;
 
   const reveal = {
-    initial: { opacity: 0, y: 60, filter: "blur(4px)" },
-    animate: { opacity: 1, y: 0, filter: "blur(0px)" },
+    initial: { opacity: 0, y: 40 },
+    animate: { opacity: 1, y: 0 },
   };
 
   const renderScrollIndicator = (className: string) => (
@@ -102,8 +102,8 @@ export default function HeroSection() {
               muted
               loop
               playsInline
-              preload="auto"
-              poster="/restaurant_terrace_1200w.webp"
+              preload="metadata"
+              poster="/restaurant_terrace_800w.webp"
               aria-hidden="true"
             >
               <source src={mobileVideoSrc} type="video/webm" />
@@ -142,15 +142,13 @@ export default function HeroSection() {
           <span className="opacity-50">—</span>
         </motion.div>
 
-        <motion.h1
+        <h1
           className="mb-5 font-[var(--font-display)] text-[clamp(3rem,10vw,6rem)] font-light leading-[0.98] tracking-[-0.02em] text-balance sm:mb-6 sm:leading-[1.02]"
-          {...reveal}
-          transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
           {t("title")}
           <br />
           <em className="italic font-normal text-gold-light">{t("titleEmphasis")}</em>
-        </motion.h1>
+        </h1>
 
         <motion.p
           className="mx-auto mb-10 max-w-[640px] font-[var(--font-body)] text-[clamp(1rem,2.4vw,1.18rem)] font-light leading-[1.7] text-white/85 sm:mb-12"

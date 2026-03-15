@@ -1,16 +1,40 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import Reveal from "@/components/ui/Reveal";
 
 export default function WelcomeSection() {
   const t = useTranslations("welcome");
+  const mediaRef = useRef<HTMLDivElement>(null);
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const posterSrcSet = [
     "/landscape_restaurant_800w.webp 800w",
     "/landscape_restaurant_1200w.webp 1200w",
     "/landscape_restaurant_1600w.webp 1600w",
     "/landscape_restaurant_1920w.webp 1920w",
   ].join(", ");
+
+  useEffect(() => {
+    const mediaNode = mediaRef.current;
+    if (!mediaNode) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const isVisible = entries.some((entry) => entry.isIntersecting);
+        if (isVisible) {
+          setShouldLoadVideo(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "240px 0px" }
+    );
+
+    observer.observe(mediaNode);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section className="py-[clamp(5rem,10vw,9rem)] px-[clamp(1.5rem,5vw,6rem)]" id="about">
@@ -23,27 +47,42 @@ export default function WelcomeSection() {
               <div className="pointer-events-none absolute inset-[6px] rounded-[1.38rem] border border-white/65" />
               <div className="pointer-events-none absolute inset-[12px] rounded-[1.12rem] border border-gold/35" />
 
-              <div className="relative aspect-video overflow-hidden rounded-[1.08rem] bg-[radial-gradient(76%_86%_at_50%_50%,rgba(30,34,40,0.72)_0%,rgba(15,17,21,0.96)_100%)]">
-                <video
-                  className="h-full w-full object-cover object-center"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="metadata"
-                  poster="/landscape_restaurant_1200w.webp"
-                  aria-label="Waldschlösschen — Landschaftsvideo"
-                >
-                  <source src="/landscape_video_webm.webm" type="video/webm" />
+              <div
+                ref={mediaRef}
+                className="relative aspect-video overflow-hidden rounded-[1.08rem] bg-[radial-gradient(76%_86%_at_50%_50%,rgba(30,34,40,0.72)_0%,rgba(15,17,21,0.96)_100%)]"
+              >
+                {shouldLoadVideo ? (
+                  <video
+                    className="h-full w-full object-cover object-center"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="none"
+                    poster="/landscape_restaurant_800w.webp"
+                    aria-label="Waldschlösschen — Landschaftsvideo"
+                  >
+                    <source src="/landscape_video_webm.webm" type="video/webm" />
+                    <img
+                      src="/landscape_restaurant_1920w.webp"
+                      srcSet={posterSrcSet}
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      alt="Waldschlösschen — Restaurant-Landschaft"
+                      loading="lazy"
+                      className="h-full w-full object-cover object-center"
+                    />
+                  </video>
+                ) : (
                   <img
-                    src="/landscape_restaurant_1920w.webp"
+                    src="/landscape_restaurant_1200w.webp"
                     srcSet={posterSrcSet}
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     alt="Waldschlösschen — Restaurant-Landschaft"
                     loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover object-center"
                   />
-                </video>
+                )}
                 <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(170deg,rgba(255,255,255,0.2)_0%,rgba(255,255,255,0)_34%,rgba(8,8,10,0.16)_100%)]" />
               </div>
             </div>
