@@ -33,9 +33,9 @@ export default function HeroSection() {
 
   const lockMobileFrame = isMobile || shouldReduceMotion;
   const useMobileVideo = isMobile && !shouldReduceMotion;
-  const cinematicScale = isMobile ? [1, 1] : [1.3, 1];
-  const cinematicX = isMobile ? [0, 0] : [0, -20];
-  const cinematicY = isMobile ? [0, 0] : [0, 14];
+  const cinematicScale = isMobile ? [1, 1] : [1.18, 1.08];
+  const cinematicX = isMobile ? [0, 0] : [0, -8];
+  const cinematicY = isMobile ? [0, 0] : [0, 6];
   const cinematicDuration = 22;
   const staticFrameDuration = 0.01;
 

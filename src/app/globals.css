@@ -1462,12 +1462,12 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
-    transform: scale(1.03);
+    transform: scale(1);
     transition: transform 1.2s var(--ease-out-expo);
   }
 
   .voucher-media-card:hover .voucher-media-video {
-    transform: scale(1.08);
+    transform: scale(1.015);
   }
 
   .voucher-media-overlay {
@@ -1570,12 +1570,12 @@
     }
 
     .voucher-media-video {
-      object-position: 50% 42%;
-      transform: scale(0.99);
+      object-position: 50% 50%;
+      transform: scale(1);
     }
 
     .voucher-media-card:hover .voucher-media-video {
-      transform: scale(1.01);
+      transform: scale(1.008);
     }
 
     .voucher-media-frame {
