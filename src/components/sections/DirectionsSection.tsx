@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import Image from "next/image";
 import Reveal from "@/components/ui/Reveal";
 
 const cards = [
@@ -53,24 +52,20 @@ export default function DirectionsSection() {
               <div className="directions-card group relative aspect-[3/4] cursor-pointer">
                 <div className="directions-card-surface">
                   <div className="directions-card-glow" />
-                  {"srcSet" in card ? (
-                    <img
-                      src={card.image}
-                      srcSet={card.srcSet}
-                      sizes={card.responsiveSizes}
-                      alt={t(`${card.key}.title`)}
-                      loading="lazy"
-                      className={`h-full w-full object-cover ${card.imagePosition} brightness-[0.72] transition-all duration-700 group-hover:brightness-[0.58] group-hover:scale-[1.08]`}
-                    />
-                  ) : (
-                    <Image
-                      src={card.image}
-                      alt={t(`${card.key}.title`)}
-                      fill
-                      className="object-cover brightness-[0.72] group-hover:brightness-[0.58] group-hover:scale-[1.08] transition-all duration-700"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    />
-                  )}
+                  <img
+                    src={card.image}
+                    srcSet={"srcSet" in card ? card.srcSet : undefined}
+                    sizes={
+                      "srcSet" in card
+                        ? card.responsiveSizes
+                        : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    }
+                    alt={t(`${card.key}.title`)}
+                    loading="lazy"
+                    className={`h-full w-full object-cover ${
+                      "imagePosition" in card ? card.imagePosition : "object-center"
+                    } brightness-[0.72] transition-all duration-700 group-hover:brightness-[0.58] group-hover:scale-[1.08]`}
+                  />
                   <div className="directions-card-overlay" />
 
                   <div className="absolute bottom-0 left-0 right-0 z-10 p-6 sm:p-8 lg:p-9 group-hover:-translate-y-2 transition-transform duration-500">
