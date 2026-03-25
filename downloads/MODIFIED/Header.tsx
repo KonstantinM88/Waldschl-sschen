@@ -150,7 +150,7 @@ export default function Header() {
 
   const navLinks = [
     { href: "/hotel", label: t("hotel"), isPage: true },
-    { href: "/restaurant", label: t("restaurant"), isPage: true },
+    { href: "#restaurant", label: t("restaurant"), isPage: false },
     { href: "#events", label: t("events"), isPage: false },
     { href: "#ausflugsziele", label: t("destinations"), isPage: false },
     { href: "#kontakt", label: t("contact"), isPage: false },

@@ -20,7 +20,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const pages = [
     { path: "", priority: 1, changeFrequency: "weekly" as const },
     { path: "/hotel", priority: 0.9, changeFrequency: "weekly" as const },
-    { path: "/restaurant", priority: 0.9, changeFrequency: "weekly" as const },
   ];
 
   return pages.flatMap((page) =>

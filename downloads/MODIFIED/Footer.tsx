@@ -30,7 +30,7 @@ export default function Footer() {
             </h4>
             <nav className="flex flex-col">
               <Link href="/hotel" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{nav("hotel")}</Link>
-              <Link href="/restaurant" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{nav("restaurant")}</Link>
+              <a href="#restaurant" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{nav("restaurant")}</a>
               <a href="#events" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{nav("events")}</a>
               <a href="#ausflugsziele" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{nav("destinations")}</a>
             </nav>
@@ -43,7 +43,7 @@ export default function Footer() {
             </h4>
             <nav className="flex flex-col">
               <a href="#buchen" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("bookRoom")}</a>
-              <Link href="/restaurant" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("reserveTable")}</Link>
+              <a href="#restaurant" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("reserveTable")}</a>
               <a href="#gutschein" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("vouchers")}</a>
               <a href="#events" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("arrangements")}</a>
               <a href="#kontakt" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{nav("contact")}</a>

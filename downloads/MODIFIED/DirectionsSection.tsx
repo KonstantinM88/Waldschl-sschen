@@ -20,7 +20,6 @@ const cards = [
     srcSet: "/restaurant_room_800w.webp 800w, /restaurant_room_1200w.webp 1200w, /restaurant_room_1600w.webp 1600w, /restaurant_room_1920w.webp 1920w",
     responsiveSizes: "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw",
     imagePosition: "object-[center_52%] sm:object-center",
-    pageLink: "/restaurant",
   },
   {
     key: "weddings",
