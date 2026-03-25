@@ -1,10 +1,13 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { siteConfig } from "@/data/site";
 
 export default function Footer() {
+  const locale = useLocale();
   const t = useTranslations("footer");
   const nav = useTranslations("nav");
+  const buildPageHref = (path: string) => `/${locale}${path}`;
+  const buildHomeSectionHref = (hash: string) => `/${locale}${hash}`;
 
   return (
     <footer className="bg-[#111] text-white py-[clamp(4rem,8vw,6rem)] px-[clamp(1.5rem,5vw,6rem)]" role="contentinfo">
@@ -12,7 +15,10 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-16 border-b border-white/8">
           {/* Brand */}
           <div>
-            <Link href="/" className="block font-[var(--font-display)] text-2xl font-medium tracking-[0.02em] mb-6">
+            <Link
+              href={`/${locale}`}
+              className="block font-[var(--font-display)] text-2xl font-medium tracking-[0.02em] mb-6"
+            >
               Waldschlösschen
               <span className="block text-[0.65rem] font-[var(--font-body)] font-light tracking-[0.25em] uppercase opacity-70 mt-0.5">
                 Saale-Unstrut · seit 2012
@@ -29,10 +35,10 @@ export default function Footer() {
               {t("discover")}
             </h4>
             <nav className="flex flex-col">
-              <Link href="/hotel" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{nav("hotel")}</Link>
-              <Link href="/restaurant" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{nav("restaurant")}</Link>
-              <a href="#events" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{nav("events")}</a>
-              <a href="#ausflugsziele" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{nav("destinations")}</a>
+              <Link href={buildPageHref("/hotel")} className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{nav("hotel")}</Link>
+              <Link href={buildPageHref("/restaurant")} className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{nav("restaurant")}</Link>
+              <Link href={buildPageHref("/events")} className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{nav("events")}</Link>
+              <Link href={buildHomeSectionHref("#ausflugsziele")} className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{nav("destinations")}</Link>
             </nav>
           </div>
 
@@ -42,11 +48,11 @@ export default function Footer() {
               {t("service")}
             </h4>
             <nav className="flex flex-col">
-              <a href="#buchen" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("bookRoom")}</a>
-              <Link href="/restaurant" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("reserveTable")}</Link>
-              <a href="#gutschein" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("vouchers")}</a>
-              <a href="#events" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("arrangements")}</a>
-              <a href="#kontakt" className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{nav("contact")}</a>
+              <Link href={buildHomeSectionHref("#buchen")} className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("bookRoom")}</Link>
+              <Link href={buildPageHref("/restaurant#reservieren")} className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("reserveTable")}</Link>
+              <Link href={buildHomeSectionHref("#gutschein")} className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("vouchers")}</Link>
+              <Link href={buildPageHref("/events")} className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("arrangements")}</Link>
+              <Link href={buildHomeSectionHref("#kontakt")} className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{nav("contact")}</Link>
             </nav>
           </div>
 

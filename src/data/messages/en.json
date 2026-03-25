@@ -378,5 +378,89 @@
       "ctaPhone": "+49 34461 / 255 360",
       "ctaEmail": "Send Email"
     }
+  },
+  "eventsPage": {
+    "meta": {
+      "title": "Celebrations & Events at Waldschlösschen Nebra – Weddings, Family Events, Conferences | Saale-Unstrut",
+      "description": "Celebrate weddings, family events and conferences at Waldschlösschen Nebra. Registry office on-site, up to 50 guests, historic setting in the Saale-Unstrut-Triasland nature park."
+    },
+    "hero": {
+      "badge": "Celebrations & Events · Waldschlösschen",
+      "title": "Special occasions,",
+      "titleEmphasis": "unforgettable moments",
+      "subtitle": "Weddings, family celebrations and events in a historic setting — with a registry office on-site, regional cuisine and heartfelt hospitality.",
+      "ctaInquiry": "Enquire Now",
+      "ctaWeddings": "Discover weddings"
+    },
+    "intro": {
+      "label": "Celebrate with Character",
+      "title": "A special celebration deserves",
+      "titleEmphasis": "a special setting",
+      "text1": "Over more than 80 years, Waldschlösschen has hosted countless celebrations — weddings, birthdays, confirmations and anniversaries. Let yourself be enchanted by the stunning scenery and classic flair of our heritage-listed house.",
+      "text2": "With lovingly restored rooms for different group sizes, our own registry office, in-house kitchen with regional specialities and 24 rooms for your guests, we offer everything under one roof. Because in everything we do, alongside expertise, there is above all a great deal of heart."
+    },
+    "weddings": {
+      "label": "Weddings",
+      "title": "Say 'I do' —",
+      "titleEmphasis": "at Waldschlösschen",
+      "text": "The most beautiful day of your life deserves an extraordinary setting. Unforgettable moments in historic ambiance, with personal support from the first conversation to the last dance.",
+      "registryBadge": "Registry office on-site",
+      "registryTitle": "Civil Ceremony",
+      "registryDesc": "Since March 2017, a branch of the registry office of the Unstrut-Tal municipal association has been set up in the Waldschlösschen atrium. Marry in a unique setting — ceremony and celebration under one roof.",
+      "registryNote": "Ceremony room on the 1st floor, seats 14 + bridal couple. Contact: Registry Office Freyburg, Ms Böttcher, Tel: 03 44 64 / 30 03 4",
+      "celebrationTitle": "Your Wedding Reception",
+      "celebrationDesc": "Whether a large gathering or an intimate family circle — we have the right ambiance for you. Our experienced team accompanies you in planning and ensures your day is perfect.",
+      "menuPlanning": "Menu planning",
+      "decoration": "Decoration",
+      "music": "Music & DJ",
+      "photo": "Photography",
+      "cake": "Wedding cake",
+      "accommodation": "Accommodation"
+    },
+    "types": {
+      "label": "Events",
+      "title": "Every occasion,",
+      "titleEmphasis": "perfectly staged",
+      "family": {
+        "title": "Family Celebrations",
+        "desc": "Whether birthday, christening, confirmation or anniversary — family is the anchor in the river of time. Celebrate special moments in a warm, hospitable setting."
+      },
+      "meetings": {
+        "title": "Conferences & Seminars",
+        "desc": "Creative ideas need inspiring places. Our conference room seats up to 40 with projector, screen, flipchart and Wi-Fi."
+      },
+      "celebrations": {
+        "title": "Corporate Events",
+        "desc": "Team building, summer party or Christmas celebration — with terrace, beer garden and regional cuisine, we'll create your corporate event."
+      },
+      "inquire": "Enquire"
+    },
+    "spaces": {
+      "label": "Our Venues",
+      "title": "Space for your",
+      "titleEmphasis": "finest moments",
+      "text": "From the magnificent atrium to the cosy Schachtstube — our historic rooms provide the ideal setting for every occasion.",
+      "foyer": { "sub": "Registry office & reception", "title": "Atrium & Foyer" },
+      "schachtstube": { "sub": "Up to 50 guests", "title": "Schachtstube" },
+      "bergmann": { "sub": "Up to 30 guests", "title": "Bergmannszimmer" },
+      "persons": "Guests"
+    },
+    "process": {
+      "label": "Your Path to the Celebration",
+      "title": "Four steps to the",
+      "titleEmphasis": "perfect event",
+      "contact": { "title": "Contact", "desc": "Call us or write to us. We'll discuss your wishes and ideas." },
+      "visit": { "title": "Visit", "desc": "Visit us and be convinced by our spaces and atmosphere." },
+      "plan": { "title": "Planning", "desc": "Together we create your individual concept — menu, decoration, schedule and details." },
+      "celebrate": { "title": "Celebrate", "desc": "Enjoy your special day. We take care of everything — you take care of your guests." }
+    },
+    "cta": {
+      "label": "Let us plan your celebration",
+      "title": "Ready for your",
+      "titleEmphasis": "special occasion?",
+      "text": "Contact us for a no-obligation consultation. We'll be happy to create a bespoke offer — tailored to your wishes.",
+      "ctaPhone": "+49 34461 / 255 360",
+      "ctaEmail": "Send Email"
+    }
   }
 }

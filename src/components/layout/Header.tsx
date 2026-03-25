@@ -151,7 +151,7 @@ export default function Header() {
   const navLinks = [
     { href: "/hotel", label: t("hotel"), isPage: true },
     { href: "/restaurant", label: t("restaurant"), isPage: true },
-    { href: "#events", label: t("events"), isPage: false },
+    { href: "/events", label: t("events"), isPage: true },
     { href: "#ausflugsziele", label: t("destinations"), isPage: false },
     { href: "#kontakt", label: t("contact"), isPage: false },
   ];
@@ -160,6 +160,8 @@ export default function Header() {
   const localePrefixPattern = new RegExp(`^/(${locales.join("|")})(?=/|$)`);
   const currentPath = pathname.replace(localePrefixPattern, "") || "/";
   const homeHref = `/${activeLocale}`;
+  const buildPageHref = (path: string) => `/${activeLocale}${path}`;
+  const buildHomeSectionHref = (hash: string) => `${homeHref}${hash}`;
   const languageOptions = [
     {
       value: "de" as const,
@@ -254,12 +256,12 @@ export default function Header() {
           );
 
           return link.isPage ? (
-            <NextLink key={link.href} href={`/${activeLocale}${link.href}`} className={linkClasses}>
+            <NextLink key={link.href} href={buildPageHref(link.href)} className={linkClasses}>
               {link.label}
               <span className="absolute -bottom-1 left-0 w-0 h-px bg-gold transition-all duration-300 group-hover:w-full" />
             </NextLink>
           ) : (
-            <a key={link.href} href={link.href} className={linkClasses}>
+            <a key={link.href} href={buildHomeSectionHref(link.href)} className={linkClasses}>
               {link.label}
               <span className="absolute -bottom-1 left-0 w-0 h-px bg-gold transition-all duration-300 group-hover:w-full" />
             </a>
@@ -334,7 +336,7 @@ export default function Header() {
           </AnimatePresence>
         </div>
         <a
-          href="#buchen"
+          href={buildHomeSectionHref("#buchen")}
           className={cn("btn-primary btn-header", scrolled && "btn-header-scrolled")}
         >
           {t("book")}
@@ -421,7 +423,7 @@ export default function Header() {
                   return link.isPage ? (
                     <motion.div key={link.href} {...mobileProps}>
                       <NextLink
-                        href={`/${activeLocale}${link.href}`}
+                        href={buildPageHref(link.href)}
                         className="mobile-menu-link header-script"
                         onClick={closeMobileMenu}
                       >
@@ -429,7 +431,11 @@ export default function Header() {
                       </NextLink>
                     </motion.div>
                   ) : (
-                    <motion.a key={link.href} href={link.href} {...mobileProps}>
+                    <motion.a
+                      key={link.href}
+                      href={buildHomeSectionHref(link.href)}
+                      {...mobileProps}
+                    >
                       {link.label}
                     </motion.a>
                   );
@@ -469,7 +475,7 @@ export default function Header() {
               </motion.div>
 
               <motion.a
-                href="#buchen"
+                href={buildHomeSectionHref("#buchen")}
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}

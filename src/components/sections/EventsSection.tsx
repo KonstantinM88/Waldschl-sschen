@@ -1,6 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import NextLink from "next/link";
+import { usePathname as useNextPathname } from "next/navigation";
 import { Heart, Users, Monitor, Globe } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 
@@ -13,6 +15,9 @@ const eventCards = [
 
 export default function EventsSection() {
   const t = useTranslations("events");
+  const pathname = useNextPathname();
+  const activeLocale = pathname.startsWith("/en") ? "en" : "de";
+  const eventsHref = `/${activeLocale}/events`;
 
   return (
     <section
@@ -48,9 +53,9 @@ export default function EventsSection() {
                   <h3 className="events-card-title">{t(`${card.key}.title`)}</h3>
                   <p className="events-card-desc">{t(`${card.key}.desc`)}</p>
 
-                  <a href="#kontakt" className="events-card-link">
+                  <NextLink href={eventsHref} className="events-card-link">
                     {t("more")} →
-                  </a>
+                  </NextLink>
                 </div>
               </div>
             </Reveal>

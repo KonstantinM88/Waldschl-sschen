@@ -378,5 +378,89 @@
       "ctaPhone": "+49 34461 / 255 360",
       "ctaEmail": "E-Mail Schreiben"
     }
+  },
+  "eventsPage": {
+    "meta": {
+      "title": "Feiern & Events im Waldschlösschen Nebra – Hochzeiten, Familienfeiern, Tagungen | Saale-Unstrut",
+      "description": "Feiern Sie Hochzeiten, Familienfeiern und Tagungen im Waldschlösschen Nebra. Standesamt im Haus, bis zu 50 Personen, historisches Ambiente im Naturpark Saale-Unstrut-Triasland."
+    },
+    "hero": {
+      "badge": "Feiern & Events · Waldschlösschen",
+      "title": "Besondere Anlässe,",
+      "titleEmphasis": "unvergessliche Momente",
+      "subtitle": "Hochzeiten, Familienfeiern und Veranstaltungen in historischem Ambiente — mit Standesamt im Haus, regionaler Küche und herzlicher Gastfreundschaft.",
+      "ctaInquiry": "Unverbindlich Anfragen",
+      "ctaWeddings": "Hochzeiten entdecken"
+    },
+    "intro": {
+      "label": "Feiern mit Charakter",
+      "title": "Eine besondere Feier verdient",
+      "titleEmphasis": "einen besonderen Rahmen",
+      "text1": "Das Waldschlösschen hat in seiner über 80-jährigen Geschichte unzählige Feste erlebt — Hochzeiten, Geburtstage, Jugendweihen, Konfirmationen und Jubiläen. Lassen Sie sich verführen von der traumhaften Kulisse und dem klassischen Flair unseres denkmalgeschützten Hauses.",
+      "text2": "Mit liebevoll restaurierten Räumen für unterschiedliche Gruppengrößen, einem eigenen Standesamt, hauseigener Küche mit regionalen Spezialitäten und 24 Zimmern für Ihre Gäste bieten wir Ihnen alles aus einer Hand. Denn in allem, was wir tun, steckt neben Kompetenz vor allem viel Herz."
+    },
+    "weddings": {
+      "label": "Hochzeiten",
+      "title": "Trauen Sie sich —",
+      "titleEmphasis": "im Waldschlösschen",
+      "text": "Der schönste Tag Ihres Lebens verdient eine außergewöhnliche Kulisse. Unvergessliche Augenblicke in historischem Ambiente, mit persönlicher Betreuung vom ersten Gespräch bis zum letzten Tanz.",
+      "registryBadge": "Standesamt im Haus",
+      "registryTitle": "Standesamtliche Trauung",
+      "registryDesc": "Seit März 2017 ist im Lichthof des Waldschlösschens eine Zweigstelle des Standesamtes der Verbandsgemeinde Unstrut-Tal eingerichtet. Heiraten Sie in einzigartigem Ambiente — Trauung und Feier unter einem Dach.",
+      "registryNote": "Trauzimmer in der 1. Etage, Platz für 14 Personen + Brautpaar. Kontakt: Standesamt Freyburg, Frau Böttcher, Tel: 03 44 64 / 30 03 4",
+      "celebrationTitle": "Ihre Hochzeitsfeier",
+      "celebrationDesc": "Ob in großer Runde oder im engen Familienkreis — wir haben für Sie das passende Ambiente. Unser erfahrenes Team begleitet Sie bei der Planung und sorgt dafür, dass Ihr Tag perfekt wird.",
+      "menuPlanning": "Menüplanung",
+      "decoration": "Dekoration",
+      "music": "Musik & DJ",
+      "photo": "Fotografie",
+      "cake": "Hochzeitstorte",
+      "accommodation": "Übernachtung"
+    },
+    "types": {
+      "label": "Veranstaltungen",
+      "title": "Jeder Anlass,",
+      "titleEmphasis": "perfekt inszeniert",
+      "family": {
+        "title": "Familienfeiern",
+        "desc": "Ob Geburtstag, Taufe, Jugendweihe oder Jubiläum — die Familie ist der Anker im Fluss der Zeit. Feiern Sie besondere Momente in warmem, gastlichem Ambiente."
+      },
+      "meetings": {
+        "title": "Tagungen & Seminare",
+        "desc": "Kreative Ideen brauchen inspirierende Orte. Unser Tagungsraum bietet Platz für bis zu 40 Personen mit Beamer, Leinwand, Flipchart und WLAN."
+      },
+      "celebrations": {
+        "title": "Firmenfeiern & Events",
+        "desc": "Teambuilding, Sommerfest oder Weihnachtsfeier — mit Sommertterrasse, Biergarten und regionaler Küche gestalten wir Ihr Firmenevent."
+      },
+      "inquire": "Anfragen"
+    },
+    "spaces": {
+      "label": "Unsere Räumlichkeiten",
+      "title": "Raum für Ihre",
+      "titleEmphasis": "schönsten Momente",
+      "text": "Vom prächtigen Lichthof bis zur gemütlichen Schachtstube — unsere historischen Räume bieten für jeden Anlass den idealen Rahmen.",
+      "foyer": { "sub": "Standesamt & Empfang", "title": "Lichthof & Foyer" },
+      "schachtstube": { "sub": "Bis zu 50 Personen", "title": "Schachtstube" },
+      "bergmann": { "sub": "Bis zu 30 Personen", "title": "Bergmannszimmer" },
+      "persons": "Personen"
+    },
+    "process": {
+      "label": "Ihr Weg zur Feier",
+      "title": "In vier Schritten zum",
+      "titleEmphasis": "perfekten Fest",
+      "contact": { "title": "Kontakt", "desc": "Rufen Sie uns an oder schreiben Sie uns. Wir besprechen Ihre Wünsche und Vorstellungen." },
+      "visit": { "title": "Besichtigung", "desc": "Besuchen Sie uns und lassen Sie sich von unseren Räumlichkeiten und der Atmosphäre überzeugen." },
+      "plan": { "title": "Planung", "desc": "Gemeinsam gestalten wir Ihr individuelles Konzept — Menü, Dekoration, Ablauf und Details." },
+      "celebrate": { "title": "Feiern", "desc": "Genießen Sie Ihren besonderen Tag. Wir kümmern uns um alles — Sie um Ihre Gäste." }
+    },
+    "cta": {
+      "label": "Lassen Sie uns Ihre Feier planen",
+      "title": "Bereit für Ihren",
+      "titleEmphasis": "besonderen Anlass?",
+      "text": "Kontaktieren Sie uns für ein unverbindliches Beratungsgespräch. Wir erstellen Ihnen gern ein individuelles Angebot — ganz nach Ihren Wünschen.",
+      "ctaPhone": "+49 34461 / 255 360",
+      "ctaEmail": "E-Mail Schreiben"
+    }
   }
 }
