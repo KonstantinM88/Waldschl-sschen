@@ -1,5 +1,6 @@
 "use client";
 
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -20,6 +21,165 @@ import {
 import Reveal from "@/components/ui/Reveal";
 import { siteConfig } from "@/data/site";
 
+type ScrollDirection = "up" | "down";
+
+const MOBILE_WAVE_QUERY = "(max-width: 1024px), (hover: none) and (pointer: coarse)";
+
+interface RestaurantWaveFrameProps {
+  src: string;
+  alt: string;
+  sizes: string;
+  outerClassName: string;
+  surfaceClassName: string;
+  imageClassName?: string;
+  priority?: boolean;
+  beforeSheen?: ReactNode;
+  afterSheen?: ReactNode;
+  children?: ReactNode;
+}
+
+/* ================================================================
+   UNIVERSAL WAVE FRAME — Scroll / Hover / Tap
+   ================================================================ */
+function RestaurantWaveFrame({
+  src,
+  alt,
+  sizes,
+  outerClassName,
+  surfaceClassName,
+  imageClassName = "object-cover",
+  priority = false,
+  beforeSheen,
+  afterSheen,
+  children,
+}: RestaurantWaveFrameProps) {
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const pulseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasScrolledRef = useRef(false);
+  const lastScrollYRef = useRef(0);
+  const scrollDirectionRef = useRef<ScrollDirection>("down");
+  const pulseDoneRef = useRef(false);
+  const [mobilePulseDirection, setMobilePulseDirection] = useState<ScrollDirection | null>(null);
+
+  const triggerMobilePulse = (direction: ScrollDirection = scrollDirectionRef.current) => {
+    if (pulseTimeoutRef.current) {
+      clearTimeout(pulseTimeoutRef.current);
+    }
+
+    setMobilePulseDirection(null);
+
+    window.requestAnimationFrame(() => {
+      setMobilePulseDirection(direction);
+      pulseTimeoutRef.current = setTimeout(() => {
+        setMobilePulseDirection(null);
+      }, 1720);
+    });
+  };
+
+  useEffect(() => {
+    lastScrollYRef.current = window.scrollY;
+
+    const onScroll = () => {
+      const nextScrollY = window.scrollY;
+      const delta = nextScrollY - lastScrollYRef.current;
+
+      if (Math.abs(delta) > 2) {
+        hasScrolledRef.current = true;
+        scrollDirectionRef.current = delta > 0 ? "down" : "up";
+      }
+
+      lastScrollYRef.current = nextScrollY;
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    const node = cardRef.current;
+    if (!node || typeof window === "undefined" || typeof IntersectionObserver === "undefined") {
+      return;
+    }
+
+    const mobileMedia = window.matchMedia(MOBILE_WAVE_QUERY);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry?.isIntersecting) {
+          return;
+        }
+
+        if (mobileMedia.matches && hasScrolledRef.current && !pulseDoneRef.current) {
+          pulseDoneRef.current = true;
+          triggerMobilePulse(scrollDirectionRef.current);
+        }
+
+        observer.unobserve(entry.target);
+      },
+      {
+        threshold: 0.22,
+        rootMargin: "0px 0px -10% 0px",
+      }
+    );
+
+    observer.observe(node);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (pulseTimeoutRef.current) {
+        clearTimeout(pulseTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const wrapperClassName = [
+    outerClassName,
+    "restaurant-wave-host",
+    "group",
+    mobilePulseDirection
+      ? `restaurant-wave-mobile-pulse restaurant-wave-mobile-pulse-${mobilePulseDirection}`
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const mediaSurfaceClassName = ["restaurant-wave-surface", surfaceClassName].filter(Boolean).join(" ");
+
+  return (
+    <div
+      ref={cardRef}
+      className={wrapperClassName}
+      onTouchStart={() => {
+        triggerMobilePulse();
+      }}
+    >
+      <div className={mediaSurfaceClassName}>
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          priority={priority}
+          className={imageClassName}
+          sizes={sizes}
+        />
+        {beforeSheen}
+        <span className="restaurant-wave-sheen" aria-hidden="true" />
+        {afterSheen}
+      </div>
+      {children}
+    </div>
+  );
+}
+
 /* ================================================================
    HERO
    ================================================================ */
@@ -32,43 +192,40 @@ function RestaurantHero() {
   };
 
   return (
-    <section className="relative h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden">
-      <div className="restaurant-hero-media absolute inset-0">
-        <Image
-          src="/restaurant_room_1920w.webp"
-          alt="Restaurant Waldschlösschen — Gastraum"
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 via-charcoal/10 to-charcoal/70" />
-        <div className="restaurant-hero-shine" aria-hidden="true" />
-      </div>
-
+    <RestaurantWaveFrame
+      src="/restaurant_room_1920w.webp"
+      alt="Restaurant Waldschlösschen — Gastraum"
+      sizes="100vw"
+      priority
+      outerClassName="relative h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden"
+      surfaceClassName="restaurant-hero-media absolute inset-0"
+      imageClassName="object-cover"
+      beforeSheen={<div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 via-charcoal/10 to-charcoal/70" />}
+      afterSheen={<div className="restaurant-hero-shine" aria-hidden="true" />}
+    >
       <div className="relative z-10 text-center text-white px-8 max-w-[900px]">
         <motion.div
-          className="inline-block text-[0.7rem] font-normal tracking-[0.35em] uppercase text-gold-light mb-8"
+          className="restaurant-hero-kicker inline-block text-[0.7rem] font-normal tracking-[0.35em] uppercase mb-8"
           {...reveal}
           transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
         >
-          <span className="opacity-50 mx-4">—</span>
+          <span className="restaurant-hero-kicker-mark mx-4">—</span>
           {t("badge")}
-          <span className="opacity-50 mx-4">—</span>
+          <span className="restaurant-hero-kicker-mark mx-4">—</span>
         </motion.div>
 
         <motion.h1
-          className="heading-display text-[clamp(2.8rem,6vw,5rem)] mb-6"
+          className="restaurant-hero-title heading-display text-[clamp(2.8rem,6vw,5rem)] mb-6"
           {...reveal}
           transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
           {t("title")}
           <br />
-          <em className="text-gold-light">{t("titleEmphasis")}</em>
+          <em>{t("titleEmphasis")}</em>
         </motion.h1>
 
         <motion.p
-          className="text-[clamp(0.95rem,1.5vw,1.15rem)] font-light leading-relaxed opacity-85 max-w-[620px] mx-auto mb-12"
+          className="restaurant-hero-subtitle text-[clamp(0.95rem,1.5vw,1.15rem)] font-light leading-relaxed max-w-[620px] mx-auto mb-12"
           {...reveal}
           transition={{ duration: 1, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
@@ -84,7 +241,30 @@ function RestaurantHero() {
           <a href="#speisen" className="btn-outline-light">{t("ctaMenu")}</a>
         </motion.div>
       </div>
-    </section>
+    </RestaurantWaveFrame>
+  );
+}
+
+/* ================================================================
+   INTRO MEDIA
+   ================================================================ */
+function RestaurantIntroMediaCard() {
+  return (
+    <RestaurantWaveFrame
+      src="/restaurant_private_room_1920w.webp"
+      alt="Restaurant Waldschlösschen — Privatraum"
+      sizes="(max-width: 1024px) 100vw, 50vw"
+      outerClassName="voucher-media-card"
+      surfaceClassName="voucher-media-surface aspect-[4/5]"
+      imageClassName="voucher-media-video object-cover"
+      beforeSheen={<div className="voucher-media-overlay" />}
+      afterSheen={
+        <>
+          <div className="voucher-media-frame voucher-media-frame-outer" />
+          <div className="voucher-media-frame voucher-media-frame-inner" />
+        </>
+      }
+    />
   );
 }
 
@@ -98,20 +278,7 @@ function RestaurantIntro() {
     <section className="py-[clamp(5rem,10vw,9rem)] px-[clamp(1.5rem,5vw,6rem)]">
       <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-[clamp(3rem,6vw,8rem)] items-center">
         <Reveal>
-          <div className="voucher-media-card group">
-            <div className="voucher-media-surface aspect-[4/5]">
-              <Image
-                src="/restaurant_private_room_1920w.webp"
-                alt="Restaurant Waldschlösschen — Privatraum"
-                fill
-                className="voucher-media-video object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
-              <div className="voucher-media-overlay" />
-              <div className="voucher-media-frame voucher-media-frame-outer" />
-              <div className="voucher-media-frame voucher-media-frame-inner" />
-            </div>
-          </div>
+          <RestaurantIntroMediaCard />
         </Reveal>
 
         <Reveal delay={0.2}>
@@ -247,16 +414,15 @@ function RestaurantSpaces() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {spaces.map((space, i) => (
             <Reveal key={space.key} delay={i * 0.12} className={space.span}>
-              <div className={`spaces-card group relative cursor-pointer ${space.aspect}`}>
-                <div className="spaces-card-surface">
-                  <div className="spaces-card-glow" />
-                  <Image
-                    src={space.image}
-                    alt={t(`${space.key}.title`)}
-                    fill
-                    className="object-cover brightness-[0.84] transition-all duration-700 group-hover:brightness-[0.7] group-hover:scale-[1.06]"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
+              <RestaurantWaveFrame
+                src={space.image}
+                alt={t(`${space.key}.title`)}
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                outerClassName={`spaces-card relative cursor-pointer ${space.aspect}`}
+                surfaceClassName="spaces-card-surface"
+                imageClassName="object-cover brightness-[0.84] transition-all duration-700 group-hover:brightness-[0.7] group-hover:scale-[1.06]"
+                beforeSheen={<div className="spaces-card-glow" />}
+                afterSheen={
                   <div className="spaces-card-overlay flex items-end p-8 lg:p-10">
                     <div className="relative z-[1]">
                       <space.Icon className="w-6 h-6 text-gold-light stroke-[1.5] mb-4" />
@@ -268,8 +434,8 @@ function RestaurantSpaces() {
                       </p>
                     </div>
                   </div>
-                </div>
-              </div>
+                }
+              />
             </Reveal>
           ))}
         </div>
@@ -305,23 +471,22 @@ function RestaurantGallery() {
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
           {images.map((img, i) => (
             <Reveal key={img.src} delay={(i % 3) * 0.1} className={img.span}>
-              <div className="spaces-card group relative aspect-[16/10] cursor-pointer">
-                <div className="spaces-card-surface">
-                  <div className="spaces-card-glow" />
-                  <Image
-                    src={img.src}
-                    alt={img.alt}
-                    fill
-                    className="object-cover brightness-[0.9] transition-all duration-700 group-hover:brightness-[0.74] group-hover:scale-[1.06]"
-                    sizes="(max-width: 768px) 50vw, 33vw"
-                  />
+              <RestaurantWaveFrame
+                src={img.src}
+                alt={img.alt}
+                sizes="(max-width: 768px) 50vw, 33vw"
+                outerClassName="spaces-card relative aspect-[16/10] cursor-pointer"
+                surfaceClassName="spaces-card-surface"
+                imageClassName="object-cover brightness-[0.9] transition-all duration-700 group-hover:brightness-[0.74] group-hover:scale-[1.06]"
+                beforeSheen={<div className="spaces-card-glow" />}
+                afterSheen={
                   <div className="spaces-card-overlay flex items-end p-4 sm:p-5">
                     <span className="relative z-[1] font-[var(--font-body)] text-[0.66rem] font-light tracking-[0.16em] uppercase text-white/82">
                       {img.alt}
                     </span>
                   </div>
-                </div>
-              </div>
+                }
+              />
             </Reveal>
           ))}
         </div>
@@ -531,17 +696,15 @@ function RestaurantCta() {
   const t = useTranslations("restaurantPage.cta");
 
   return (
-    <section className="relative py-[clamp(6rem,12vw,10rem)] px-[clamp(1.5rem,5vw,6rem)] text-center text-white overflow-hidden">
-      <div className="absolute inset-0">
-        <Image
-          src="/restaurant_terrace_1920w.webp"
-          alt="Terrasse Waldschlösschen"
-          fill
-          className="object-cover"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-forest/85 to-forest/92" />
-      </div>
+    <RestaurantWaveFrame
+      src="/restaurant_terrace_1920w.webp"
+      alt="Terrasse Waldschlösschen"
+      sizes="100vw"
+      outerClassName="relative py-[clamp(6rem,12vw,10rem)] px-[clamp(1.5rem,5vw,6rem)] text-center text-white overflow-hidden"
+      surfaceClassName="absolute inset-0"
+      imageClassName="object-cover"
+      beforeSheen={<div className="absolute inset-0 bg-gradient-to-b from-forest/85 to-forest/92" />}
+    >
       <Reveal>
         <div className="relative z-10 max-w-[700px] mx-auto">
           <span className="label-caps text-gold-light">{t("label")}</span>
@@ -555,7 +718,7 @@ function RestaurantCta() {
           </div>
         </div>
       </Reveal>
-    </section>
+    </RestaurantWaveFrame>
   );
 }
 
