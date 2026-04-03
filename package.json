@@ -13,30 +13,30 @@
     "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
-    "next": "15.2.8",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "@prisma/client": "^6.19.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "framer-motion": "^12.0.0",
     "lucide-react": "^0.468.0",
+    "next": "15.5.13",
     "next-intl": "^4.1.0",
-    "clsx": "^2.1.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "tailwind-merge": "^2.6.0",
-    "class-variance-authority": "^0.7.1",
     "zod": "^3.24.0"
   },
   "devDependencies": {
-    "typescript": "^5.9.3",
+    "@eslint/eslintrc": "^3.0.0",
+    "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "15.5.13",
+    "postcss": "^8.5.0",
     "prisma": "^6.19.2",
     "tailwindcss": "^4.0.0",
-    "@tailwindcss/postcss": "^4.0.0",
-    "postcss": "^8.5.0",
     "tsx": "^4.19.0",
-    "eslint": "^9.0.0",
-    "eslint-config-next": "15.2.8",
-    "@eslint/eslintrc": "^3.0.0"
+    "typescript": "^5.9.3"
   }
 }

@@ -33,7 +33,7 @@ function RestaurantHero() {
 
   return (
     <section className="relative h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0">
+      <div className="restaurant-hero-media absolute inset-0">
         <Image
           src="/restaurant_room_1920w.webp"
           alt="Restaurant Waldschlösschen — Gastraum"
@@ -43,6 +43,7 @@ function RestaurantHero() {
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 via-charcoal/10 to-charcoal/70" />
+        <div className="restaurant-hero-shine" aria-hidden="true" />
       </div>
 
       <div className="relative z-10 text-center text-white px-8 max-w-[900px]">
@@ -97,29 +98,33 @@ function RestaurantIntro() {
     <section className="py-[clamp(5rem,10vw,9rem)] px-[clamp(1.5rem,5vw,6rem)]">
       <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-[clamp(3rem,6vw,8rem)] items-center">
         <Reveal>
-          <div className="relative">
-            <div className="aspect-[4/5] overflow-hidden relative">
+          <div className="voucher-media-card group">
+            <div className="voucher-media-surface aspect-[4/5]">
               <Image
                 src="/restaurant_private_room_1920w.webp"
                 alt="Restaurant Waldschlösschen — Privatraum"
                 fill
-                className="object-cover hover:scale-[1.03] transition-transform duration-700"
+                className="voucher-media-video object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
+              <div className="voucher-media-overlay" />
+              <div className="voucher-media-frame voucher-media-frame-outer" />
+              <div className="voucher-media-frame voucher-media-frame-inner" />
             </div>
-            <div className="absolute -bottom-5 -right-5 w-[200px] h-[200px] border border-gold opacity-30 -z-10" />
           </div>
         </Reveal>
 
         <Reveal delay={0.2}>
-          <span className="label-caps text-gold">{t("label")}</span>
-          <h2 className="heading-display text-[clamp(2.2rem,4.5vw,3.8rem)] text-charcoal mt-5 mb-6">
-            {t("title")} <em>{t("titleEmphasis")}</em>
-          </h2>
-          <div className="gold-divider mb-8" />
-          <p className="body-text max-w-[620px]">{t("text1")}</p>
-          <p className="body-text max-w-[620px] mt-5">{t("text2")}</p>
-          <p className="body-text max-w-[620px] mt-5">{t("text3")}</p>
+          <div className="voucher-content-panel">
+            <span className="label-caps text-gold">{t("label")}</span>
+            <h2 className="heading-display text-[clamp(2.2rem,4.5vw,3.8rem)] text-charcoal mt-5 mb-6">
+              {t("title")} <em>{t("titleEmphasis")}</em>
+            </h2>
+            <div className="gold-divider mb-8" />
+            <p className="body-text max-w-[620px]">{t("text1")}</p>
+            <p className="body-text max-w-[620px] mt-5">{t("text2")}</p>
+            <p className="body-text max-w-[620px] mt-5">{t("text3")}</p>
+          </div>
         </Reveal>
       </div>
     </section>
@@ -155,16 +160,18 @@ function RestaurantCuisine() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {highlights.map((item, i) => (
             <Reveal key={item.key} delay={i * 0.1}>
-              <div className="group bg-white p-8 lg:p-10 text-center hover:shadow-[0_20px_60px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-500">
-                <div className="w-14 h-14 rounded-full bg-sand-light group-hover:bg-gold/10 flex items-center justify-center mx-auto mb-6 transition-colors duration-500">
-                  <item.Icon className="w-6 h-6 text-gold stroke-[1.5]" />
+              <div className="testimonial-card group h-full">
+                <div className="testimonial-card-surface min-h-0 items-center p-8 text-center lg:p-10">
+                  <div className="relative z-[1] mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-sand-light shadow-[inset_0_1px_0_rgba(255,255,255,0.72)] transition-colors duration-500 group-hover:bg-gold/10">
+                    <item.Icon className="w-6 h-6 text-gold stroke-[1.5]" />
+                  </div>
+                  <h3 className="relative z-[1] font-[var(--font-display)] text-xl font-medium text-charcoal mb-3">
+                    {t(`${item.key}.title`)}
+                  </h3>
+                  <p className="relative z-[1] text-sm font-light leading-relaxed text-text-secondary">
+                    {t(`${item.key}.desc`)}
+                  </p>
                 </div>
-                <h3 className="font-[var(--font-display)] text-xl font-medium text-charcoal mb-3">
-                  {t(`${item.key}.title`)}
-                </h3>
-                <p className="text-sm font-light leading-relaxed text-text-secondary">
-                  {t(`${item.key}.desc`)}
-                </p>
               </div>
             </Reveal>
           ))}
@@ -240,23 +247,27 @@ function RestaurantSpaces() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {spaces.map((space, i) => (
             <Reveal key={space.key} delay={i * 0.12} className={space.span}>
-              <div className={`group relative overflow-hidden cursor-pointer ${space.aspect}`}>
-                <Image
-                  src={space.image}
-                  alt={t(`${space.key}.title`)}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/10 to-transparent group-hover:from-charcoal/90 transition-all duration-500" />
-                <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-10">
-                  <space.Icon className="w-6 h-6 text-gold-light stroke-[1.5] mb-4" />
-                  <h3 className="font-[var(--font-display)] text-2xl font-normal mb-2">
-                    {t(`${space.key}.title`)}
-                  </h3>
-                  <p className="text-sm font-light leading-relaxed text-white/70 max-w-[400px]">
-                    {t(`${space.key}.desc`)}
-                  </p>
+              <div className={`spaces-card group relative cursor-pointer ${space.aspect}`}>
+                <div className="spaces-card-surface">
+                  <div className="spaces-card-glow" />
+                  <Image
+                    src={space.image}
+                    alt={t(`${space.key}.title`)}
+                    fill
+                    className="object-cover brightness-[0.84] transition-all duration-700 group-hover:brightness-[0.7] group-hover:scale-[1.06]"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                  <div className="spaces-card-overlay flex items-end p-8 lg:p-10">
+                    <div className="relative z-[1]">
+                      <space.Icon className="w-6 h-6 text-gold-light stroke-[1.5] mb-4" />
+                      <h3 className="font-[var(--font-display)] text-2xl font-normal mb-2">
+                        {t(`${space.key}.title`)}
+                      </h3>
+                      <p className="text-sm font-light leading-relaxed text-white/70 max-w-[400px]">
+                        {t(`${space.key}.desc`)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </Reveal>
@@ -294,15 +305,22 @@ function RestaurantGallery() {
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
           {images.map((img, i) => (
             <Reveal key={img.src} delay={(i % 3) * 0.1} className={img.span}>
-              <div className="group relative aspect-[16/10] overflow-hidden cursor-pointer">
-                <Image
-                  src={img.src}
-                  alt={img.alt}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                  sizes="(max-width: 768px) 50vw, 33vw"
-                />
-                <div className="absolute inset-0 bg-charcoal/0 group-hover:bg-charcoal/20 transition-colors duration-500" />
+              <div className="spaces-card group relative aspect-[16/10] cursor-pointer">
+                <div className="spaces-card-surface">
+                  <div className="spaces-card-glow" />
+                  <Image
+                    src={img.src}
+                    alt={img.alt}
+                    fill
+                    className="object-cover brightness-[0.9] transition-all duration-700 group-hover:brightness-[0.74] group-hover:scale-[1.06]"
+                    sizes="(max-width: 768px) 50vw, 33vw"
+                  />
+                  <div className="spaces-card-overlay flex items-end p-4 sm:p-5">
+                    <span className="relative z-[1] font-[var(--font-body)] text-[0.66rem] font-light tracking-[0.16em] uppercase text-white/82">
+                      {img.alt}
+                    </span>
+                  </div>
+                </div>
               </div>
             </Reveal>
           ))}
@@ -347,22 +365,25 @@ function RestaurantHours() {
           </Reveal>
 
           <Reveal delay={0.2}>
-            <div className="bg-white/[0.06] border border-white/10 backdrop-blur-sm p-8 lg:p-10">
-              <div className="flex items-center gap-3 mb-8">
-                <Clock className="w-5 h-5 text-gold-light stroke-[1.5]" />
-                <h3 className="font-[var(--font-display)] text-xl font-normal">{t("hoursTitle")}</h3>
-              </div>
-              {rows.map((row, i) => (
-                <div
-                  key={row.dayKey}
-                  className={`flex items-center justify-between py-4 ${i < rows.length - 1 ? "border-b border-white/10" : ""}`}
-                >
-                  <span className="text-sm font-light text-white/80">{t(row.dayKey)}</span>
-                  <span className="text-sm font-medium text-gold-light">{t(row.timeKey)}</span>
+            <div className="events-card group relative">
+              <div className="events-card-surface min-h-0 p-8 lg:p-10">
+                <div className="events-card-glow" />
+                <div className="relative z-[1] flex items-center gap-3 mb-8">
+                  <Clock className="w-5 h-5 text-gold-light stroke-[1.5]" />
+                  <h3 className="font-[var(--font-display)] text-xl font-normal">{t("hoursTitle")}</h3>
                 </div>
-              ))}
-              <div className="mt-8 pt-6 border-t border-white/10 text-center">
-                <p className="text-xs font-light text-white/50">{t("closed")}</p>
+                {rows.map((row, i) => (
+                  <div
+                    key={row.dayKey}
+                    className={`relative z-[1] flex items-center justify-between py-4 ${i < rows.length - 1 ? "border-b border-white/10" : ""}`}
+                  >
+                    <span className="text-sm font-light text-white/80">{t(row.dayKey)}</span>
+                    <span className="text-sm font-medium text-gold-light">{t(row.timeKey)}</span>
+                  </div>
+                ))}
+                <div className="relative z-[1] mt-8 pt-6 border-t border-white/10 text-center">
+                  <p className="text-xs font-light text-white/50">{t("closed")}</p>
+                </div>
               </div>
             </div>
           </Reveal>
@@ -407,14 +428,18 @@ function RestaurantEvents() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {items.map((item, i) => (
             <Reveal key={item.key} delay={i * 0.1}>
-              <div className="group p-8 lg:p-10 bg-white border border-sand hover:border-gold/30 hover:shadow-[0_16px_50px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-500">
-                <item.Icon className="w-7 h-7 text-gold stroke-[1.5] mb-6" />
-                <h3 className="font-[var(--font-display)] text-xl font-medium text-charcoal mb-3">
-                  {t(`${item.key}.title`)}
-                </h3>
-                <p className="text-sm font-light leading-relaxed text-text-secondary">
-                  {t(`${item.key}.desc`)}
-                </p>
+              <div className="testimonial-card group h-full">
+                <div className="testimonial-card-surface min-h-0 p-8 lg:p-10">
+                  <div className="relative z-[1] mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-sand-light shadow-[inset_0_1px_0_rgba(255,255,255,0.72)] transition-colors duration-500 group-hover:bg-gold/10">
+                    <item.Icon className="w-7 h-7 text-gold stroke-[1.5]" />
+                  </div>
+                  <h3 className="relative z-[1] font-[var(--font-display)] text-xl font-medium text-charcoal mb-3">
+                    {t(`${item.key}.title`)}
+                  </h3>
+                  <p className="relative z-[1] text-sm font-light leading-relaxed text-text-secondary">
+                    {t(`${item.key}.desc`)}
+                  </p>
+                </div>
               </div>
             </Reveal>
           ))}
@@ -458,8 +483,11 @@ function RestaurantTestimonials() {
   ];
 
   return (
-    <section className="py-[clamp(5rem,10vw,9rem)] px-[clamp(1.5rem,5vw,6rem)]">
-      <div className="max-w-[1200px] mx-auto">
+    <section className="testimonials-section relative overflow-hidden py-[clamp(5rem,10vw,9rem)] px-[clamp(1.5rem,5vw,6rem)]">
+      <div className="testimonials-orb testimonials-orb-left" />
+      <div className="testimonials-orb testimonials-orb-right" />
+
+      <div className="max-w-[1200px] mx-auto relative z-[1]">
         <Reveal>
           <div className="text-center mb-16">
             <span className="label-caps text-gold">Gästestimmen</span>
@@ -472,17 +500,21 @@ function RestaurantTestimonials() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {reviews.map((review, i) => (
             <Reveal key={i} delay={i * 0.1}>
-              <div className="p-10 bg-sand-light hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.06)] transition-all duration-500">
-                <div className="flex gap-1 text-gold mb-6">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} className="w-3.5 h-3.5 fill-gold stroke-gold" />
-                  ))}
+              <div className="testimonial-card h-full">
+                <div className="testimonial-card-surface p-8 lg:p-10">
+                  <div className="relative z-[1] flex gap-1 text-gold mb-6">
+                    {[...Array(5)].map((_, j) => (
+                      <Star key={j} className="w-3.5 h-3.5 fill-gold stroke-gold" />
+                    ))}
+                  </div>
+                  <p className="testimonial-quote relative z-[1] mb-6 !text-[1.45rem] lg:!text-[1.62rem]">
+                    „{review.text[locale]}“
+                  </p>
+                  <div className="testimonial-meta">
+                    <div className="testimonial-author">{review.author[locale]}</div>
+                    <div className="testimonial-source">{review.source}</div>
+                  </div>
                 </div>
-                <p className="font-[var(--font-display)] text-lg font-normal italic leading-relaxed text-text-primary mb-6">
-                  „{review.text[locale]}"
-                </p>
-                <div className="text-xs font-medium text-text-secondary">{review.author[locale]}</div>
-                <div className="text-[0.7rem] font-light text-text-muted mt-1">{review.source}</div>
               </div>
             </Reveal>
           ))}
