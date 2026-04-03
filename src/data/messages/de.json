@@ -492,7 +492,13 @@
       "title": "Saale-Unstrut —",
       "titleEmphasis": "die Toskana des Ostens",
       "text1": "Das Waldschlösschen liegt im Herzen einer der faszinierendsten Kulturlandschaften Deutschlands. Der Naturpark Saale-Unstrut-Triasland begeistert mit Streuobstwiesen, Wäldern, Burgen und Schlössern, den Flusslandschaften von Saale und Unstrut und der nördlichsten Qualitätsweinregion Europas.",
-      "text2": "Ob kulturhistorische Entdeckungen, Radtouren entlang idyllischer Flussläufe, Weinproben in historischen Kellern oder einfach die Stille der Natur genießen — hier finden Sie Erholung und Inspiration zugleich."
+      "text2": "Ob kulturhistorische Entdeckungen, Radtouren entlang idyllischer Flussläufe, Weinproben in historischen Kellern oder einfach die Stille der Natur genießen — hier finden Sie Erholung und Inspiration zugleich.",
+      "stats": {
+        "arche": "zur Arche Nebra",
+        "wineries": "Weingüter in der Region",
+        "cycling": "direkt am Unstrutradweg",
+        "culture": "Weltkultur & Geschichte"
+      }
     },
     "highlights": {
       "label": "Top-Highlights",
@@ -572,7 +578,13 @@
       "label": "Die Region in Zahlen",
       "title": "Saale-Unstrut-Triasland —",
       "titleEmphasis": "ein Naturpark voller Vielfalt",
-      "text": "Das Qualitätsanbaugebiet Saale-Unstrut zeichnet sich durch seine Weinberge mit Steilterrassen, jahrhundertealten Trockenmauern und romantischen Weinbergshäuschen aus. Eingebettet zwischen Burgen, Klöstern und idyllischen Flusstälern ist die Region ein Geheimtipp für Genießer, Kulturliebhaber und Naturfreunde."
+      "text": "Das Qualitätsanbaugebiet Saale-Unstrut zeichnet sich durch seine Weinberge mit Steilterrassen, jahrhundertealten Trockenmauern und romantischen Weinbergshäuschen aus. Eingebettet zwischen Burgen, Klöstern und idyllischen Flusstälern ist die Region ein Geheimtipp für Genießer, Kulturliebhaber und Naturfreunde.",
+      "stats": {
+        "vineyards": "Rebfläche im Anbaugebiet",
+        "wineries": "Weingüter & Winzerhöfe",
+        "hiking": "Fernwanderwege in der Region",
+        "cycling": "Länge des Unstrutradwegs"
+      }
     },
     "cta": {
       "label": "Ihr Ausgangspunkt für Entdeckungen",

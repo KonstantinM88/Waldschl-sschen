@@ -492,7 +492,13 @@
       "title": "Saale-Unstrut —",
       "titleEmphasis": "the Tuscany of the East",
       "text1": "Waldschlösschen is located in the heart of one of Germany's most fascinating cultural landscapes. The Saale-Unstrut-Triasland nature park captivates with meadow orchards, forests, castles, the river landscapes of the Saale and Unstrut and Europe's northernmost quality wine region.",
-      "text2": "Whether cultural-historical discoveries, cycling tours along idyllic rivers, wine tastings in historic cellars or simply enjoying the silence of nature — here you'll find relaxation and inspiration in equal measure."
+      "text2": "Whether cultural-historical discoveries, cycling tours along idyllic rivers, wine tastings in historic cellars or simply enjoying the silence of nature — here you'll find relaxation and inspiration in equal measure.",
+      "stats": {
+        "arche": "to the Arche Nebra",
+        "wineries": "wineries in the region",
+        "cycling": "directly on the Unstrut cycle path",
+        "culture": "world heritage & culture"
+      }
     },
     "highlights": {
       "label": "Top Highlights",
@@ -572,7 +578,13 @@
       "label": "The Region in Numbers",
       "title": "Saale-Unstrut-Triasland —",
       "titleEmphasis": "a nature park full of variety",
-      "text": "The Saale-Unstrut quality wine-growing area is distinguished by its vineyards with steep terraces, centuries-old dry stone walls and romantic vineyard cottages. Nestled between castles, monasteries and idyllic river valleys, the region is an insider tip for connoisseurs, culture lovers and nature enthusiasts."
+      "text": "The Saale-Unstrut quality wine-growing area is distinguished by its vineyards with steep terraces, centuries-old dry stone walls and romantic vineyard cottages. Nestled between castles, monasteries and idyllic river valleys, the region is an insider tip for connoisseurs, culture lovers and nature enthusiasts.",
+      "stats": {
+        "vineyards": "vineyard area in the wine region",
+        "wineries": "wineries & estates",
+        "hiking": "long-distance hiking trails",
+        "cycling": "length of the Unstrut cycle path"
+      }
     },
     "cta": {
       "label": "Your starting point for discoveries",
