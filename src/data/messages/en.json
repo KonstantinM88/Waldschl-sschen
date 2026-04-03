@@ -397,7 +397,13 @@
       "title": "A special celebration deserves",
       "titleEmphasis": "a special setting",
       "text1": "Over more than 80 years, Waldschlösschen has hosted countless celebrations — weddings, birthdays, confirmations and anniversaries. Let yourself be enchanted by the stunning scenery and classic flair of our heritage-listed house.",
-      "text2": "With lovingly restored rooms for different group sizes, our own registry office, in-house kitchen with regional specialities and 24 rooms for your guests, we offer everything under one roof. Because in everything we do, alongside expertise, there is above all a great deal of heart."
+      "text2": "With lovingly restored rooms for different group sizes, our own registry office, in-house kitchen with regional specialities and 24 rooms for your guests, we offer everything under one roof. Because in everything we do, alongside expertise, there is above all a great deal of heart.",
+      "stats": {
+        "guests": "Guests in larger celebrations",
+        "venues": "Venue settings in-house",
+        "rooms": "Rooms for your guests",
+        "registry": "Registry office on-site"
+      }
     },
     "weddings": {
       "label": "Weddings",
@@ -453,6 +459,11 @@
       "visit": { "title": "Visit", "desc": "Visit us and be convinced by our spaces and atmosphere." },
       "plan": { "title": "Planning", "desc": "Together we create your individual concept — menu, decoration, schedule and details." },
       "celebrate": { "title": "Celebrate", "desc": "Enjoy your special day. We take care of everything — you take care of your guests." }
+    },
+    "testimonials": {
+      "label": "Guest Voices",
+      "title": "What makes the experience",
+      "titleEmphasis": "feel exceptional"
     },
     "cta": {
       "label": "Let us plan your celebration",

@@ -397,7 +397,13 @@
       "title": "Eine besondere Feier verdient",
       "titleEmphasis": "einen besonderen Rahmen",
       "text1": "Das Waldschlösschen hat in seiner über 80-jährigen Geschichte unzählige Feste erlebt — Hochzeiten, Geburtstage, Jugendweihen, Konfirmationen und Jubiläen. Lassen Sie sich verführen von der traumhaften Kulisse und dem klassischen Flair unseres denkmalgeschützten Hauses.",
-      "text2": "Mit liebevoll restaurierten Räumen für unterschiedliche Gruppengrößen, einem eigenen Standesamt, hauseigener Küche mit regionalen Spezialitäten und 24 Zimmern für Ihre Gäste bieten wir Ihnen alles aus einer Hand. Denn in allem, was wir tun, steckt neben Kompetenz vor allem viel Herz."
+      "text2": "Mit liebevoll restaurierten Räumen für unterschiedliche Gruppengrößen, einem eigenen Standesamt, hauseigener Küche mit regionalen Spezialitäten und 24 Zimmern für Ihre Gäste bieten wir Ihnen alles aus einer Hand. Denn in allem, was wir tun, steckt neben Kompetenz vor allem viel Herz.",
+      "stats": {
+        "guests": "Gäste im großen Rahmen",
+        "venues": "Raumkonzepte im Haus",
+        "rooms": "Zimmer für Ihre Gäste",
+        "registry": "Standesamt im Haus"
+      }
     },
     "weddings": {
       "label": "Hochzeiten",
@@ -453,6 +459,11 @@
       "visit": { "title": "Besichtigung", "desc": "Besuchen Sie uns und lassen Sie sich von unseren Räumlichkeiten und der Atmosphäre überzeugen." },
       "plan": { "title": "Planung", "desc": "Gemeinsam gestalten wir Ihr individuelles Konzept — Menü, Dekoration, Ablauf und Details." },
       "celebrate": { "title": "Feiern", "desc": "Genießen Sie Ihren besonderen Tag. Wir kümmern uns um alles — Sie um Ihre Gäste." }
+    },
+    "testimonials": {
+      "label": "Gästestimmen",
+      "title": "Was unsere Gastgeberlebnisse",
+      "titleEmphasis": "besonders macht"
     },
     "cta": {
       "label": "Lassen Sie uns Ihre Feier planen",
