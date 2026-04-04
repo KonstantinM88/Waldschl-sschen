@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Reveal from "@/components/ui/Reveal";
+import PremiumWaveFrame from "@/components/ui/PremiumWaveFrame";
 import { destinations } from "@/data/site";
 import type { Locale } from "@/lib/i18n/config";
 
-const destinationFallbacks = {
+const destinationMedia = {
   default: {
     src: "/landscape_restaurant_1920w.webp",
     srcSet:
@@ -14,28 +14,45 @@ const destinationFallbacks = {
     position: "object-center",
   },
   "arche-nebra": {
-    src: "/Foyer_1920w.webp",
+    src: "/model_1600.webp",
     srcSet:
-      "/Foyer_800w%20.webp 800w, /Foyer_1200w%20.webp 1200w, /Foyer_1600w%20.webp 1600w, /Foyer_1920w.webp 1920w",
+      "/model_1200.webp 1200w, /model_1600.webp 1600w",
     position: "object-[center_50%] sm:object-center",
   },
   weinberge: {
-    src: "/landscape_restaurant_1920w.webp",
+    src: "/vineyard_1600.webp",
     srcSet:
-      "/landscape_restaurant_800w.webp 800w, /landscape_restaurant_1200w.webp 1200w, /landscape_restaurant_1600w.webp 1600w, /landscape_restaurant_1920w.webp 1920w",
+      "/vineyard_1200.webp 1200w, /vineyard_1600.webp 1600w",
     position: "object-[center_52%] sm:object-center",
   },
   unstrutradweg: {
-    src: "/restaurant_terrace_1920w.webp",
+    src: "/river_village_1600.webp",
     srcSet:
-      "/restaurant_terrace_800w.webp 800w, /restaurant_terrace_1200w.webp 1200w, /restaurant_terrace_1600w.webp 1600w, /restaurant_terrace_1920w.webp 1920w",
+      "/river_village_1200.webp 1200w, /river_village_1600.webp 1600w",
     position: "object-[center_54%] sm:object-center",
+  },
+  rotkaeppchen: {
+    src: "/wine_cellar_alt_1600.webp",
+    srcSet:
+      "/wine_cellar_alt_1200.webp 1200w, /wine_cellar_alt_1600.webp 1600w",
+    position: "object-[center_52%] sm:object-center",
+  },
+  memleben: {
+    src: "/abbey_ruins_1600.webp",
+    srcSet:
+      "/abbey_ruins_1200.webp 1200w, /abbey_ruins_1600.webp 1600w",
+    position: "object-[center_52%] sm:object-center",
+  },
+  mittelberg: {
+    src: "/tower_1600.webp",
+    srcSet:
+      "/tower_1200.webp 1200w, /tower_1600.webp 1600w",
+    position: "object-[center_52%] sm:object-center",
   },
 } as const;
 
 type DestinationCardProps = {
   id: string;
-  image: string;
   title: string;
   label: string;
   description: string;
@@ -44,37 +61,31 @@ type DestinationCardProps = {
 
 function DestinationCard({
   id,
-  image,
   title,
   label,
   description,
   delay,
 }: DestinationCardProps) {
-  const [useFallback, setUseFallback] = useState(false);
-  const fallback = destinationFallbacks[id as keyof typeof destinationFallbacks] ?? destinationFallbacks.default;
-  const src = useFallback ? fallback.src : image;
-  const srcSet = useFallback ? fallback.srcSet : undefined;
+  const preferredMedia = destinationMedia[id as keyof typeof destinationMedia];
+  const fallbackMedia = destinationMedia.default;
+  const activeMedia = preferredMedia ?? fallbackMedia;
+  const src = activeMedia.src;
+  const srcSet = activeMedia?.srcSet;
+  const positionClass = activeMedia?.position ?? fallbackMedia.position;
 
   return (
     <Reveal delay={delay} className="h-full">
       <article className="destination-card group h-full cursor-pointer">
         <div className="destination-card-surface">
-          <div className="destination-card-media">
-            <img
-              src={src}
-              srcSet={srcSet}
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              alt={title}
-              loading="lazy"
-              onError={() => {
-                if (!useFallback) {
-                  setUseFallback(true);
-                }
-              }}
-              className={`h-full w-full object-cover brightness-[0.9] transition-all duration-700 group-hover:scale-[1.06] group-hover:brightness-[0.8] ${fallback.position}`}
-            />
-            <div className="destination-card-overlay" />
-          </div>
+          <PremiumWaveFrame
+            src={src}
+            alt={title}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            outerClassName="destination-card-media"
+            surfaceClassName="relative h-full"
+            imageClassName={`object-cover brightness-[0.9] transition-all duration-700 group-hover:scale-[1.06] group-hover:brightness-[0.8] ${positionClass}`}
+            beforeSheen={<div className="destination-card-overlay" />}
+          />
 
           <div className="destination-card-content">
             <span className="destination-card-distance">{label}</span>
@@ -116,7 +127,6 @@ export default function DestinationsSection() {
             <DestinationCard
               key={dest.id}
               id={dest.id}
-              image={dest.image}
               title={dest.name[locale]}
               label={dest.distance[locale]}
               description={dest.description[locale]}
