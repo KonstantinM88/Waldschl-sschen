@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import {
@@ -156,6 +157,10 @@ function EventsIntro() {
 /* ================================================================ WEDDINGS */
 function EventsWeddings() {
   const t = useTranslations("eventsPage.weddings");
+  const locale = useLocale() as "de" | "en";
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const detailsLabel = locale === "de" ? "Mehr Details" : "More details";
+  const hideLabel = locale === "de" ? "Weniger" : "Less";
 
   const weddingCards = [
     {
@@ -207,40 +212,73 @@ function EventsWeddings() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
           {weddingCards.map((card, index) => (
             <Reveal key={card.key} delay={index * 0.12}>
-              <PremiumWaveFrame
-                src={card.image}
-                mobileSrc={"mobileImage" in card ? card.mobileImage : undefined}
-                desktopSrc={"desktopImage" in card ? card.desktopImage : undefined}
-                alt={card.title}
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                outerClassName="spaces-card relative aspect-[5/4] sm:aspect-[16/11] cursor-pointer"
-                surfaceClassName="spaces-card-surface"
-                imageClassName="object-cover brightness-[0.82] transition-all duration-700 group-hover:scale-[1.06] group-hover:brightness-[0.68]"
-                beforeSheen={<div className="spaces-card-glow" />}
-                afterSheen={
-                  <div className="spaces-card-overlay flex items-end p-6 sm:p-8 lg:p-10">
-                    <div className="relative z-[1] max-w-[34rem]">
-                      {card.badge ? (
-                        <span className="mb-4 inline-flex max-w-full items-center rounded-full border border-white/20 bg-black/20 px-3.5 py-2 text-[0.56rem] font-medium uppercase leading-relaxed tracking-[0.14em] text-white/90 backdrop-blur-sm sm:mb-5 sm:px-4 sm:text-[0.62rem] sm:tracking-[0.18em]">
-                          {card.badge}
-                        </span>
-                      ) : null}
-                      <card.Icon className="mb-4 h-6 w-6 text-gold-light stroke-[1.5]" />
-                      <h3 className="mb-3 font-[var(--font-display)] text-[clamp(1.5rem,6.4vw,2.3rem)] font-normal text-white sm:text-[clamp(1.7rem,2.2vw,2.3rem)]">
-                        {card.title}
-                      </h3>
-                      <p className="text-sm font-light leading-relaxed text-white/78">
-                        {card.desc}
-                      </p>
-                      {card.note ? (
-                        <p className="mt-4 text-xs font-light italic leading-relaxed text-white/62">
-                          {card.note}
+              <div>
+                <PremiumWaveFrame
+                  src={card.image}
+                  mobileSrc={"mobileImage" in card ? card.mobileImage : undefined}
+                  desktopSrc={"desktopImage" in card ? card.desktopImage : undefined}
+                  alt={card.title}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  outerClassName="spaces-card relative aspect-[5/4] sm:aspect-[16/11] cursor-pointer"
+                  surfaceClassName="spaces-card-surface"
+                  imageClassName="object-cover brightness-[0.82] transition-all duration-700 group-hover:scale-[1.06] group-hover:brightness-[0.68]"
+                  beforeSheen={<div className="spaces-card-glow" />}
+                  afterSheen={
+                    <div className="spaces-card-overlay flex items-end p-5 sm:p-8 lg:p-10">
+                      <div className="relative z-[1] max-w-[15.5rem] sm:max-w-[34rem]">
+                        {card.badge ? (
+                          <span className="mb-3 inline-flex max-w-full items-center rounded-full border border-white/20 bg-black/20 px-3 py-1.5 text-[0.52rem] font-medium uppercase leading-relaxed tracking-[0.12em] text-white/90 backdrop-blur-sm sm:mb-5 sm:px-4 sm:py-2 sm:text-[0.62rem] sm:tracking-[0.18em]">
+                            {card.badge}
+                          </span>
+                        ) : null}
+                        <card.Icon className="mb-3 h-5 w-5 text-gold-light stroke-[1.5] sm:mb-4 sm:h-6 sm:w-6" />
+                        <h3 className="mb-3 font-[var(--font-display)] text-[clamp(1.45rem,7vw,2rem)] font-normal leading-[0.98] text-white sm:text-[clamp(1.7rem,2.2vw,2.3rem)]">
+                          {card.title}
+                        </h3>
+                        <p className="hidden text-sm font-light leading-relaxed text-white/78 sm:block">
+                          {card.desc}
                         </p>
-                      ) : null}
+                        {card.note ? (
+                          <p className="mt-4 hidden text-xs font-light italic leading-relaxed text-white/62 sm:block">
+                            {card.note}
+                          </p>
+                        ) : null}
+                        <button
+                          type="button"
+                          className="pointer-events-auto relative z-[2] mt-4 inline-flex items-center gap-2 rounded-full border border-white/18 bg-black/20 px-4 py-2 text-[0.62rem] font-medium uppercase tracking-[0.14em] text-white/92 backdrop-blur-sm sm:hidden"
+                          onClick={() => {
+                            setExpandedCard((current) => (current === card.key ? null : card.key));
+                          }}
+                        >
+                          {expandedCard === card.key ? hideLabel : detailsLabel}
+                          <ChevronRight
+                            className={`h-3.5 w-3.5 stroke-[2] transition-transform duration-300 ${
+                              expandedCard === card.key ? "rotate-90" : ""
+                            }`}
+                          />
+                        </button>
+                      </div>
                     </div>
+                  }
+                />
+
+                <div
+                  className={`overflow-hidden transition-all duration-400 ease-out sm:hidden ${
+                    expandedCard === card.key ? "max-h-[18rem] pt-3 opacity-100" : "max-h-0 pt-0 opacity-0"
+                  }`}
+                >
+                  <div className="rounded-[1.5rem] border border-charcoal/10 bg-white/96 px-5 py-5 shadow-[0_18px_50px_rgba(22,18,12,0.1)]">
+                    <p className="text-sm font-light leading-relaxed text-text-secondary">
+                      {card.desc}
+                    </p>
+                    {card.note ? (
+                      <p className="mt-4 text-xs font-light italic leading-relaxed text-text-muted">
+                        {card.note}
+                      </p>
+                    ) : null}
                   </div>
-                }
-              />
+                </div>
+              </div>
             </Reveal>
           ))}
         </div>
@@ -315,7 +353,7 @@ function EventTypes() {
                       </p>
                       <a
                         href="#anfrage"
-                        className="mt-5 inline-flex items-center gap-2 text-[0.62rem] font-medium uppercase tracking-[0.14em] text-gold-light transition-all duration-300 group-hover:gap-3 sm:text-[0.68rem] sm:tracking-[0.16em]"
+                        className="pointer-events-auto relative z-[2] mt-5 inline-flex items-center gap-2 text-[0.62rem] font-medium uppercase tracking-[0.14em] text-gold-light transition-all duration-300 group-hover:gap-3 sm:text-[0.68rem] sm:tracking-[0.16em]"
                       >
                         {t("inquire")}
                         <ChevronRight className="h-3.5 w-3.5 stroke-[2]" />
@@ -560,30 +598,32 @@ function EventsCta() {
   const t = useTranslations("eventsPage.cta");
 
   return (
-    <PremiumWaveFrame
-      src="/landscape_restaurant_1920w.webp"
-      alt="Landschaft Saale-Unstrut"
-      sizes="100vw"
-      outerClassName="relative overflow-hidden py-[clamp(5rem,11vw,10rem)] px-[clamp(1.25rem,5vw,6rem)] text-center text-white"
-      surfaceClassName="events-hero-media absolute inset-0"
-      imageClassName="object-cover"
-      beforeSheen={<div className="absolute inset-0 bg-gradient-to-b from-forest/84 to-forest/92" />}
-      afterSheen={<div className="events-hero-shine events-hero-shine-soft" aria-hidden="true" />}
-    >
-      <Reveal>
-        <div className="relative z-10 mx-auto max-w-[720px]">
-          <span className="events-hero-kicker label-caps inline-block max-w-[19rem] text-balance text-gold-light leading-[1.8] tracking-[0.2em] sm:max-w-none sm:tracking-[0.3em]">{t("label")}</span>
-          <h2 className="events-hero-title heading-display mt-5 mb-5 text-[clamp(1.95rem,8.2vw,3.8rem)] text-white sm:mb-6 sm:text-[clamp(2.2rem,4.5vw,3.8rem)]">
-            {t("title")} <em>{t("titleEmphasis")}</em>
-          </h2>
-          <p className="events-hero-subtitle mb-8 text-[0.98rem] font-light leading-relaxed sm:mb-12 sm:text-lg">{t("text")}</p>
-          <div className="mx-auto flex max-w-[18rem] flex-col gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:justify-center sm:gap-5">
-            <a href={`tel:${siteConfig.phone}`} className="btn-primary w-full sm:w-auto">{t("ctaPhone")}</a>
-            <a href={`mailto:${siteConfig.email}`} className="btn-outline-light w-full sm:w-auto">{t("ctaEmail")}</a>
+    <section id="anfrage">
+      <PremiumWaveFrame
+        src="/landscape_restaurant_1920w.webp"
+        alt="Landschaft Saale-Unstrut"
+        sizes="100vw"
+        outerClassName="relative overflow-hidden py-[clamp(5rem,11vw,10rem)] px-[clamp(1.25rem,5vw,6rem)] text-center text-white"
+        surfaceClassName="events-hero-media absolute inset-0"
+        imageClassName="object-cover"
+        beforeSheen={<div className="absolute inset-0 bg-gradient-to-b from-forest/84 to-forest/92" />}
+        afterSheen={<div className="events-hero-shine events-hero-shine-soft" aria-hidden="true" />}
+      >
+        <Reveal>
+          <div className="relative z-10 mx-auto max-w-[720px]">
+            <span className="events-hero-kicker label-caps inline-block max-w-[19rem] text-balance text-gold-light leading-[1.8] tracking-[0.2em] sm:max-w-none sm:tracking-[0.3em]">{t("label")}</span>
+            <h2 className="events-hero-title heading-display mt-5 mb-5 text-[clamp(1.95rem,8.2vw,3.8rem)] text-white sm:mb-6 sm:text-[clamp(2.2rem,4.5vw,3.8rem)]">
+              {t("title")} <em>{t("titleEmphasis")}</em>
+            </h2>
+            <p className="events-hero-subtitle mb-8 text-[0.98rem] font-light leading-relaxed sm:mb-12 sm:text-lg">{t("text")}</p>
+            <div className="mx-auto flex max-w-[18rem] flex-col gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:justify-center sm:gap-5">
+              <a href={`tel:${siteConfig.phone}`} className="btn-primary w-full sm:w-auto">{t("ctaPhone")}</a>
+              <a href={`mailto:${siteConfig.email}`} className="btn-outline-light w-full sm:w-auto">{t("ctaEmail")}</a>
+            </div>
           </div>
-        </div>
-      </Reveal>
-    </PremiumWaveFrame>
+        </Reveal>
+      </PremiumWaveFrame>
+    </section>
   );
 }
 
