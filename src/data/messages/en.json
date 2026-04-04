@@ -190,7 +190,13 @@
       "title": "Arrive and",
       "titleEmphasis": "unwind",
       "text1": "The impressive 19th century building sits idyllically between the gentle hills of the Saale-Unstrut-Triasland nature park, on the banks of the Unstrut and just a short walk from the Arche Nebra. Once the administration building of the Kleinwangen potash union, the house has been lovingly restored to combine its heritage-protected shell with every modern comfort.",
-      "text2": "Here, where your gaze wanders across lush green meadows and fresh air lulls you into a deep sleep, you'll find the distance from everyday life you need. Throughout your stay, you'll experience the magic of a unique atmosphere and private hospitality — because in everything we do, alongside our highest standards, there is above all a great deal of heart."
+      "text2": "Here, where your gaze wanders across lush green meadows and fresh air lulls you into a deep sleep, you'll find the distance from everyday life you need. Throughout your stay, you'll experience the magic of a unique atmosphere and private hospitality — because in everything we do, alongside our highest standards, there is above all a great deal of heart.",
+      "stats": {
+        "rooms": "Rooms",
+        "rating": "Rating",
+        "recommendation": "Recommendation",
+        "classification": "Classification"
+      }
     },
     "rooms": {
       "label": "Our Rooms",
@@ -203,6 +209,7 @@
       "doubleTitle": "Double Room",
       "doublePrice": "from €125.00",
       "doubleDesc": "Spacious room for two with romantic furnishings.",
+      "priceUnit": "per night",
       "priceNote": "All prices per room per night, including a generous breakfast buffet and a bottle of mineral water in the room on arrival day."
     },
     "amenities": {
@@ -228,6 +235,7 @@
       "title": "The perfect start",
       "titleEmphasis": "to your day",
       "text": "Start every morning with our generous breakfast buffet. Fresh regional produce, homemade spreads, crusty bread and aromatic coffee — everything your heart desires to begin a day full of discoveries.",
+      "scheduleTitle": "Breakfast hours",
       "weekday": "Monday – Friday",
       "weekdayTime": "7:00 – 10:00 AM",
       "weekend": "Saturday – Sunday",
@@ -257,6 +265,16 @@
       "petsInfo": "Dogs welcome (€15.00 / day)",
       "parkingLabel": "Parking",
       "parkingInfo": "Free (car & bus)"
+    },
+    "gallery": {
+      "label": "Impressions",
+      "title": "A glimpse into our",
+      "titleEmphasis": "house"
+    },
+    "testimonials": {
+      "label": "Guest reviews",
+      "title": "What guests say about our",
+      "titleEmphasis": "hotel"
     },
     "cta": {
       "label": "Your Stay",

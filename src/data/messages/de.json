@@ -190,7 +190,13 @@
       "title": "Ankommen und",
       "titleEmphasis": "durchatmen",
       "text1": "Das imposante Gebäude aus dem 19. Jahrhundert liegt idyllisch zwischen den sanften Hügeln des Naturparks Saale-Unstrut-Triasland, an der Unstrut und nur wenige Gehminuten von der Arche Nebra entfernt. Einst das Verwaltungsgebäude der Kaligewerkschaft Kleinwangen, wurde das Haus mit viel Liebe zum Detail restauriert und verbindet heute seine denkmalgeschützte Hülle mit allem modernen Komfort.",
-      "text2": "Hier, wo der Blick über satte grüne Wiesen schweift und frische Luft Sie tief und fest schlafen lässt, finden Sie den nötigen Abstand vom Alltag. Während Ihres gesamten Aufenthaltes erleben Sie den Zauber einer einzigartigen Atmosphäre und privater Gastlichkeit — denn bei uns steckt in allem, was wir tun, neben höchstem Anspruch vor allem viel Herz."
+      "text2": "Hier, wo der Blick über satte grüne Wiesen schweift und frische Luft Sie tief und fest schlafen lässt, finden Sie den nötigen Abstand vom Alltag. Während Ihres gesamten Aufenthaltes erleben Sie den Zauber einer einzigartigen Atmosphäre und privater Gastlichkeit — denn bei uns steckt in allem, was wir tun, neben höchstem Anspruch vor allem viel Herz.",
+      "stats": {
+        "rooms": "Zimmer",
+        "rating": "Bewertung",
+        "recommendation": "Empfehlung",
+        "classification": "Klassifizierung"
+      }
     },
     "rooms": {
       "label": "Unsere Zimmer",
@@ -203,6 +209,7 @@
       "doubleTitle": "Doppelzimmer",
       "doublePrice": "ab 125,00 €",
       "doubleDesc": "Geräumiges Zimmer für zwei Personen mit romantischer Ausstattung.",
+      "priceUnit": "pro Nacht",
       "priceNote": "Alle Preise pro Zimmer und Nacht, inkl. reichhaltigem Frühstück vom Buffet und einer Flasche Mineralwasser auf dem Zimmer am Anreisetag."
     },
     "amenities": {
@@ -228,6 +235,7 @@
       "title": "Der perfekte Start",
       "titleEmphasis": "in den Tag",
       "text": "Beginnen Sie jeden Morgen mit unserem reichhaltigen Frühstücksbuffet. Frische regionale Produkte, hausgemachte Aufstriche, knuspriges Brot und aromatischer Kaffee — alles, was das Herz begehrt, um gestärkt in einen Tag voller Entdeckungen zu starten.",
+      "scheduleTitle": "Frühstückszeiten",
       "weekday": "Montag – Freitag",
       "weekdayTime": "07:00 – 10:00 Uhr",
       "weekend": "Samstag – Sonntag",
@@ -257,6 +265,16 @@
       "petsInfo": "Hunde willkommen (15,00 € / Tag)",
       "parkingLabel": "Parkplatz",
       "parkingInfo": "Kostenfrei (PKW & Bus)"
+    },
+    "gallery": {
+      "label": "Impressionen",
+      "title": "Ein Blick in unser",
+      "titleEmphasis": "Haus"
+    },
+    "testimonials": {
+      "label": "Gästestimmen",
+      "title": "Was Gäste über unser",
+      "titleEmphasis": "Hotel sagen"
     },
     "cta": {
       "label": "Ihr Aufenthalt",
