@@ -160,7 +160,9 @@ function EventsWeddings() {
   const weddingCards = [
     {
       key: "registry" as const,
-      image: "/Foyer_1920w.webp",
+      image: "/waldschloesschen_image.webp",
+      mobileImage: "/waldschloesschen_image.webp",
+      desktopImage: "/waldschloesschen_image.webp",
       Icon: Church,
       badge: t("registryBadge"),
       title: t("registryTitle"),
