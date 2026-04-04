@@ -169,7 +169,9 @@ function EventsWeddings() {
     },
     {
       key: "celebration" as const,
-      image: "/restaurant_private_room_1920w.webp",
+      image: "/wedding_rings_1600.webp",
+      mobileImage: "/wedding_rings_1200.webp",
+      desktopImage: "/wedding_rings_1600.webp",
       Icon: Heart,
       badge: "",
       title: t("celebrationTitle"),
@@ -205,6 +207,8 @@ function EventsWeddings() {
             <Reveal key={card.key} delay={index * 0.12}>
               <PremiumWaveFrame
                 src={card.image}
+                mobileSrc={"mobileImage" in card ? card.mobileImage : undefined}
+                desktopSrc={"desktopImage" in card ? card.desktopImage : undefined}
                 alt={card.title}
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 outerClassName="spaces-card relative aspect-[5/4] sm:aspect-[16/11] cursor-pointer"

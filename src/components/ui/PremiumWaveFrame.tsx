@@ -9,6 +9,8 @@ const MOBILE_WAVE_QUERY = "(max-width: 1024px), (hover: none) and (pointer: coar
 
 interface PremiumWaveFrameProps {
   src: string;
+  mobileSrc?: string;
+  desktopSrc?: string;
   alt: string;
   sizes: string;
   outerClassName: string;
@@ -22,6 +24,8 @@ interface PremiumWaveFrameProps {
 
 export default function PremiumWaveFrame({
   src,
+  mobileSrc,
+  desktopSrc,
   alt,
   sizes,
   outerClassName,
@@ -39,6 +43,7 @@ export default function PremiumWaveFrame({
   const scrollDirectionRef = useRef<ScrollDirection>("down");
   const pulseDoneRef = useRef(false);
   const [mobilePulseDirection, setMobilePulseDirection] = useState<ScrollDirection | null>(null);
+  const [resolvedSrc, setResolvedSrc] = useState<string>(desktopSrc ?? src);
 
   const triggerMobilePulse = (direction: ScrollDirection = scrollDirectionRef.current) => {
     if (pulseTimeoutRef.current) {
@@ -54,6 +59,32 @@ export default function PremiumWaveFrame({
       }, 1720);
     });
   };
+
+  useEffect(() => {
+    if (!mobileSrc && !desktopSrc) {
+      setResolvedSrc(src);
+      return;
+    }
+
+    const media = window.matchMedia("(max-width: 639px)");
+    const updateSrc = () => {
+      setResolvedSrc(media.matches ? mobileSrc ?? desktopSrc ?? src : desktopSrc ?? src);
+    };
+
+    updateSrc();
+
+    if (typeof media.addEventListener === "function") {
+      media.addEventListener("change", updateSrc);
+      return () => {
+        media.removeEventListener("change", updateSrc);
+      };
+    }
+
+    media.addListener(updateSrc);
+    return () => {
+      media.removeListener(updateSrc);
+    };
+  }, [src, mobileSrc, desktopSrc]);
 
   useEffect(() => {
     lastScrollYRef.current = window.scrollY;
@@ -143,7 +174,7 @@ export default function PremiumWaveFrame({
     >
       <div className={mediaSurfaceClassName}>
         <Image
-          src={src}
+          src={resolvedSrc}
           alt={alt}
           fill
           priority={priority}
