@@ -24,18 +24,18 @@ const spaces = [
   {
     key: "schachtstube",
     image: "/Schachtstube_mural_1920w.webp",
-    responsiveSizes: "(max-width: 768px) 50vw, (max-width: 1280px) 34vw, 33vw",
+    responsiveSizes: "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw",
     imagePosition: "object-center",
-    colSpan: "col-span-6 lg:col-span-4",
-    aspect: "aspect-square",
+    colSpan: "col-span-12 sm:col-span-6 lg:col-span-4",
+    aspect: "aspect-[6/5] sm:aspect-square",
   },
   {
     key: "sommergarten",
     image: "/restaurant_terrace_1920w.webp",
-    responsiveSizes: "(max-width: 768px) 50vw, (max-width: 1280px) 34vw, 33vw",
+    responsiveSizes: "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw",
     imagePosition: "object-[center_52%] sm:object-center",
-    colSpan: "col-span-6 lg:col-span-4",
-    aspect: "aspect-square",
+    colSpan: "col-span-12 sm:col-span-6 lg:col-span-4",
+    aspect: "aspect-[6/5] sm:aspect-square",
   },
   {
     key: "bergmannszimmer",
@@ -43,7 +43,7 @@ const spaces = [
     responsiveSizes: "(max-width: 768px) 100vw, (max-width: 1280px) 34vw, 33vw",
     imagePosition: "object-[center_52%] sm:object-center",
     colSpan: "col-span-12 lg:col-span-4",
-    aspect: "aspect-square lg:aspect-square",
+    aspect: "aspect-[6/5] sm:aspect-square lg:aspect-square",
   },
 ] as const;
 
@@ -76,12 +76,12 @@ export default function SpacesSection() {
                 imageClassName={`object-cover ${space.imagePosition} brightness-[0.82] transition-all duration-700 group-hover:brightness-[0.68] group-hover:scale-[1.06]`}
                 beforeSheen={<div className="spaces-card-glow" />}
                 afterSheen={
-                  <div className="spaces-card-overlay flex items-end p-5 sm:p-7">
-                    <div>
-                      <span className="mb-2 block font-[var(--font-body)] text-[0.68rem] font-light uppercase tracking-[0.16em] text-white/76">
+                  <div className="spaces-card-overlay flex items-end p-4 sm:p-7">
+                    <div className="max-w-[92%] sm:max-w-none">
+                      <span className="mb-2 block font-[var(--font-body)] text-[0.58rem] font-light uppercase tracking-[0.13em] text-white/76 sm:text-[0.68rem] sm:tracking-[0.16em]">
                         {t(`${space.key}.label`)}
                       </span>
-                      <span className="font-[var(--font-display)] text-[1.7rem] font-normal leading-tight text-white sm:text-[1.88rem]">
+                      <span className="block font-[var(--font-display)] text-[clamp(1.55rem,7vw,1.88rem)] font-normal leading-[0.96] text-white sm:text-[1.88rem]">
                         {t(`${space.key}.name`)}
                       </span>
                     </div>
