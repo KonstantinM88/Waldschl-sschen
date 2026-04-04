@@ -2,12 +2,12 @@
 
 import { useTranslations } from "next-intl";
 import Reveal from "@/components/ui/Reveal";
+import PremiumWaveFrame from "@/components/ui/PremiumWaveFrame";
 
 const spaces = [
   {
     key: "foyer",
     image: "/Foyer_1920w.webp",
-    srcSet: "/Foyer_800w%20.webp 800w, /Foyer_1200w%20.webp 1200w, /Foyer_1600w%20.webp 1600w, /Foyer_1920w.webp 1920w",
     responsiveSizes: "(max-width: 768px) 100vw, (max-width: 1280px) 58vw, 50vw",
     imagePosition: "object-[center_46%] sm:object-center",
     colSpan: "col-span-12 lg:col-span-7",
@@ -16,7 +16,6 @@ const spaces = [
   {
     key: "lobby",
     image: "/library_room_1920w.webp",
-    srcSet: "/library_room_800w.webp 800w, /library_room_1200w.webp 1200w, /library_room_1600w.webp 1600w, /library_room_1920w.webp 1920w",
     responsiveSizes: "(max-width: 768px) 100vw, (max-width: 1280px) 42vw, 50vw",
     imagePosition: "object-[center_50%] sm:object-center",
     colSpan: "col-span-12 lg:col-span-5",
@@ -25,7 +24,6 @@ const spaces = [
   {
     key: "schachtstube",
     image: "/Schachtstube_mural_1920w.webp",
-    srcSet: "/Schachtstube_mural_800w.webp 800w, /Schachtstube_mural_1200w.webp 1200w, /Schachtstube_mural_1600w.webp 1600w, /Schachtstube_mural_1920w.webp 1920w",
     responsiveSizes: "(max-width: 768px) 50vw, (max-width: 1280px) 34vw, 33vw",
     imagePosition: "object-center",
     colSpan: "col-span-6 lg:col-span-4",
@@ -34,7 +32,6 @@ const spaces = [
   {
     key: "sommergarten",
     image: "/restaurant_terrace_1920w.webp",
-    srcSet: "/restaurant_terrace_800w.webp 800w, /restaurant_terrace_1200w.webp 1200w, /restaurant_terrace_1600w.webp 1600w, /restaurant_terrace_1920w.webp 1920w",
     responsiveSizes: "(max-width: 768px) 50vw, (max-width: 1280px) 34vw, 33vw",
     imagePosition: "object-[center_52%] sm:object-center",
     colSpan: "col-span-6 lg:col-span-4",
@@ -43,7 +40,6 @@ const spaces = [
   {
     key: "bergmannszimmer",
     image: "/restaurant_private_room_1920w.webp",
-    srcSet: "/restaurant_private_room_800w.webp 800w, /restaurant_private_room_1200w.webp 1200w, /restaurant_private_room_1600w.webp 1600w, /restaurant_private_room_1920w.webp 1920w",
     responsiveSizes: "(max-width: 768px) 100vw, (max-width: 1280px) 34vw, 33vw",
     imagePosition: "object-[center_52%] sm:object-center",
     colSpan: "col-span-12 lg:col-span-4",
@@ -71,20 +67,18 @@ export default function SpacesSection() {
         <div className="grid grid-cols-12 gap-3 sm:gap-4">
           {spaces.map((space, i) => (
             <Reveal key={space.key} delay={i * 0.1} className={space.colSpan}>
-              <div className={`spaces-card group relative cursor-pointer ${space.aspect}`}>
-                <div className="spaces-card-surface">
-                  <div className="spaces-card-glow" />
-                  <img
-                    src={space.image}
-                    srcSet={space.srcSet}
-                    sizes={space.responsiveSizes}
-                    alt={t(`${space.key}.name`)}
-                    loading="lazy"
-                    className={`h-full w-full object-cover ${space.imagePosition} brightness-[0.82] transition-all duration-700 group-hover:brightness-[0.68] group-hover:scale-[1.06]`}
-                  />
+              <PremiumWaveFrame
+                src={space.image}
+                alt={t(`${space.key}.name`)}
+                sizes={space.responsiveSizes}
+                outerClassName={`spaces-card relative cursor-pointer ${space.aspect}`}
+                surfaceClassName="spaces-card-surface"
+                imageClassName={`object-cover ${space.imagePosition} brightness-[0.82] transition-all duration-700 group-hover:brightness-[0.68] group-hover:scale-[1.06]`}
+                beforeSheen={<div className="spaces-card-glow" />}
+                afterSheen={
                   <div className="spaces-card-overlay flex items-end p-5 sm:p-7">
                     <div>
-                      <span className="mb-2 block font-[var(--font-body)] text-[0.68rem] font-light tracking-[0.16em] uppercase text-white/76">
+                      <span className="mb-2 block font-[var(--font-body)] text-[0.68rem] font-light uppercase tracking-[0.16em] text-white/76">
                         {t(`${space.key}.label`)}
                       </span>
                       <span className="font-[var(--font-display)] text-[1.7rem] font-normal leading-tight text-white sm:text-[1.88rem]">
@@ -92,8 +86,8 @@ export default function SpacesSection() {
                       </span>
                     </div>
                   </div>
-                </div>
-              </div>
+                }
+              />
             </Reveal>
           ))}
         </div>
