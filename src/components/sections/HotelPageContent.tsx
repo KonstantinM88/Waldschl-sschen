@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 import PremiumWaveFrame from "@/components/ui/PremiumWaveFrame";
+import HotelImmersiveGallery from "@/components/sections/HotelImmersiveGallery";
 import { siteConfig } from "@/data/site";
 
 /* ---------- HERO ---------- */
@@ -326,132 +327,7 @@ function HotelAmenities() {
 
 /* ---------- GALLERY ---------- */
 function HotelGallery() {
-  const locale = useLocale() as "de" | "en";
-  const t = useTranslations("hotelPage.gallery");
-
-  const images = [
-    {
-      src: "/Foyer_1920w.webp",
-      alt: {
-        de: "Foyer mit historischer Glasdecke",
-        en: "Foyer with historic glass ceiling",
-      },
-      title: {
-        de: "Foyer & Glasdecke",
-        en: "Foyer & glass ceiling",
-      },
-      className: "sm:col-span-2 lg:col-span-2 lg:row-span-2",
-      aspect: "aspect-[5/4] sm:aspect-[16/10] lg:h-full lg:min-h-[520px] lg:aspect-auto",
-    },
-    {
-      src: "/library_room_1920w.webp",
-      alt: {
-        de: "Bibliothek und Lesezimmer",
-        en: "Library and reading room",
-      },
-      title: {
-        de: "Bibliothek",
-        en: "Library",
-      },
-      className: "",
-      aspect: "aspect-[5/4] sm:aspect-[4/3]",
-    },
-    {
-      src: "/hotel_room_1920w.webp",
-      alt: {
-        de: "Doppelzimmer im Hotel",
-        en: "Double room in the hotel",
-      },
-      title: {
-        de: "Zimmer",
-        en: "Rooms",
-      },
-      className: "",
-      aspect: "aspect-[5/4] sm:aspect-[4/3]",
-    },
-    {
-      src: "/Schachtstube_mural_1920w.webp",
-      alt: {
-        de: "Historische Schachtstube",
-        en: "Historic Schachtstube",
-      },
-      title: {
-        de: "Historische Details",
-        en: "Historic details",
-      },
-      className: "",
-      aspect: "aspect-[5/4] sm:aspect-[4/3]",
-    },
-    {
-      src: "/restaurant_terrace_1920w.webp",
-      alt: {
-        de: "Terrasse mit Blick ins Grune",
-        en: "Terrace with a green view",
-      },
-      title: {
-        de: "Sonnenterrasse",
-        en: "Sun terrace",
-      },
-      className: "",
-      aspect: "aspect-[5/4] sm:aspect-[4/3]",
-    },
-    {
-      src: "/landscape_restaurant_1920w.webp",
-      alt: {
-        de: "Landschaft in Saale-Unstrut",
-        en: "Landscape in Saale-Unstrut",
-      },
-      title: {
-        de: "Saale-Unstrut",
-        en: "Saale-Unstrut",
-      },
-      className: "",
-      aspect: "aspect-[5/4] sm:aspect-[4/3]",
-    },
-  ];
-
-  return (
-    <section className="py-[clamp(5rem,10vw,9rem)] px-[clamp(1.5rem,5vw,6rem)]">
-      <div className="mx-auto max-w-[1400px]">
-        <Reveal>
-          <div className="mb-16 text-center">
-            <span className="label-caps text-gold">{t("label")}</span>
-            <h2 className="heading-display mt-5 text-[clamp(2.2rem,4.5vw,3.8rem)] text-charcoal">
-              {t("title")} <em>{t("titleEmphasis")}</em>
-            </h2>
-          </div>
-        </Reveal>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {images.map((image, index) => (
-            <Reveal key={image.src} delay={(index % 3) * 0.08} className={image.className}>
-              <PremiumWaveFrame
-                src={image.src}
-                alt={image.alt[locale]}
-                sizes="(max-width: 1024px) 100vw, 33vw"
-                outerClassName={`spaces-card relative cursor-pointer ${image.aspect}`}
-                surfaceClassName="spaces-card-surface"
-                imageClassName="object-cover brightness-[0.84] transition-all duration-700 group-hover:scale-[1.06] group-hover:brightness-[0.7]"
-                beforeSheen={<div className="spaces-card-glow" />}
-                afterSheen={
-                  <div className="spaces-card-overlay flex items-end p-6 sm:p-7">
-                    <div className="relative z-[1]">
-                      <span className="mb-2 block text-[0.58rem] font-medium uppercase tracking-[0.16em] text-gold-light">
-                        {t("label")}
-                      </span>
-                      <h3 className="font-[var(--font-display)] text-[1.45rem] font-normal text-white sm:text-[1.7rem]">
-                        {image.title[locale]}
-                      </h3>
-                    </div>
-                  </div>
-                }
-              />
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+  return <HotelImmersiveGallery />;
 }
 
 /* ---------- BREAKFAST ---------- */

@@ -1893,6 +1893,15 @@
     animation: voucher-media-sheen-left 1.72s ease-out 1;
   }
 
+  .hotel-gallery-scroll {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hotel-gallery-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
   .voucher-media-frame {
     position: absolute;
     pointer-events: none;
