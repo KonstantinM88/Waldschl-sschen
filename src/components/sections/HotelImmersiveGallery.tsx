@@ -283,13 +283,13 @@ const HOTEL_GALLERY_ITEMS: GalleryItem[] = [
 const GALLERY_COPY = {
   de: {
     intro:
-      "Eine kuratierte Bildstrecke aus Zimmern, Bad, Balkon und den ruhigen Details unseres Hauses. Die Galerie lauft automatisch, bleibt aber auf Tap und Hover voll steuerbar.",
-    pills: ["10 kuratierte Szenen", "Mobile & Desktop", "Auto-Play Galerie"],
+      "Entdecken Sie ausgewahlte Impressionen aus Zimmern, Bad, Balkon und den ruhigen Details unseres Hauses.",
+    pills: ["Zimmer & Details", "Balkon & Aussicht", "Bad & Komfort"],
     live: "Live Galerie",
     activeScene: "Aktive Szene",
     next: "Nachste Szene",
     previous: "Vorherige Szene",
-    hint: "Tippen, wischen oder per Klick die Szene wechseln.",
+    hint: "Weitere Eindrucke unseres Hauses in Ruhe entdecken.",
     highlights: [
       { label: "Zimmer", value: "10 Bildwelten", Icon: BedDouble },
       { label: "Bad", value: "Wanne & Details", Icon: Bath },
@@ -298,13 +298,13 @@ const GALLERY_COPY = {
   },
   en: {
     intro:
-      "A curated image sequence of rooms, bath, balcony and the quieter details of the house. The gallery runs automatically but stays fully controllable on tap and hover.",
-    pills: ["10 curated scenes", "Mobile & desktop", "Auto-play gallery"],
+      "Discover selected impressions of our rooms, bath, balcony and the quieter details of the house.",
+    pills: ["Rooms & details", "Balcony & views", "Bath & comfort"],
     live: "Live gallery",
     activeScene: "Active scene",
     next: "Next scene",
     previous: "Previous scene",
-    hint: "Tap, swipe or click to switch the scene.",
+    hint: "Browse further impressions of the house at your own pace.",
     highlights: [
       { label: "Rooms", value: "10 visual scenes", Icon: BedDouble },
       { label: "Bath", value: "Tub & details", Icon: Bath },
