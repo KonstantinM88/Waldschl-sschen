@@ -1,4 +1,4 @@
-import type { BookingLocale } from "@/lib/booking-engine";
+import type { BookingLocale } from "@/lib/booking-shared";
 
 export const BERLIN_TIME_ZONE = "Europe/Berlin";
 

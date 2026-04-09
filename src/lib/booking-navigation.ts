@@ -1,4 +1,4 @@
-import type { BookingLocale } from "@/lib/booking-engine";
+import type { BookingLocale } from "@/lib/booking-shared";
 
 export type BookingRouteLocale = Extract<BookingLocale, "de" | "en">;
 

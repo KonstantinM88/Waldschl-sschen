@@ -1,7 +1,8 @@
 "use server";
 
 import { ZodError } from "zod";
-import { createBooking, type BookingLocale } from "@/lib/booking-engine";
+import { createBooking } from "@/lib/booking-engine";
+import type { BookingLocale } from "@/lib/booking-shared";
 
 export interface SubmitHotelBookingState {
   status: "idle" | "success" | "error";

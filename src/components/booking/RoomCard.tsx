@@ -1,6 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 import { BedDouble, Coffee, ShieldCheck, Users } from "lucide-react";
-import type { AvailableRoom, BookingLocale } from "@/lib/booking-engine";
+import type { AvailableRoom, BookingLocale } from "@/lib/booking-shared";
 
 interface RoomCardProps {
   className?: string;
@@ -65,10 +66,12 @@ export default function RoomCard({
       ].join(" ")}
     >
       <div className="relative aspect-[5/4] overflow-hidden sm:aspect-[16/11]">
-        <img
+        <Image
           src={room.imageUrl ?? "/Hotel/room_1600.webp"}
           alt={room.title}
-          className="h-full w-full object-cover"
+          fill
+          sizes="(max-width: 640px) 100vw, 50vw"
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,12,10,0.08)_0%,rgba(15,12,10,0.1)_34%,rgba(15,12,10,0.6)_100%)]" />
         <div className="absolute left-4 top-4 flex flex-wrap gap-2">

@@ -15,8 +15,11 @@ import {
   UserRound,
   UtensilsCrossed,
 } from "lucide-react";
-import type { AvailableRoom, BookingLocale } from "@/lib/booking-engine";
-import { DOG_FEE_PER_NIGHT } from "@/lib/booking-engine";
+import {
+  DOG_FEE_PER_NIGHT,
+  type AvailableRoom,
+  type BookingLocale,
+} from "@/lib/booking-shared";
 import {
   submitHotelBookingAction,
   type SubmitHotelBookingState,

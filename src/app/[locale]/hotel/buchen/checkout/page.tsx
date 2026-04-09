@@ -1,10 +1,10 @@
 import { addDays, format } from "date-fns";
 import { CalendarDays, Coffee, Sparkles, Users } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import BookingCheckoutForm from "@/components/booking/BookingCheckoutForm";
 import BookingLanguageSwitcher from "@/components/booking/BookingLanguageSwitcher";
 import {
-  type BookingLocale,
   getAvailableRooms,
   getDefaultRestaurantTimeOptions,
 } from "@/lib/booking-engine";
@@ -13,6 +13,7 @@ import {
   toBookingDisplayLocale,
   toBookingRouteLocale,
 } from "@/lib/booking-navigation";
+import type { BookingLocale } from "@/lib/booking-shared";
 
 export const dynamic = "force-dynamic";
 
@@ -195,10 +196,12 @@ export default async function HotelBookingCheckoutPage({
 
               <div className="mt-6 overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/[0.04]">
                 <div className="relative aspect-[16/11] overflow-hidden">
-                  <img
+                  <Image
                     src={selectedRoom.imageUrl ?? "/Hotel/room_1600.webp"}
                     alt={selectedRoom.title}
-                    className="h-full w-full object-cover"
+                    fill
+                    sizes="(max-width: 1280px) 100vw, 40vw"
+                    className="object-cover"
                   />
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(12,10,9,0.08)_0%,rgba(12,10,9,0.22)_45%,rgba(12,10,9,0.78)_100%)]" />
                   <div className="absolute inset-x-0 bottom-0 p-5">

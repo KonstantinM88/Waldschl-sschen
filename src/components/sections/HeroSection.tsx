@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -14,12 +15,6 @@ export default function HeroSection() {
   const t = useTranslations("hero");
   const bookingHref = `/${locale}/hotel/buchen`;
   const mobileVideoSrc = "/video_mobile_noaudio.webm";
-  const heroImageSrcSet = [
-    "/restaurant_terrace_800w.webp 800w",
-    "/restaurant_terrace_1200w.webp 1200w",
-    "/restaurant_terrace_1600w.webp 1600w",
-    "/restaurant_terrace_1920w.webp 1920w",
-  ].join(", ");
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 767px)");
@@ -111,15 +106,14 @@ export default function HeroSection() {
               <source src={mobileVideoSrc} type="video/webm" />
             </video>
           ) : (
-            <img
+            <Image
               src="/restaurant_terrace_1920w.webp"
-              srcSet={heroImageSrcSet}
-              sizes="100vw"
               alt=""
+              fill
+              priority
+              sizes="100vw"
               aria-hidden="true"
-              className="h-full w-full object-cover object-center"
-              loading="eager"
-              fetchPriority="high"
+              className="object-cover object-center"
             />
           )}
         </motion.div>

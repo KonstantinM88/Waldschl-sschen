@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { BookingLocale } from "@/lib/booking-engine";
+import type { BookingLocale } from "@/lib/booking-shared";
 import {
   buildBookingHref,
   type BookingFlowState,

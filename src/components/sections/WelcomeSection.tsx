@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import Reveal from "@/components/ui/Reveal";
@@ -8,12 +9,6 @@ export default function WelcomeSection() {
   const t = useTranslations("welcome");
   const mediaRef = useRef<HTMLDivElement>(null);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
-  const posterSrcSet = [
-    "/landscape_restaurant_800w.webp 800w",
-    "/landscape_restaurant_1200w.webp 1200w",
-    "/landscape_restaurant_1600w.webp 1600w",
-    "/landscape_restaurant_1920w.webp 1920w",
-  ].join(", ");
 
   useEffect(() => {
     const mediaNode = mediaRef.current;
@@ -63,24 +58,24 @@ export default function WelcomeSection() {
                     aria-label="Waldschlösschen — Landschaftsvideo"
                   >
                     <source src="/landscape_video_webm.webm" type="video/webm" />
-                    <img
+                    <Image
                       src="/landscape_restaurant_1920w.webp"
-                      srcSet={posterSrcSet}
-                      sizes="(max-width: 1024px) 100vw, 50vw"
                       alt="Waldschlösschen — Restaurant-Landschaft"
+                      width={1920}
+                      height={1080}
+                      sizes="(max-width: 1024px) 100vw, 50vw"
                       loading="lazy"
                       className="h-full w-full object-cover object-center"
                     />
                   </video>
                 ) : (
-                  <img
-                    src="/landscape_restaurant_1200w.webp"
-                    srcSet={posterSrcSet}
-                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  <Image
+                    src="/landscape_restaurant_1920w.webp"
                     alt="Waldschlösschen — Restaurant-Landschaft"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
                     loading="lazy"
-                    decoding="async"
-                    className="h-full w-full object-cover object-center"
+                    className="object-cover object-center"
                   />
                 )}
                 <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(170deg,rgba(255,255,255,0.2)_0%,rgba(255,255,255,0)_34%,rgba(8,8,10,0.16)_100%)]" />

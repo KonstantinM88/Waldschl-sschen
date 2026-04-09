@@ -1,16 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import Reveal from "@/components/ui/Reveal";
 
 export default function VoucherSection() {
   const t = useTranslations("voucher");
-  const voucherBannerSrcSet = [
-    "/gutschein_banner_800w.webp 800w",
-    "/gutschein_banner_1200w.webp 1200w",
-    "/gutschein_banner_1600w.webp 1600w",
-    "/gutschein_banner_1920w.webp 1920w",
-  ].join(", ");
 
   return (
     <section className="voucher-section py-[clamp(5rem,10vw,9rem)] px-[clamp(1.5rem,5vw,6rem)] relative overflow-hidden" id="gutschein">
@@ -32,13 +27,14 @@ export default function VoucherSection() {
                 aria-hidden="true"
               >
                 <source src="/gutschein_video.webm" type="video/webm" />
-                <img
+                <Image
                   src="/gutschein_banner_1920w.webp"
-                  srcSet={voucherBannerSrcSet}
-                  sizes="(max-width: 1024px) 100vw, 50vw"
                   alt=""
                   aria-hidden="true"
                   className="voucher-media-video"
+                  width={1920}
+                  height={1080}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                   loading="lazy"
                 />
               </video>

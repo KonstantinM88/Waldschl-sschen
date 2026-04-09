@@ -1,12 +1,31 @@
-import { type Room } from "@prisma/client";
 import { ImageIcon, Layers3, Users } from "lucide-react";
 import { updateRoomAction } from "@/app/admin/room-actions";
 import { getAdminDictionary, type AdminLocale } from "@/lib/admin-i18n";
 
+interface AdminRoom {
+  id: string;
+  type: string;
+  inventory: number;
+  maxGuests: number;
+  basePrice: number | string | { toString(): string };
+  isActive: boolean;
+  titleDe: string;
+  titleEn: string;
+  titleRu: string;
+  descriptionDe: string;
+  descriptionEn: string;
+  descriptionRu: string;
+  shortDescriptionDe: string | null;
+  shortDescriptionEn: string | null;
+  shortDescriptionRu: string | null;
+  imageUrl: string | null;
+  amenities: unknown;
+}
+
 interface AdminRoomManagementProps {
   activeBookingCounts: Record<string, number>;
   locale: AdminLocale;
-  rooms: Room[];
+  rooms: AdminRoom[];
 }
 
 function amenitiesToTextarea(value: unknown) {
@@ -17,7 +36,7 @@ function amenitiesToTextarea(value: unknown) {
   return value.filter((item): item is string => typeof item === "string").join("\n");
 }
 
-function formatCurrency(value: Room["basePrice"], locale: AdminLocale) {
+function formatCurrency(value: AdminRoom["basePrice"], locale: AdminLocale) {
   return new Intl.NumberFormat(locale === "ru" ? "ru-RU" : "de-DE", {
     style: "currency",
     currency: "EUR",

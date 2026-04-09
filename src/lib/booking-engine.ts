@@ -1,40 +1,19 @@
 import { differenceInCalendarDays } from "date-fns";
-import { BookingStatus, Prisma, RoomType } from "@prisma/client";
 import { z } from "zod";
+import { BookingStatus, Prisma, RoomType, type Room } from "@prisma/client";
 import { parseHotelDateInput } from "@/lib/booking-dates";
+import {
+  type AvailableRoom,
+  type BookingLocale,
+  DOG_FEE_PER_NIGHT,
+} from "@/lib/booking-shared";
 import { prisma } from "@/lib/prisma";
-
-export type BookingLocale = "de" | "en" | "ru";
-
-export interface AvailableRoom {
-  amenities: string[];
-  availableCount: number;
-  basePrice: number;
-  bookedCount: number;
-  breakfastIncluded: boolean;
-  description: string;
-  guests: number;
-  id: string;
-  imageUrl: string | null;
-  inventory: number;
-  locale: BookingLocale;
-  maxGuests: number;
-  nights: number;
-  shortDescription: string | null;
-  slug: string;
-  title: string;
-  totalBasePrice: number;
-  type: RoomType;
-}
 
 export const ACTIVE_BOOKING_STATUSES = [
   BookingStatus.PENDING,
   BookingStatus.CONFIRMED,
   BookingStatus.CHECKED_IN,
 ] as const;
-
-export const DOG_FEE_PER_NIGHT = 15;
-export const FREE_BICYCLE_PRICE = 0;
 
 const bookingDateSchema = z.object({
   checkIn: z.string().min(1),
@@ -117,9 +96,20 @@ const DEFAULT_ROOMS = [
   },
 ] as const;
 
-type PrismaRoomClient =
-  | Pick<typeof prisma, "room">
-  | Pick<Prisma.TransactionClient, "room">;
+type PrismaRoomClient = {
+  room: {
+    upsert: typeof prisma.room.upsert;
+  };
+};
+
+type AvailableRoomsQueryResult = Room[];
+
+type ReservedRoomCount = {
+  roomId: string;
+  _count: {
+    _all: number;
+  };
+};
 
 function toBookingLocale(locale?: string | null): BookingLocale {
   return locale === "en" || locale === "ru" ? locale : "de";
@@ -243,41 +233,50 @@ export async function getAvailableRooms(
   const nights = assertDateRange(checkIn, checkOut);
   const normalizedLocale = toBookingLocale(locale);
 
-  const [rooms, reservedCounts] = await Promise.all([
-    prisma.room.findMany({
-      where: {
-        isActive: true,
-        maxGuests: {
-          gte: guests,
-        },
+  const roomResultsPromise: Promise<AvailableRoomsQueryResult> = prisma.room.findMany({
+    where: {
+      isActive: true,
+      maxGuests: {
+        gte: guests,
       },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    }),
-    prisma.booking.groupBy({
-      by: ["roomId"],
-      where: {
-        status: {
-          in: [...ACTIVE_BOOKING_STATUSES],
-        },
-        checkIn: {
-          lt: checkOut,
-        },
-        checkOut: {
-          gt: checkIn,
-        },
+    },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+  });
+
+  const reservedCountsPromise = (
+    prisma.booking as unknown as {
+      groupBy: (args: unknown) => Promise<ReservedRoomCount[]>;
+    }
+  ).groupBy({
+    by: ["roomId"],
+    where: {
+      status: {
+        in: [...ACTIVE_BOOKING_STATUSES],
       },
-      _count: {
-        _all: true,
+      checkIn: {
+        lt: checkOut,
       },
-    }),
-  ]);
+      checkOut: {
+        gt: checkIn,
+      },
+    },
+    _count: {
+      _all: true,
+    },
+  });
+
+  const [rooms, reservedCounts]: [AvailableRoomsQueryResult, ReservedRoomCount[]] =
+    await Promise.all([
+      roomResultsPromise,
+      reservedCountsPromise,
+    ]);
 
   const reservedByRoom = new Map(
     reservedCounts.map((entry) => [entry.roomId, entry._count._all])
   );
 
   return rooms
-    .map((room) => {
+    .map((room: Room) => {
       const reserved = reservedByRoom.get(room.id) ?? 0;
       const available = Math.max(room.inventory - reserved, 0);
       const localized = getLocalizedRoomField(room, normalizedLocale);
@@ -314,9 +313,11 @@ export async function createBooking(input: z.infer<typeof createBookingSchema>) 
   const nights = assertDateRange(checkIn, checkOut);
 
   return prisma.$transaction(async (tx) => {
-    await ensureDefaultRooms(tx);
+    const transactionClient = tx as unknown as typeof prisma;
 
-    const room = await tx.room.findUnique({
+    await ensureDefaultRooms(transactionClient);
+
+    const room = await transactionClient.room.findUnique({
       where: {
         id: validated.roomId,
       },
@@ -330,7 +331,7 @@ export async function createBooking(input: z.infer<typeof createBookingSchema>) 
       throw new Error("Guest count exceeds room capacity.");
     }
 
-    const overlappingBookings = await tx.booking.count({
+    const overlappingBookings = await transactionClient.booking.count({
       where: {
         roomId: room.id,
         status: {
@@ -355,7 +356,7 @@ export async function createBooking(input: z.infer<typeof createBookingSchema>) 
     const dogFeeTotal = dogFeePerNight.mul(validated.dogCount).mul(nights);
     const totalAmount = baseTotal.add(dogFeeTotal);
 
-    const guest = await tx.guest.create({
+    const guest = await transactionClient.guest.create({
       data: {
         firstName: validated.firstName,
         lastName: validated.lastName,
@@ -366,7 +367,7 @@ export async function createBooking(input: z.infer<typeof createBookingSchema>) 
       },
     });
 
-    const booking = await tx.booking.create({
+    const booking = await transactionClient.booking.create({
       data: {
         guestId: guest.id,
         roomId: room.id,
@@ -395,7 +396,10 @@ export async function createBooking(input: z.infer<typeof createBookingSchema>) 
 
     return {
       bookingId: booking.id,
-      roomType: ROOM_TYPE_LABELS[room.type][toBookingLocale(validated.locale)],
+      roomType:
+        ROOM_TYPE_LABELS[room.type as RoomType][
+          toBookingLocale(validated.locale)
+        ],
       totalAmount: Number(totalAmount),
     };
   });

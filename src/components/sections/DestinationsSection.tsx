@@ -9,44 +9,30 @@ import type { Locale } from "@/lib/i18n/config";
 const destinationMedia = {
   default: {
     src: "/landscape_restaurant_1920w.webp",
-    srcSet:
-      "/landscape_restaurant_800w.webp 800w, /landscape_restaurant_1200w.webp 1200w, /landscape_restaurant_1600w.webp 1600w, /landscape_restaurant_1920w.webp 1920w",
     position: "object-center",
   },
   "arche-nebra": {
     src: "/model_1600.webp",
-    srcSet:
-      "/model_1200.webp 1200w, /model_1600.webp 1600w",
     position: "object-[center_50%] sm:object-center",
   },
   weinberge: {
     src: "/vineyard_1600.webp",
-    srcSet:
-      "/vineyard_1200.webp 1200w, /vineyard_1600.webp 1600w",
     position: "object-[center_52%] sm:object-center",
   },
   unstrutradweg: {
     src: "/river_village_1600.webp",
-    srcSet:
-      "/river_village_1200.webp 1200w, /river_village_1600.webp 1600w",
     position: "object-[center_54%] sm:object-center",
   },
   rotkaeppchen: {
     src: "/wine_cellar_alt_1600.webp",
-    srcSet:
-      "/wine_cellar_alt_1200.webp 1200w, /wine_cellar_alt_1600.webp 1600w",
     position: "object-[center_52%] sm:object-center",
   },
   memleben: {
     src: "/abbey_ruins_1600.webp",
-    srcSet:
-      "/abbey_ruins_1200.webp 1200w, /abbey_ruins_1600.webp 1600w",
     position: "object-[center_52%] sm:object-center",
   },
   mittelberg: {
     src: "/tower_1600.webp",
-    srcSet:
-      "/tower_1200.webp 1200w, /tower_1600.webp 1600w",
     position: "object-[center_52%] sm:object-center",
   },
 } as const;
@@ -70,7 +56,6 @@ function DestinationCard({
   const fallbackMedia = destinationMedia.default;
   const activeMedia = preferredMedia ?? fallbackMedia;
   const src = activeMedia.src;
-  const srcSet = activeMedia?.srcSet;
   const positionClass = activeMedia?.position ?? fallbackMedia.position;
 
   return (

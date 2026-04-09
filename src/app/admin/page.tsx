@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import type {
+  ContactSubmission,
+  Event,
+  GiftVoucher,
+  Prisma,
+  Room,
+} from "@prisma/client";
 import {
   CalendarDays,
   CircleAlert,
@@ -33,6 +40,20 @@ import {
 import { formatHotelDate } from "@/lib/booking-dates";
 
 export const dynamic = "force-dynamic";
+
+type RecentBooking = Prisma.BookingGetPayload<{
+  include: {
+    guest: true;
+    room: true;
+  };
+}>;
+
+type ActiveRoomBookingCount = {
+  roomId: string;
+  _count: {
+    _all: number;
+  };
+};
 
 function formatDateTime(date: Date, locale: AdminLocale) {
   return new Intl.DateTimeFormat(getAdminIntlLocale(locale), {
@@ -78,6 +99,52 @@ export default async function AdminDashboardPage() {
 
   await ensureDefaultRooms();
 
+  const recentContactsPromise: Promise<ContactSubmission[]> =
+    prisma.contactSubmission.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 8,
+    });
+
+  const recentBookingsPromise: Promise<RecentBooking[]> = prisma.booking.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 6,
+    include: {
+      guest: true,
+      room: true,
+    },
+  });
+
+  const recentVouchersPromise: Promise<GiftVoucher[]> = prisma.giftVoucher.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 6,
+  });
+
+  const upcomingEventsPromise: Promise<Event[]> = prisma.event.findMany({
+    where: { date: { gte: new Date() } },
+    orderBy: { date: "asc" },
+    take: 6,
+  });
+
+  const roomsPromise: Promise<Room[]> = prisma.room.findMany({
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+  });
+
+  const activeRoomBookingCountsPromise = (
+    prisma.booking as unknown as {
+      groupBy: (args: unknown) => Promise<ActiveRoomBookingCount[]>;
+    }
+  ).groupBy({
+    by: ["roomId"],
+    where: {
+      status: {
+        in: [...ACTIVE_BOOKING_STATUSES],
+      },
+    },
+    _count: {
+      _all: true,
+    },
+  });
+
   const [
     totalContacts,
     unreadContacts,
@@ -91,6 +158,19 @@ export default async function AdminDashboardPage() {
     upcomingEvents,
     rooms,
     activeRoomBookingCounts,
+  ]: [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    ContactSubmission[],
+    RecentBooking[],
+    GiftVoucher[],
+    Event[],
+    Room[],
+    ActiveRoomBookingCount[],
   ] = await Promise.all([
     prisma.contactSubmission.count(),
     prisma.contactSubmission.count({ where: { readAt: null } }),
@@ -98,41 +178,12 @@ export default async function AdminDashboardPage() {
     prisma.booking.count({ where: { status: "PENDING" } }),
     prisma.giftVoucher.count({ where: { isRedeemed: false } }),
     prisma.event.count({ where: { isPublished: true } }),
-    prisma.contactSubmission.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 8,
-    }),
-    prisma.booking.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 6,
-      include: {
-        guest: true,
-        room: true,
-      },
-    }),
-    prisma.giftVoucher.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 6,
-    }),
-    prisma.event.findMany({
-      where: { date: { gte: new Date() } },
-      orderBy: { date: "asc" },
-      take: 6,
-    }),
-    prisma.room.findMany({
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    }),
-    prisma.booking.groupBy({
-      by: ["roomId"],
-      where: {
-        status: {
-          in: [...ACTIVE_BOOKING_STATUSES],
-        },
-      },
-      _count: {
-        _all: true,
-      },
-    }),
+    recentContactsPromise,
+    recentBookingsPromise,
+    recentVouchersPromise,
+    upcomingEventsPromise,
+    roomsPromise,
+    activeRoomBookingCountsPromise,
   ]);
 
   const activeBookingCounts = Object.fromEntries(
@@ -194,13 +245,15 @@ export default async function AdminDashboardPage() {
               >
                 {t.dashboard.openWebsite}
               </Link>
-              <a
-                href="/api/admin/logout"
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-[rgba(212,188,142,0.26)] bg-[rgba(212,188,142,0.12)] px-5 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[rgba(244,234,214,0.96)] transition-all duration-300 hover:bg-[rgba(212,188,142,0.18)]"
-              >
-                <LogOut className="h-3.5 w-3.5 stroke-[2]" />
-                {t.dashboard.logout}
-              </a>
+              <form action="/api/admin/logout" method="get">
+                <button
+                  type="submit"
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-[rgba(212,188,142,0.26)] bg-[rgba(212,188,142,0.12)] px-5 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[rgba(244,234,214,0.96)] transition-all duration-300 hover:bg-[rgba(212,188,142,0.18)]"
+                >
+                  <LogOut className="h-3.5 w-3.5 stroke-[2]" />
+                  {t.dashboard.logout}
+                </button>
+              </form>
             </div>
           </div>
         </header>
@@ -320,7 +373,11 @@ export default async function AdminDashboardPage() {
                           </div>
                         </div>
                         <span className="rounded-full border border-[#eadfcf] bg-white px-2.5 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-[#8f836f]">
-                          {t.dashboard.bookingStatuses[booking.status]}
+                          {
+                            t.dashboard.bookingStatuses[
+                              booking.status as keyof typeof t.dashboard.bookingStatuses
+                            ]
+                          }
                         </span>
                       </div>
                       <div className="mt-3 text-sm font-light leading-relaxed text-[#4f483f]">

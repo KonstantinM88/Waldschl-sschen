@@ -571,7 +571,9 @@ function HotelTestimonials() {
                     ))}
                   </div>
 
-                  <p className="testimonial-quote">"{review.text[locale]}"</p>
+                  <p className="testimonial-quote">
+                    &ldquo;{review.text[locale]}&rdquo;
+                  </p>
 
                   <div className="testimonial-meta">
                     <div className="text-xs font-medium text-text-secondary">{review.author[locale]}</div>

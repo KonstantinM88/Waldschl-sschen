@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { addDays, differenceInCalendarDays, format, parseISO } from "date-fns";
 import { de, enUS, ru } from "date-fns/locale";
 import { CalendarDays, Search, Users } from "lucide-react";
-import type { BookingLocale } from "@/lib/booking-engine";
+import type { BookingLocale } from "@/lib/booking-shared";
 
 interface BookingWidgetProps {
   action: string;

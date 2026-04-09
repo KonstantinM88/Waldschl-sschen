@@ -103,13 +103,6 @@ export default function Header() {
   }, [mobileOpen]);
 
   useEffect(() => {
-    setMobileOpen(false);
-    setLanguageOpen(false);
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = "";
-  }, [pathname]);
-
-  useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
       if (!languageMenuRef.current?.contains(event.target as Node)) {
         setLanguageOpen(false);

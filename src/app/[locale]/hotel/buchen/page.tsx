@@ -4,9 +4,6 @@ import BookingLanguageSwitcher from "@/components/booking/BookingLanguageSwitche
 import BookingWidget from "@/components/booking/BookingWidget";
 import RoomCard from "@/components/booking/RoomCard";
 import {
-  type BookingLocale,
-  DOG_FEE_PER_NIGHT,
-  FREE_BICYCLE_PRICE,
   getAvailableRooms,
   getDefaultRestaurantTimeOptions,
 } from "@/lib/booking-engine";
@@ -15,6 +12,7 @@ import {
   toBookingDisplayLocale,
   toBookingRouteLocale,
 } from "@/lib/booking-navigation";
+import { DOG_FEE_PER_NIGHT, FREE_BICYCLE_PRICE } from "@/lib/booking-shared";
 import { siteConfig } from "@/data/site";
 
 export const dynamic = "force-dynamic";
