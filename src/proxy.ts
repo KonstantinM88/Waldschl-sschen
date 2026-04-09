@@ -11,7 +11,7 @@ import {routing} from "@/lib/i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const isAdminRoute = pathname === ADMIN_DASHBOARD_PATH || pathname.startsWith(`${ADMIN_DASHBOARD_PATH}/`);
 
