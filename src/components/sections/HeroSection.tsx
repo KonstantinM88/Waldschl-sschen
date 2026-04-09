@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   motion,
   useReducedMotion,
 } from "framer-motion";
 
 export default function HeroSection() {
+  const locale = useLocale();
   const shouldReduceMotion = useReducedMotion();
   const [isMobile, setIsMobile] = useState(false);
   const t = useTranslations("hero");
+  const bookingHref = `/${locale}/hotel/buchen`;
   const mobileVideoSrc = "/video_mobile_noaudio.webm";
   const heroImageSrcSet = [
     "/restaurant_terrace_800w.webp 800w",
@@ -163,7 +165,7 @@ export default function HeroSection() {
           {...reveal}
           transition={{ duration: 1, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
         >
-          <a href="#buchen" className="btn-primary w-full justify-center sm:w-auto sm:min-w-[220px]">
+          <a href={bookingHref} className="btn-primary w-full justify-center sm:w-auto sm:min-w-[220px]">
             {t("ctaBook")}
           </a>
           <a href="#restaurant" className="btn-outline-light w-full justify-center sm:w-auto sm:min-w-[220px]">

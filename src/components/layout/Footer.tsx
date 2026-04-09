@@ -48,7 +48,7 @@ export default function Footer() {
               {t("service")}
             </h4>
             <nav className="flex flex-col">
-              <Link href={buildHomeSectionHref("#buchen")} className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("bookRoom")}</Link>
+              <Link href={buildPageHref("/hotel/buchen")} className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("bookRoom")}</Link>
               <Link href={buildPageHref("/restaurant#reservieren")} className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("reserveTable")}</Link>
               <Link href={buildHomeSectionHref("#gutschein")} className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("vouchers")}</Link>
               <Link href={buildPageHref("/events")} className="text-sm font-light leading-[2.2] opacity-55 hover:opacity-100 hover:text-gold-light transition-all">{t("arrangements")}</Link>

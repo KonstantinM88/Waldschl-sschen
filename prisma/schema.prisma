@@ -32,28 +32,6 @@ model GiftVoucher {
   redeemedAt DateTime?
 }
 
-model Booking {
-  id          String   @id @default(cuid())
-  guestName   String
-  guestEmail  String
-  guestPhone  String?
-  checkIn     DateTime
-  checkOut    DateTime
-  roomType    String
-  guests      Int      @default(2)
-  notes       String?
-  status      BookingStatus @default(PENDING)
-  locale      String   @default("de")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-enum BookingStatus {
-  PENDING
-  CONFIRMED
-  CANCELLED
-}
-
 model Event {
   id          String   @id @default(cuid())
   title       String
@@ -64,4 +42,91 @@ model Event {
   imageUrl    String?
   isPublished Boolean  @default(false)
   createdAt   DateTime @default(now())
+}
+
+model Guest {
+  id        String    @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String
+  phone     String?
+  notes     String?
+  locale    String    @default("de")
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([email])
+}
+
+model Room {
+  id                  String    @id @default(cuid())
+  slug                String    @unique
+  type                RoomType
+  inventory           Int
+  maxGuests           Int
+  basePrice           Decimal   @db.Decimal(10, 2)
+  breakfastIncluded   Boolean   @default(true)
+  isActive            Boolean   @default(true)
+  sortOrder           Int       @default(0)
+  titleDe             String
+  titleEn             String
+  titleRu             String
+  descriptionDe       String
+  descriptionEn       String
+  descriptionRu       String
+  shortDescriptionDe  String?
+  shortDescriptionEn  String?
+  shortDescriptionRu  String?
+  imageUrl            String?
+  amenities           Json?
+  bookings            Booking[]
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+model Booking {
+  id                        String        @id @default(cuid())
+  guestId                   String
+  roomId                    String
+  guest                     Guest         @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  room                      Room          @relation(fields: [roomId], references: [id], onDelete: Restrict)
+  checkIn                   DateTime
+  checkOut                  DateTime
+  guests                    Int           @default(1)
+  nights                    Int
+  basePricePerNight         Decimal       @db.Decimal(10, 2)
+  baseTotal                 Decimal       @db.Decimal(10, 2)
+  dogCount                  Int           @default(0)
+  dogFeePerNight            Decimal       @db.Decimal(10, 2) @default(15)
+  dogFeeTotal               Decimal       @db.Decimal(10, 2) @default(0)
+  bicycleReserved           Boolean       @default(false)
+  restaurantReservationTime String?
+  totalAmount               Decimal       @db.Decimal(10, 2)
+  breakfastIncluded         Boolean       @default(true)
+  notes                     String?
+  status                    BookingStatus @default(PENDING)
+  locale                    String        @default("de")
+  createdAt                 DateTime      @default(now())
+  updatedAt                 DateTime      @updatedAt
+
+  @@index([roomId, checkIn, checkOut])
+  @@index([guestId, createdAt])
+  @@index([status, checkIn, checkOut])
+}
+
+enum RoomType {
+  SINGLE
+  DOUBLE
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  CHECKED_IN
+  CHECKED_OUT
+  NO_SHOW
 }

@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   TentTree,
 } from "lucide-react";
+import AdminRoomManagement from "@/components/admin/AdminRoomManagement";
 import AdminLocaleSwitcher from "@/components/admin/AdminLocaleSwitcher";
 import { prisma } from "@/lib/prisma";
 import {
@@ -24,6 +25,12 @@ import {
   getAdminLocaleFromCookieStore,
   type AdminLocale,
 } from "@/lib/admin-i18n";
+import {
+  ACTIVE_BOOKING_STATUSES,
+  ensureDefaultRooms,
+  getRoomTypeLabel,
+} from "@/lib/booking-engine";
+import { formatHotelDate } from "@/lib/booking-dates";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +47,7 @@ function formatCurrency(value: number, locale: AdminLocale) {
     currency: "EUR",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(value);
+  }).format(Number(value));
 }
 
 function truncate(value: string, maxLength: number) {
@@ -69,6 +76,8 @@ export default async function AdminDashboardPage() {
   const t = getAdminDictionary(locale);
   const session = await requireAdminSession();
 
+  await ensureDefaultRooms();
+
   const [
     totalContacts,
     unreadContacts,
@@ -80,6 +89,8 @@ export default async function AdminDashboardPage() {
     recentBookings,
     recentVouchers,
     upcomingEvents,
+    rooms,
+    activeRoomBookingCounts,
   ] = await Promise.all([
     prisma.contactSubmission.count(),
     prisma.contactSubmission.count({ where: { readAt: null } }),
@@ -94,6 +105,10 @@ export default async function AdminDashboardPage() {
     prisma.booking.findMany({
       orderBy: { createdAt: "desc" },
       take: 6,
+      include: {
+        guest: true,
+        room: true,
+      },
     }),
     prisma.giftVoucher.findMany({
       orderBy: { createdAt: "desc" },
@@ -104,7 +119,25 @@ export default async function AdminDashboardPage() {
       orderBy: { date: "asc" },
       take: 6,
     }),
+    prisma.room.findMany({
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    }),
+    prisma.booking.groupBy({
+      by: ["roomId"],
+      where: {
+        status: {
+          in: [...ACTIVE_BOOKING_STATUSES],
+        },
+      },
+      _count: {
+        _all: true,
+      },
+    }),
   ]);
+
+  const activeBookingCounts = Object.fromEntries(
+    activeRoomBookingCounts.map((entry) => [entry.roomId, entry._count._all])
+  );
 
   const statCards = [
     {
@@ -279,19 +312,23 @@ export default async function AdminDashboardPage() {
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <h3 className="text-sm font-medium text-[#201b17]">{booking.guestName}</h3>
-                          <div className="mt-1 text-sm font-light text-[#5d564c]">{booking.roomType}</div>
+                          <h3 className="text-sm font-medium text-[#201b17]">
+                            {booking.guest.firstName} {booking.guest.lastName}
+                          </h3>
+                          <div className="mt-1 text-sm font-light text-[#5d564c]">
+                            {getRoomTypeLabel(booking.room.type, locale)}
+                          </div>
                         </div>
                         <span className="rounded-full border border-[#eadfcf] bg-white px-2.5 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-[#8f836f]">
                           {t.dashboard.bookingStatuses[booking.status]}
                         </span>
                       </div>
                       <div className="mt-3 text-sm font-light leading-relaxed text-[#4f483f]">
-                        {formatDateTime(booking.checkIn, locale)} - {formatDateTime(booking.checkOut, locale)}
+                        {formatHotelDate(booking.checkIn, locale)} - {formatHotelDate(booking.checkOut, locale)}
                       </div>
-                      <a href={`mailto:${booking.guestEmail}`} className="mt-3 inline-flex items-center gap-2 text-sm text-[#6c6459] hover:text-[#201b17]">
+                      <a href={`mailto:${booking.guest.email}`} className="mt-3 inline-flex items-center gap-2 text-sm text-[#6c6459] hover:text-[#201b17]">
                         <Mail className="h-4 w-4 stroke-[1.8]" />
-                        {booking.guestEmail}
+                        {booking.guest.email}
                       </a>
                     </article>
                   ))
@@ -381,6 +418,12 @@ export default async function AdminDashboardPage() {
             </section>
           </div>
         </section>
+
+        <AdminRoomManagement
+          locale={locale}
+          rooms={rooms}
+          activeBookingCounts={activeBookingCounts}
+        />
       </div>
     </main>
   );

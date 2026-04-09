@@ -34,6 +34,7 @@ import { siteConfig } from "@/data/site";
 /* ---------- HERO ---------- */
 function HotelHero() {
   const t = useTranslations("hotelPage.hero");
+  const locale = useLocale() as "de" | "en";
   const reveal = {
     initial: { opacity: 0, y: 60, filter: "blur(4px)" },
     animate: { opacity: 1, y: 0, filter: "blur(0px)" },
@@ -85,7 +86,7 @@ function HotelHero() {
           {...reveal}
           transition={{ duration: 1, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
         >
-          <a href="#buchen" className="btn-primary w-full sm:w-auto">{t("ctaBook")}</a>
+          <a href={`/${locale}/hotel/buchen`} className="btn-primary w-full sm:w-auto">{t("ctaBook")}</a>
           <a href="#zimmer" className="btn-outline-light w-full sm:w-auto">{t("ctaRooms")}</a>
         </motion.div>
       </div>
@@ -164,6 +165,7 @@ function HotelRooms() {
   const t = useTranslations("hotelPage.rooms");
   const tAmenities = useTranslations("hotelPage.amenities");
   const tCta = useTranslations("hotelPage.cta");
+  const locale = useLocale() as "de" | "en";
 
   const roomTypes = [
     {
@@ -243,7 +245,7 @@ function HotelRooms() {
                   </div>
 
                   <a
-                    href="#buchen"
+                    href={`/${locale}/hotel/buchen`}
                     className="mt-8 inline-flex items-center gap-2 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-gold transition-all duration-300 hover:gap-3"
                   >
                     {tCta("ctaBook")}

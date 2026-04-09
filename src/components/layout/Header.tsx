@@ -162,6 +162,7 @@ export default function Header() {
   const homeHref = `/${activeLocale}`;
   const buildPageHref = (path: string) => `/${activeLocale}${path}`;
   const buildHomeSectionHref = (hash: string) => `${homeHref}${hash}`;
+  const buildBookingHref = () => buildPageHref("/hotel/buchen");
   const languageOptions = [
     {
       value: "de" as const,
@@ -336,7 +337,7 @@ export default function Header() {
           </AnimatePresence>
         </div>
         <a
-          href={buildHomeSectionHref("#buchen")}
+          href={buildBookingHref()}
           className={cn("btn-primary btn-header", scrolled && "btn-header-scrolled")}
         >
           {t("book")}
@@ -475,7 +476,7 @@ export default function Header() {
               </motion.div>
 
               <motion.a
-                href={buildHomeSectionHref("#buchen")}
+                href={buildBookingHref()}
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}

@@ -1,11 +1,13 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import Reveal from "@/components/ui/Reveal";
 
 export default function CulinarySection() {
+  const locale = useLocale();
   const t = useTranslations("culinary");
+  const bookingHref = `/${locale}/hotel/buchen`;
 
   const hours = [
     { label: t("daily"), time: t("dailyTime") },
@@ -82,7 +84,7 @@ export default function CulinarySection() {
             ))}
           </div>
 
-          <a href="#buchen" className="btn-dark mt-8 inline-flex">
+          <a href={bookingHref} className="btn-dark mt-8 inline-flex">
             {t("ctaTable")}
           </a>
         </Reveal>
