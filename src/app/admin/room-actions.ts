@@ -1,9 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
+import { requireAdminSession } from "@/lib/admin-dashboard";
 import { normalizeAmenities } from "@/lib/booking-engine";
+import { resolveAdminReturnTo, withAdminNotice } from "@/lib/admin-feedback";
 import { prisma } from "@/lib/prisma";
 
 const roomUpdateSchema = z.object({
@@ -25,6 +28,9 @@ const roomUpdateSchema = z.object({
 });
 
 export async function updateRoomAction(formData: FormData) {
+  await requireAdminSession();
+  const returnTo = resolveAdminReturnTo(formData.get("returnTo"), "/admin/rooms");
+
   const parsed = roomUpdateSchema.parse({
     id: formData.get("id"),
     basePrice: formData.get("basePrice"),
@@ -70,4 +76,8 @@ export async function updateRoomAction(formData: FormData) {
   });
 
   revalidatePath("/admin");
+  revalidatePath("/admin/bookings");
+  revalidatePath("/admin/rooms");
+
+  redirect(withAdminNotice(returnTo, "saved"));
 }

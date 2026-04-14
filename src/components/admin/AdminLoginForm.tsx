@@ -86,6 +86,7 @@ export default function AdminLoginForm({ locale, nextPath }: AdminLoginFormProps
           name="username"
           type="text"
           autoComplete="username"
+          disabled={isPending}
           required
           className="h-12 w-full rounded-2xl border border-white/12 bg-white/[0.06] px-4 text-sm text-white outline-none transition-all duration-300 placeholder:text-white/34 focus:border-[rgba(212,188,142,0.5)] focus:bg-white/[0.08]"
           placeholder={copy.usernamePlaceholder}
@@ -104,6 +105,7 @@ export default function AdminLoginForm({ locale, nextPath }: AdminLoginFormProps
           name="password"
           type="password"
           autoComplete="current-password"
+          disabled={isPending}
           required
           className="h-12 w-full rounded-2xl border border-white/12 bg-white/[0.06] px-4 text-sm text-white outline-none transition-all duration-300 placeholder:text-white/34 focus:border-[rgba(212,188,142,0.5)] focus:bg-white/[0.08]"
           placeholder={copy.passwordPlaceholder}

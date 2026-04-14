@@ -30,7 +30,11 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
         <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10">
           <section className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl shadow-[0_30px_80px_rgba(0,0,0,0.26)] sm:p-9">
             <div className="flex justify-end">
-              <AdminLocaleSwitcher locale={locale} currentPath={currentPath} />
+              <AdminLocaleSwitcher
+                locale={locale}
+                currentPath={currentPath}
+                variant="dark"
+              />
             </div>
             <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-[rgba(212,188,142,0.24)] bg-[rgba(212,188,142,0.08)] text-[rgba(232,214,183,0.98)]">
               <Shield className="h-6 w-6 stroke-[1.8]" />
