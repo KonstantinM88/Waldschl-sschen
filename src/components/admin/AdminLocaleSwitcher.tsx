@@ -17,7 +17,7 @@ export default function AdminLocaleSwitcher({
   return (
     <div
       className={[
-        "inline-flex items-center gap-1.5 rounded-full border p-1.5 backdrop-blur-sm",
+        "inline-flex w-full min-w-0 flex-wrap items-center justify-between gap-1.5 rounded-[1.4rem] border p-1.5 backdrop-blur-sm sm:w-auto sm:flex-nowrap sm:justify-start sm:rounded-full",
         light
           ? "border-[#ddd2c0] bg-[#f7f1e8] shadow-[0_10px_24px_rgba(28,21,16,0.05)]"
           : "border-white/10 bg-white/5",
@@ -39,7 +39,7 @@ export default function AdminLocaleSwitcher({
             key={option}
             href={`/api/admin/locale?lang=${option}&next=${encodeURIComponent(currentPath)}`}
             className={[
-              "inline-flex min-w-[3rem] h-9 items-center justify-center rounded-full px-3.5 text-[0.64rem] font-semibold uppercase tracking-[0.16em] transition-all duration-300",
+              "inline-flex h-9 min-w-[3rem] flex-1 items-center justify-center rounded-full px-3.5 text-[0.64rem] font-semibold uppercase tracking-[0.16em] transition-all duration-300 sm:flex-none",
               active
                 ? light
                   ? "border border-[#d7b57e] bg-[linear-gradient(135deg,#ead8b8_0%,#ddc08d_100%)] text-[#5b4420] shadow-[0_8px_18px_rgba(128,92,39,0.18)]"

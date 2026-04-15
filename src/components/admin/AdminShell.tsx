@@ -97,7 +97,7 @@ export default function AdminShell({
   ];
 
   return (
-    <main className="min-h-screen bg-[#f5f1ea] px-4 py-5 text-[#201b17] sm:px-6 lg:px-8">
+    <main className="min-h-screen overflow-x-hidden bg-[#f5f1ea] px-3 py-4 text-[#201b17] sm:px-6 sm:py-5 lg:px-8">
       {feedback ? (
         <AdminNoticeToast
           dismissLabel={t.dashboard.controls.dismiss}
@@ -199,14 +199,14 @@ export default function AdminShell({
             </nav>
           </aside>
 
-          <div className="space-y-5">
-            <header className="rounded-[2rem] border border-[#dfd4c2] bg-white px-5 py-5 shadow-[0_18px_40px_rgba(28,21,16,0.06)] sm:px-7 sm:py-6">
+          <div className="min-w-0 space-y-5">
+            <header className="rounded-[2rem] border border-[#dfd4c2] bg-white px-4 py-4 shadow-[0_18px_40px_rgba(28,21,16,0.06)] sm:px-7 sm:py-6">
               <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
-                <div className="max-w-[54rem]">
+                <div className="min-w-0 max-w-[54rem]">
                   <div className="inline-flex items-center gap-2 rounded-full border border-[#eadfcf] bg-[#faf7f1] px-3.5 py-2 text-[0.62rem] font-medium uppercase tracking-[0.18em] text-[#b4884c]">
                     {badge}
                   </div>
-                  <h2 className="mt-4 font-[var(--font-display)] text-[clamp(2.2rem,4vw,3.7rem)] leading-[0.94] text-[#201b17]">
+                  <h2 className="mt-4 break-words font-[var(--font-display)] text-[clamp(2rem,9vw,3.7rem)] leading-[0.94] text-[#201b17] [overflow-wrap:anywhere]">
                     {title}
                   </h2>
                   <p className="mt-3 text-sm font-light leading-relaxed text-[#5d564c] sm:text-[0.98rem]">
@@ -214,7 +214,7 @@ export default function AdminShell({
                   </p>
                 </div>
 
-                <div className="flex flex-wrap gap-3">
+                <div className="grid w-full grid-cols-1 gap-3 sm:w-auto sm:grid-cols-[auto_auto] xl:flex xl:flex-wrap xl:justify-end">
                   <AdminLocaleSwitcher
                     locale={locale}
                     currentPath={currentPath}
@@ -222,14 +222,14 @@ export default function AdminShell({
                   />
                   <Link
                     href="/"
-                    className="inline-flex h-11 items-center justify-center rounded-full border border-[#dfd4c2] bg-[#faf7f1] px-5 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[#5d564c] transition-all duration-300 hover:border-[#d2c3af] hover:text-[#201b17]"
+                    className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#dfd4c2] bg-[#faf7f1] px-5 text-center text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[#5d564c] transition-all duration-300 hover:border-[#d2c3af] hover:text-[#201b17] sm:w-auto"
                   >
                     {t.dashboard.openWebsite}
                   </Link>
-                  <form action="/api/admin/logout" method="get">
+                  <form action="/api/admin/logout" method="get" className="w-full sm:w-auto">
                     <AdminSubmitButton
                       pendingLabel={`${t.dashboard.logout}...`}
-                      className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-[rgba(184,136,76,0.2)] bg-[linear-gradient(135deg,#d8bd84_0%,#c9a96e_48%,#b4884c_100%)] px-5 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-white shadow-[0_16px_30px_rgba(128,92,39,0.22)] transition-all duration-300 hover:translate-y-[-1px] hover:shadow-[0_20px_36px_rgba(128,92,39,0.3)]"
+                      className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-[rgba(184,136,76,0.2)] bg-[linear-gradient(135deg,#d8bd84_0%,#c9a96e_48%,#b4884c_100%)] px-5 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-white shadow-[0_16px_30px_rgba(128,92,39,0.22)] transition-all duration-300 hover:translate-y-[-1px] hover:shadow-[0_20px_36px_rgba(128,92,39,0.3)] sm:w-auto"
                     >
                       <LogOut className="h-3.5 w-3.5 stroke-[2]" />
                       {t.dashboard.logout}

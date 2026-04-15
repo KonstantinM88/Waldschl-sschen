@@ -86,7 +86,7 @@ export default async function AdminBookingDetailPage({
       <div className="flex flex-wrap gap-3">
         <Link
           href={backHref}
-          className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#dfd4c2] bg-white px-5 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[#6c6459] transition-all duration-300 hover:border-[#cdbca4] hover:text-[#201b17]"
+          className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#dfd4c2] bg-white px-5 text-center text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[#6c6459] transition-all duration-300 hover:border-[#cdbca4] hover:text-[#201b17] sm:w-auto"
         >
           {t.dashboard.controls.backToList}
         </Link>
@@ -291,7 +291,7 @@ export default async function AdminBookingDetailPage({
               </div>
               <a
                 href={`mailto:${booking.guest.email}`}
-                className="mt-3 inline-flex items-center gap-2 text-[#6c6459] hover:text-[#201b17]"
+                className="mt-3 inline-flex items-center gap-2 break-all text-[#6c6459] hover:text-[#201b17]"
               >
                 <Mail className="h-4 w-4 stroke-[1.8]" />
                 {booking.guest.email}
