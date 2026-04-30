@@ -20,6 +20,7 @@ import {
   ensureDefaultRooms,
 } from "@/lib/booking-engine";
 import { prisma } from "@/lib/prisma";
+import { ensureDefaultRestaurantMenu } from "@/lib/restaurant-menu";
 
 type SearchParamsValue = string | string[] | undefined;
 type SearchParamsShape = Record<string, SearchParamsValue>;
@@ -59,6 +60,7 @@ type ActiveRoomBookingCount = {
 
 export interface AdminSummary {
   activeRooms: number;
+  activeMenuCategories: number;
   availableInventory: number;
   checkedInBookings: number;
   confirmedBookings: number;
@@ -66,11 +68,13 @@ export interface AdminSummary {
   occupancyRate: number;
   occupiedInventory: number;
   pendingBookings: number;
+  publishedMenuItems: number;
   publishedEvents: number;
   redeemedVouchers: number;
   totalBookings: number;
   totalContacts: number;
   totalInventory: number;
+  totalMenuItems: number;
   totalRooms: number;
   unreadContacts: number;
   upcomingEvents: number;
@@ -274,7 +278,7 @@ export async function getAdminPageContext(currentPath: string): Promise<AdminPag
 }
 
 export async function getAdminSummary(): Promise<AdminSummary> {
-  await ensureDefaultRooms();
+  await Promise.all([ensureDefaultRooms(), ensureDefaultRestaurantMenu()]);
 
   const now = new Date();
   const activeRoomBookingCountsPromise = (
@@ -304,9 +308,15 @@ export async function getAdminSummary(): Promise<AdminSummary> {
     redeemedVouchers,
     publishedEvents,
     upcomingEvents,
+    activeMenuCategories,
+    totalMenuItems,
+    publishedMenuItems,
     rooms,
     activeRoomBookingCounts,
   ]: [
+    number,
+    number,
+    number,
     number,
     number,
     number,
@@ -330,6 +340,9 @@ export async function getAdminSummary(): Promise<AdminSummary> {
     prisma.giftVoucher.count({ where: { isRedeemed: true } }),
     prisma.event.count({ where: { isPublished: true } }),
     prisma.event.count({ where: { date: { gte: now } } }),
+    prisma.restaurantMenuCategory.count({ where: { isActive: true } }),
+    prisma.restaurantMenuItem.count(),
+    prisma.restaurantMenuItem.count({ where: { isPublished: true } }),
     prisma.room.findMany({
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     }),
@@ -349,6 +362,7 @@ export async function getAdminSummary(): Promise<AdminSummary> {
 
   return {
     activeRooms,
+    activeMenuCategories,
     availableInventory,
     checkedInBookings,
     confirmedBookings,
@@ -356,11 +370,13 @@ export async function getAdminSummary(): Promise<AdminSummary> {
     occupancyRate,
     occupiedInventory,
     pendingBookings,
+    publishedMenuItems,
     publishedEvents,
     redeemedVouchers,
     totalBookings,
     totalContacts,
     totalInventory,
+    totalMenuItems,
     totalRooms: rooms.length,
     unreadContacts,
     upcomingEvents,

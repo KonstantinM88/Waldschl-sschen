@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { siteConfig } from "@/data/site";
 import { locales, defaultLocale, type Locale } from "@/lib/i18n/config";
+import { getPublicRestaurantMenu } from "@/lib/restaurant-menu";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import RestaurantPageContent from "@/components/sections/RestaurantPageContent";
@@ -9,6 +10,8 @@ import RestaurantPageContent from "@/components/sections/RestaurantPageContent";
 interface RestaurantPageProps {
   params: Promise<{ locale: string }>;
 }
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -44,7 +47,13 @@ export async function generateMetadata({
   };
 }
 
-export default function RestaurantPage() {
+export default async function RestaurantPage({ params }: RestaurantPageProps) {
+  const { locale } = await params;
+  const normalizedLocale = locales.includes(locale as Locale)
+    ? (locale as Locale)
+    : defaultLocale;
+  const menuCategories = await getPublicRestaurantMenu(normalizedLocale);
+
   const restaurantSchema = {
     "@context": "https://schema.org",
     "@type": "Restaurant",
@@ -105,6 +114,29 @@ export default function RestaurantPage() {
       { "@type": "LocationFeatureSpecification", name: "Vegetarische Optionen", value: true },
       { "@type": "LocationFeatureSpecification", name: "Glutenfreie Optionen", value: true },
     ],
+  };
+
+  const menuSchema = {
+    "@context": "https://schema.org",
+    "@type": "Menu",
+    name: "Speisekarte Restaurant Waldschlösschen",
+    url: `${siteConfig.url}/${normalizedLocale}/restaurant#speisekarte`,
+    hasMenuSection: menuCategories.map((category) => ({
+      "@type": "MenuSection",
+      name: category.title,
+      description: category.description ?? undefined,
+      hasMenuItem: category.items.map((item) => ({
+        "@type": "MenuItem",
+        name: item.name,
+        description: item.description ?? undefined,
+        image: item.imageUrl ? `${siteConfig.url}${item.imageUrl}` : undefined,
+        offers: {
+          "@type": "Offer",
+          price: item.price.toFixed(2),
+          priceCurrency: "EUR",
+        },
+      })),
+    })),
   };
 
   const breadcrumbSchema = {
@@ -187,8 +219,12 @@ export default function RestaurantPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(menuSchema) }}
+      />
       <Header />
-      <RestaurantPageContent />
+      <RestaurantPageContent menuCategories={menuCategories} />
       <Footer />
     </>
   );

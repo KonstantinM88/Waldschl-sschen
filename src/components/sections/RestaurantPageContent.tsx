@@ -5,6 +5,10 @@ import { useTranslations, useLocale } from "next-intl";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import {
+  BadgeEuro,
+  ChefHat,
+  Check,
+  ChevronDown,
   Clock,
   UtensilsCrossed,
   Wine,
@@ -17,9 +21,11 @@ import {
   Wheat,
   MilkOff,
   Heart,
+  Sparkles,
 } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 import { siteConfig } from "@/data/site";
+import type { PublicRestaurantMenuCategory } from "@/lib/restaurant-menu-shared";
 
 type ScrollDirection = "up" | "down";
 
@@ -238,7 +244,7 @@ function RestaurantHero() {
           transition={{ duration: 1, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
         >
           <a href="#reservieren" className="btn-primary">{t("ctaReserve")}</a>
-          <a href="#speisen" className="btn-outline-light">{t("ctaMenu")}</a>
+          <a href="#speisekarte" className="btn-outline-light">{t("ctaMenu")}</a>
         </motion.div>
       </div>
     </RestaurantWaveFrame>
@@ -361,6 +367,592 @@ function RestaurantCuisine() {
             </span>
           </div>
         </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ================================================================
+   MENU — Live menu from admin
+   ================================================================ */
+function RestaurantMenuShowcase({
+  categories,
+}: {
+  categories: PublicRestaurantMenuCategory[];
+}) {
+  const locale = useLocale() as "de" | "en";
+  const [activeSlug, setActiveSlug] = useState(categories[0]?.slug ?? "");
+  const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false);
+
+  if (!categories.length) {
+    return null;
+  }
+
+  const activeCategory =
+    categories.find((category) => category.slug === activeSlug) ?? categories[0];
+  const featuredItem =
+    activeCategory.items.find((item) => item.isSignature) ?? activeCategory.items[0];
+  const supportingItems = activeCategory.items.filter(
+    (item) => item.id !== featuredItem?.id
+  );
+  const activeCategoryIndex = Math.max(
+    categories.findIndex((category) => category.slug === activeCategory.slug),
+    0
+  );
+  const priceFormatter = new Intl.NumberFormat(locale === "en" ? "en-US" : "de-DE", {
+    currency: "EUR",
+    style: "currency",
+  });
+  const copy =
+    locale === "en"
+      ? {
+          badge: "Menu · April 2026",
+          title: "Seasonal dishes with",
+          titleEmphasis: "Waldschlösschen character",
+          text:
+            "A modern view into our current restaurant menu: asparagus season, regional classics, crisp flammkuchen and desserts from the Waldschlösschen kitchen.",
+          signature: "Recommendation",
+          vegetarian: "Vegetarian",
+          allergens: "Allergens",
+          fromPdf: "From the current house menu",
+          categoryLabel: "Menu category",
+          categoryHint: "Choose what you would like to explore",
+        }
+      : {
+          badge: "Speisekarte · April 2026",
+          title: "Saisonale Gerichte mit",
+          titleEmphasis: "Waldschlösschen Charakter",
+          text:
+            "Ein moderner Blick in unsere aktuelle Karte: Spargelzeit, regionale Klassiker, krosse Flammkuchen und Desserts aus der Waldschlösschen-Küche.",
+          signature: "Empfehlung",
+          vegetarian: "Vegetarisch",
+          allergens: "Allergene",
+          fromPdf: "Aus der aktuellen Hauskarte",
+          categoryLabel: "Menükategorie",
+          categoryHint: "Wählen Sie, worauf Sie gerade Lust haben",
+        };
+  const formatPrice = (price: number) => priceFormatter.format(price);
+  const formatItemCount = (count: number) =>
+    locale === "en"
+      ? `${count} ${count === 1 ? "item" : "items"}`
+      : `${count} ${count === 1 ? "Position" : "Positionen"}`;
+  const renderPrice = (
+    item: PublicRestaurantMenuCategory["items"][number],
+    compact = false
+  ) => {
+    if (item.priceVariants.length) {
+      return (
+        <div
+          className={[
+            "flex flex-wrap items-center gap-2",
+            compact ? "justify-end" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          {item.priceVariants.map((variant) => (
+            <span
+              key={`${variant.label}-${variant.price}`}
+              className={[
+                "inline-flex items-center gap-2 rounded-full border border-white/[0.16] bg-black/[0.28] backdrop-blur-md",
+                compact
+                  ? "min-h-9 px-3 text-xs"
+                  : "min-h-12 px-4 text-sm sm:text-base",
+              ].join(" ")}
+            >
+              <span className="text-white/[0.58]">{variant.label}</span>
+              <span className="font-medium text-white">{formatPrice(variant.price)}</span>
+            </span>
+          ))}
+        </div>
+      );
+    }
+
+    return (
+      <span
+        className={[
+          "inline-flex items-center justify-center rounded-full border border-white/[0.16] bg-black/[0.28] font-medium text-white backdrop-blur-md",
+          compact ? "min-h-9 px-3 text-sm" : "min-h-12 px-4 text-xl",
+        ].join(" ")}
+      >
+        {formatPrice(item.price)}
+      </span>
+    );
+  };
+
+  return (
+    <section
+      id="speisekarte"
+      className="relative overflow-hidden bg-[#15120f] px-[clamp(1.25rem,5vw,6rem)] py-[clamp(5rem,10vw,9rem)] text-white"
+    >
+      <div className="absolute inset-0 opacity-[0.18]">
+        <Image
+          src="/restaurant_room_1920w.webp"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover"
+        />
+      </div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(212,177,111,0.24),transparent_32%),linear-gradient(180deg,rgba(21,18,15,0.72)_0%,#15120f_72%)]" />
+
+      <div className="relative z-[1] mx-auto max-w-[1480px]">
+        <Reveal>
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(320px,0.58fr)] lg:items-end">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.08] px-4 py-2 text-xs font-medium text-[#f2d49b] backdrop-blur-md">
+                <ChefHat className="h-4 w-4 stroke-[1.7]" />
+                {copy.badge}
+              </div>
+              <h2 className="mt-6 max-w-[760px] font-[var(--font-display)] text-[clamp(2.4rem,5.6vw,5.2rem)] leading-[0.92] text-white">
+                {copy.title} <em>{copy.titleEmphasis}</em>
+              </h2>
+            </div>
+            <p className="max-w-[620px] text-base font-light leading-relaxed text-white/72 lg:text-lg">
+              {copy.text}
+            </p>
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.12}>
+          <div className="mt-10 space-y-4">
+            <div className="sm:hidden">
+              <div className="overflow-hidden rounded-[1.6rem] border border-[#f2d49b]/[0.22] bg-[linear-gradient(145deg,rgba(255,255,255,0.12),rgba(255,255,255,0.055))] p-3 shadow-[0_22px_54px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+                <button
+                  type="button"
+                  aria-expanded={mobileCategoriesOpen}
+                  onClick={() => setMobileCategoriesOpen((open) => !open)}
+                  className="flex min-h-16 w-full items-center justify-between gap-4 rounded-[1.25rem] border border-white/[0.12] bg-[#211b16]/[0.92] px-4 py-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                >
+                  <span className="min-w-0">
+                    <span className="block text-[0.58rem] font-medium uppercase text-[#f2d49b]">
+                      {copy.categoryLabel}
+                    </span>
+                    <span className="mt-1 block break-words text-[1rem] font-medium leading-tight text-white">
+                      {activeCategory.title}
+                    </span>
+                  </span>
+                  <span
+                    className={[
+                      "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#f2d49b]/[0.22] bg-[#f2d49b]/[0.12] text-[#f2d49b] transition-transform duration-300",
+                      mobileCategoriesOpen ? "rotate-180" : "",
+                    ].join(" ")}
+                  >
+                    <ChevronDown className="h-4 w-4 stroke-[2]" />
+                  </span>
+                </button>
+
+                {mobileCategoriesOpen ? (
+                  <div className="mt-3 rounded-[1.25rem] border border-white/[0.1] bg-[#17120f]/[0.92] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+                    <p className="px-3 pb-2 pt-1 text-xs font-light leading-relaxed text-white/[0.48]">
+                      {copy.categoryHint}
+                    </p>
+                    <div className="max-h-[54vh] space-y-1 overflow-y-auto pr-1 [scrollbar-color:#d8bd84_transparent] [scrollbar-width:thin]">
+                      {categories.map((category) => {
+                        const active = category.slug === activeCategory.slug;
+
+                        return (
+                          <button
+                            key={category.id}
+                            type="button"
+                            onClick={() => {
+                              setActiveSlug(category.slug);
+                              setMobileCategoriesOpen(false);
+                            }}
+                            className={[
+                              "flex min-h-12 w-full items-center justify-between gap-3 rounded-[1rem] px-3 py-2.5 text-left text-sm font-medium leading-tight transition-all duration-300",
+                              active
+                                ? "bg-[#d8bd84] text-[#17120d] shadow-[0_14px_28px_rgba(216,189,132,0.2)]"
+                                : "text-white/[0.78] hover:bg-white/[0.07] hover:text-white",
+                            ].join(" ")}
+                          >
+                            <span className="min-w-0 break-words">{category.title}</span>
+                            {active ? (
+                              <Check className="h-4 w-4 shrink-0 stroke-[2.2]" />
+                            ) : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="hidden flex-wrap gap-3 rounded-[1.6rem] border border-white/[0.1] bg-black/[0.16] p-2 backdrop-blur-md sm:flex lg:hidden">
+              {categories.map((category) => {
+                const active = category.slug === activeCategory.slug;
+
+                return (
+                  <button
+                    key={category.id}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setActiveSlug(category.slug)}
+                    className={[
+                      "inline-flex min-h-12 max-w-full items-center justify-center rounded-full border px-4 text-center text-sm font-medium leading-tight transition-all duration-300 md:px-5",
+                      active
+                        ? "border-[#d8bd84] bg-[#d8bd84] text-[#17120d] shadow-[0_18px_36px_rgba(216,189,132,0.24)]"
+                        : "border-white/[0.12] bg-white/[0.07] text-white/72 backdrop-blur-md hover:border-white/[0.26] hover:text-white",
+                    ].join(" ")}
+                  >
+                    {category.title}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </Reveal>
+
+        <div className="mt-8 hidden grid-cols-[minmax(270px,0.32fr)_minmax(0,1fr)] gap-6 lg:grid xl:grid-cols-[320px_minmax(0,1fr)] xl:gap-8">
+          <Reveal delay={0.14} className="h-full">
+            <aside className="sticky top-28 overflow-hidden rounded-[1.9rem] border border-white/[0.11] bg-[#211a14]/[0.78] p-3 shadow-[0_28px_70px_rgba(0,0,0,0.24)] backdrop-blur-xl">
+              <div className="px-3 pb-4 pt-2">
+                <div className="text-[0.62rem] font-medium uppercase tracking-[0.18em] text-[#f2d49b]">
+                  {copy.categoryLabel}
+                </div>
+                <p className="mt-2 text-sm font-light leading-relaxed text-white/[0.58]">
+                  {copy.categoryHint}
+                </p>
+              </div>
+
+              <div className="max-h-[calc(100vh-230px)] space-y-1.5 overflow-y-auto pr-1 [scrollbar-color:#d8bd84_transparent] [scrollbar-width:thin]">
+                {categories.map((category, index) => {
+                  const active = category.slug === activeCategory.slug;
+
+                  return (
+                    <button
+                      key={category.id}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => setActiveSlug(category.slug)}
+                      className={[
+                        "group/menu relative flex min-h-[4.4rem] w-full items-center gap-3 rounded-[1.25rem] px-3.5 py-3 text-left transition-all duration-300",
+                        active
+                          ? "bg-[#d8bd84] text-[#17120d] shadow-[0_18px_38px_rgba(216,189,132,0.22)]"
+                          : "text-white/72 hover:bg-white/[0.075] hover:text-white",
+                      ].join(" ")}
+                    >
+                      <span
+                        className={[
+                          "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-xs font-medium transition-colors duration-300",
+                          active
+                            ? "border-[#17120d]/10 bg-[#17120d]/10 text-[#17120d]"
+                            : "border-white/[0.1] bg-white/[0.045] text-[#f2d49b]",
+                        ].join(" ")}
+                      >
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block break-words text-sm font-medium leading-tight">
+                          {category.title}
+                        </span>
+                        <span
+                          className={[
+                            "mt-1 block text-xs font-light",
+                            active ? "text-[#17120d]/60" : "text-white/[0.42]",
+                          ].join(" ")}
+                        >
+                          {formatItemCount(category.items.length)}
+                        </span>
+                      </span>
+                      {active ? (
+                        <Check className="h-4 w-4 shrink-0 stroke-[2.2]" />
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
+            </aside>
+          </Reveal>
+
+          <div className="min-w-0 space-y-6">
+            {featuredItem ? (
+              <Reveal delay={0.18}>
+                <article className="overflow-hidden rounded-[2.15rem] border border-white/[0.12] bg-[linear-gradient(145deg,rgba(255,255,255,0.12),rgba(255,255,255,0.055))] shadow-[0_34px_92px_rgba(0,0,0,0.31)] backdrop-blur-xl">
+                  <div className="grid min-h-[520px] xl:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)]">
+                    <div className="group relative min-h-[520px] overflow-hidden bg-[#2b241c]">
+                      <Image
+                        src={featuredItem.imageUrl || "/restaurant-menu/default.webp"}
+                        alt={featuredItem.name}
+                        fill
+                        sizes="(max-width: 1280px) 62vw, 46vw"
+                        className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                      />
+                      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,8,6,0.04)_0%,rgba(10,8,6,0.16)_45%,rgba(10,8,6,0.58)_100%)]" />
+                      <div className="absolute left-6 top-6 inline-flex max-w-[calc(100%-3rem)] items-center gap-2 rounded-full border border-[#f2d49b]/[0.28] bg-[#15120f]/[0.48] px-4 py-2 text-xs font-medium text-[#ffe7b2] backdrop-blur-md">
+                        {featuredItem.isSignature ? (
+                          <Sparkles className="h-3.5 w-3.5 shrink-0 stroke-[1.8]" />
+                        ) : (
+                          <ChefHat className="h-3.5 w-3.5 shrink-0 stroke-[1.8]" />
+                        )}
+                        <span className="min-w-0 truncate">
+                          {featuredItem.isSignature ? copy.signature : activeCategory.title}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex min-w-0 flex-col justify-between p-8 xl:p-10">
+                      <div>
+                        <div className="inline-flex max-w-full flex-wrap items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.06] px-3.5 py-2 text-xs font-medium text-[#f2d49b]">
+                          <span>{String(activeCategoryIndex + 1).padStart(2, "0")}</span>
+                          <span className="h-1 w-1 rounded-full bg-[#f2d49b]/60" />
+                          <span>{activeCategory.title}</span>
+                        </div>
+
+                        <h3 className="mt-7 break-words font-[var(--font-display)] text-[clamp(3rem,4.5vw,4.75rem)] leading-[0.88] text-white">
+                          {featuredItem.name}
+                        </h3>
+
+                        {featuredItem.description ? (
+                          <p className="mt-6 max-w-[620px] text-base font-light leading-relaxed text-white/[0.68] xl:text-lg">
+                            {featuredItem.description}
+                          </p>
+                        ) : null}
+
+                        <div className="mt-6 flex flex-wrap gap-2">
+                          {featuredItem.isSignature ? (
+                            <span className="inline-flex items-center gap-2 rounded-full border border-[#f2d49b]/30 bg-[#f2d49b]/[0.14] px-3 py-1.5 text-xs font-medium text-[#ffe7b2]">
+                              <Sparkles className="h-3.5 w-3.5 stroke-[1.8]" />
+                              {copy.signature}
+                            </span>
+                          ) : null}
+                          {featuredItem.isVegetarian ? (
+                            <span className="inline-flex items-center gap-2 rounded-full border border-[#9bc98c]/30 bg-[#9bc98c]/[0.16] px-3 py-1.5 text-xs font-medium text-[#d8f4cc]">
+                              <Leaf className="h-3.5 w-3.5 stroke-[1.8]" />
+                              {copy.vegetarian}
+                            </span>
+                          ) : null}
+                        </div>
+                      </div>
+
+                      <div className="mt-10 border-t border-white/[0.1] pt-7">
+                        <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+                          <div>
+                            <div className="text-sm font-light text-white/[0.46]">
+                              {copy.fromPdf}
+                            </div>
+                            {featuredItem.allergens ? (
+                              <div className="mt-2 text-xs font-light text-white/[0.42]">
+                                {copy.allergens}: {featuredItem.allergens}
+                              </div>
+                            ) : null}
+                            {featuredItem.priceNote ? (
+                              <div className="mt-2 text-xs font-light text-white/[0.42]">
+                                {featuredItem.priceNote}
+                              </div>
+                            ) : null}
+                          </div>
+                          <div className="shrink-0">{renderPrice(featuredItem)}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </Reveal>
+            ) : null}
+
+            <Reveal delay={0.22}>
+              <div className="overflow-hidden rounded-[2rem] border border-white/[0.1] bg-[#1b1511]/[0.68] p-5 shadow-[0_28px_70px_rgba(0,0,0,0.22)] backdrop-blur-xl xl:p-6">
+                <div className="flex flex-col gap-4 border-b border-white/[0.08] pb-5 xl:flex-row xl:items-end xl:justify-between">
+                  <div>
+                    <div className="text-[0.66rem] font-medium uppercase tracking-[0.18em] text-[#f2d49b]">
+                      {formatItemCount(activeCategory.items.length)}
+                    </div>
+                    <h3 className="mt-2 break-words font-[var(--font-display)] text-[2.15rem] leading-none text-white">
+                      {activeCategory.title}
+                    </h3>
+                  </div>
+                  {activeCategory.description ? (
+                    <p className="max-w-[500px] text-sm font-light leading-relaxed text-white/[0.54]">
+                      {activeCategory.description}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="divide-y divide-white/[0.075]">
+                  {supportingItems.map((item, index) => (
+                    <article
+                      key={item.id}
+                      className="group/item grid grid-cols-[88px_minmax(0,1fr)] gap-4 py-5 transition-colors duration-300 hover:bg-white/[0.035] xl:grid-cols-[104px_minmax(0,1fr)] xl:gap-5"
+                    >
+                      <div className="relative aspect-square overflow-hidden rounded-[1.15rem] bg-[#2b241c]">
+                        <Image
+                          src={item.imageUrl || "/restaurant-menu/default.webp"}
+                          alt={item.name}
+                          fill
+                          sizes="104px"
+                          className="object-cover transition-transform duration-500 group-hover/item:scale-[1.07]"
+                        />
+                        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_54%,rgba(10,8,6,0.32)_100%)]" />
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                          <div className="min-w-0">
+                            <div className="mb-2 flex flex-wrap items-center gap-2">
+                              <span className="text-xs font-light text-[#f2d49b]/70">
+                                {String(index + 2).padStart(2, "0")}
+                              </span>
+                              {item.isSignature ? (
+                                <span className="rounded-full bg-[#f2d49b]/[0.13] px-2.5 py-1 text-[0.7rem] font-medium text-[#f2d49b]">
+                                  {copy.signature}
+                                </span>
+                              ) : null}
+                              {item.isVegetarian ? (
+                                <span className="rounded-full bg-[#9bc98c]/[0.13] px-2.5 py-1 text-[0.7rem] font-medium text-[#d8f4cc]">
+                                  {copy.vegetarian}
+                                </span>
+                              ) : null}
+                            </div>
+                            <h4 className="break-words font-[var(--font-display)] text-[1.7rem] leading-none text-white transition-colors duration-300 group-hover/item:text-[#ffe7b2]">
+                              {item.name}
+                            </h4>
+                            {item.description ? (
+                              <p className="mt-3 max-w-[720px] text-sm font-light leading-relaxed text-white/[0.58]">
+                                {item.description}
+                              </p>
+                            ) : null}
+                            {item.allergens ? (
+                              <div className="mt-3 text-xs font-light text-white/[0.34]">
+                                {copy.allergens}: {item.allergens}
+                              </div>
+                            ) : null}
+                            {item.priceNote ? (
+                              <div className="mt-2 text-xs font-light text-white/[0.34]">
+                                {item.priceNote}
+                              </div>
+                            ) : null}
+                          </div>
+
+                          <div className="shrink-0 xl:max-w-[280px]">
+                            {renderPrice(item, true)}
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 gap-5 lg:hidden">
+          {featuredItem ? (
+            <Reveal delay={0.16}>
+              <article className="group relative min-h-[520px] overflow-hidden rounded-[2rem] border border-white/[0.12] bg-white/[0.08] shadow-[0_28px_80px_rgba(0,0,0,0.28)] backdrop-blur-md">
+                <Image
+                  src={featuredItem.imageUrl || "/restaurant-menu/default.webp"}
+                  alt={featuredItem.name}
+                  fill
+                  sizes="(max-width: 1280px) 100vw, 42vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,8,6,0.08)_0%,rgba(10,8,6,0.38)_42%,rgba(10,8,6,0.9)_100%)]" />
+                <div className="absolute inset-x-0 bottom-0 p-5 sm:p-8">
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    {featuredItem.isSignature ? (
+                      <span className="inline-flex items-center gap-2 rounded-full border border-[#f2d49b]/30 bg-[#f2d49b]/[0.18] px-3 py-1.5 text-xs font-medium text-[#ffe7b2]">
+                        <Sparkles className="h-3.5 w-3.5 stroke-[1.8]" />
+                        {copy.signature}
+                      </span>
+                    ) : null}
+                    {featuredItem.isVegetarian ? (
+                      <span className="inline-flex items-center gap-2 rounded-full border border-[#9bc98c]/30 bg-[#9bc98c]/[0.16] px-3 py-1.5 text-xs font-medium text-[#d8f4cc]">
+                        <Leaf className="h-3.5 w-3.5 stroke-[1.8]" />
+                        {copy.vegetarian}
+                      </span>
+                    ) : null}
+                  </div>
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <div className="min-w-0">
+                      <div className="text-sm font-light text-white/[0.58]">
+                        {copy.fromPdf}
+                      </div>
+                      <h3 className="mt-2 break-words font-[var(--font-display)] text-[clamp(2rem,7vw,3.6rem)] leading-[0.92] text-white">
+                        {featuredItem.name}
+                      </h3>
+                    </div>
+                    <div className="shrink-0">
+                      {renderPrice(featuredItem)}
+                    </div>
+                  </div>
+                  {featuredItem.description ? (
+                    <p className="mt-4 max-w-[680px] text-sm font-light leading-relaxed text-white/72 sm:text-base">
+                      {featuredItem.description}
+                    </p>
+                  ) : null}
+                  {featuredItem.allergens ? (
+                    <div className="mt-4 text-xs font-light text-white/[0.45]">
+                      {copy.allergens}: {featuredItem.allergens}
+                    </div>
+                  ) : null}
+                  {featuredItem.priceNote ? (
+                    <div className="mt-2 text-xs font-light text-white/[0.45]">
+                      {featuredItem.priceNote}
+                    </div>
+                  ) : null}
+                </div>
+              </article>
+            </Reveal>
+          ) : null}
+
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            {supportingItems.map((item, index) => (
+              <Reveal key={item.id} delay={0.1 + (index % 6) * 0.04}>
+                <article className="group h-full overflow-hidden rounded-[1.6rem] border border-white/10 bg-white/[0.075] shadow-[0_20px_54px_rgba(0,0,0,0.18)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.18]">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-[#2b241c]">
+                    <Image
+                      src={item.imageUrl || "/restaurant-menu/default.webp"}
+                      alt={item.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 30vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                    />
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_48%,rgba(10,8,6,0.48)_100%)]" />
+                    <div className="absolute bottom-3 right-3 flex max-w-[calc(100%-1.5rem)] items-center gap-2 rounded-[1.2rem] text-white">
+                      <BadgeEuro className="h-4 w-4 stroke-[1.8]" />
+                      {renderPrice(item, true)}
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      {item.isSignature ? (
+                        <span className="rounded-full bg-[#f2d49b]/[0.14] px-3 py-1 text-xs font-medium text-[#f2d49b]">
+                          {copy.signature}
+                        </span>
+                      ) : null}
+                      {item.isVegetarian ? (
+                        <span className="rounded-full bg-[#9bc98c]/[0.13] px-3 py-1 text-xs font-medium text-[#d8f4cc]">
+                          {copy.vegetarian}
+                        </span>
+                      ) : null}
+                    </div>
+                    <h3 className="break-words font-[var(--font-display)] text-[1.55rem] leading-none text-white">
+                      {item.name}
+                    </h3>
+                    {item.description ? (
+                      <p className="mt-3 text-sm font-light leading-relaxed text-white/[0.62]">
+                        {item.description}
+                      </p>
+                    ) : null}
+                    {item.allergens ? (
+                      <div className="mt-4 text-xs font-light text-white/[0.36]">
+                        {copy.allergens}: {item.allergens}
+                      </div>
+                    ) : null}
+                    {item.priceNote ? (
+                      <div className="mt-2 text-xs font-light text-white/[0.36]">
+                        {item.priceNote}
+                      </div>
+                    ) : null}
+                  </div>
+                </article>
+              </Reveal>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -725,12 +1317,17 @@ function RestaurantCta() {
 /* ================================================================
    MAIN EXPORT
    ================================================================ */
-export default function RestaurantPageContent() {
+export default function RestaurantPageContent({
+  menuCategories,
+}: {
+  menuCategories: PublicRestaurantMenuCategory[];
+}) {
   return (
     <main>
       <RestaurantHero />
       <RestaurantIntro />
       <RestaurantCuisine />
+      <RestaurantMenuShowcase categories={menuCategories} />
       <RestaurantSpaces />
       <RestaurantGallery />
       <RestaurantHours />

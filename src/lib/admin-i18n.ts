@@ -84,6 +84,10 @@ const adminDictionaries = {
           label: "Events",
           detail: "Planungskalender",
         },
+        menu: {
+          label: "Speisekarte",
+          detail: "Gerichte & Bilder",
+        },
         rooms: {
           label: "Zimmer",
           detail: "Preise & Inhalte",
@@ -366,6 +370,49 @@ const adminDictionaries = {
               "Einzelansicht fur Zeit, Inhalte, Veroffentlichungsstatus und Pflege eines Events.",
           },
         },
+        menu: {
+          badge: "Speisekarte",
+          title: "Restaurant-Speisekarte",
+          description:
+            "Pflege der Restaurantkarte mit Kategorien, Preisen, Veroffentlichung und WebP-Bildern pro Gericht.",
+          stats: {
+            categories: "Aktive Kategorien",
+            published: "Sichtbare Gerichte",
+            total: "Alle Gerichte",
+          },
+          fields: {
+            allergens: "Allergene",
+            category: "Kategorie",
+            descriptionDe: "Beschreibung DE",
+            descriptionEn: "Beschreibung EN",
+            imageFile: "Bild hochladen",
+            imageUrl: "Bild-URL",
+            nameDe: "Name DE",
+            nameEn: "Name EN",
+            price: "Preis",
+            priceNoteDe: "Preisnotiz DE",
+            priceNoteEn: "Preisnotiz EN",
+            priceVariants: "Preisvarianten",
+            slug: "Slug",
+            sortOrder: "Sortierung",
+            titleDe: "Titel DE",
+            titleEn: "Titel EN",
+          },
+          form: {
+            categoryTitle: "Kategorie anlegen",
+            itemTitle: "Gericht anlegen",
+            editCategory: "Kategorie bearbeiten",
+            editItem: "Gericht bearbeiten",
+            active: "Aktiv",
+            published: "Sichtbar",
+            signature: "Empfehlung",
+            vegetarian: "Vegetarisch",
+            uploadHint:
+              "JPEG, PNG, WebP, AVIF oder GIF werden beim Speichern automatisch als WebP abgelegt.",
+            priceVariantsHint:
+              "Eine Variante pro Zeile: 0,2l | 7,50",
+          },
+        },
         rooms: {
           badge: "Zimmerverwaltung",
           title: "Zimmer, Preise und Verfugbarkeit",
@@ -509,6 +556,10 @@ const adminDictionaries = {
         events: {
           label: "События",
           detail: "Календарь планирования",
+        },
+        menu: {
+          label: "Меню",
+          detail: "Блюда и фото",
         },
         rooms: {
           label: "Номера",
@@ -790,6 +841,49 @@ const adminDictionaries = {
             title: "Детали события",
             description:
               "Отдельная страница для времени, контента, публикации и ручного управления событием.",
+          },
+        },
+        menu: {
+          badge: "Меню ресторана",
+          title: "Управление ресторанным меню",
+          description:
+            "Редактирование категорий, блюд, цен, публикации и WebP-изображений для каждой позиции.",
+          stats: {
+            categories: "Активные категории",
+            published: "Видимые блюда",
+            total: "Все блюда",
+          },
+          fields: {
+            allergens: "Аллергены",
+            category: "Категория",
+            descriptionDe: "Описание DE",
+            descriptionEn: "Описание EN",
+            imageFile: "Загрузить фото",
+            imageUrl: "URL изображения",
+            nameDe: "Название DE",
+            nameEn: "Название EN",
+            price: "Цена",
+            priceNoteDe: "Примечание к цене DE",
+            priceNoteEn: "Примечание к цене EN",
+            priceVariants: "Варианты цены",
+            slug: "Slug",
+            sortOrder: "Сортировка",
+            titleDe: "Заголовок DE",
+            titleEn: "Заголовок EN",
+          },
+          form: {
+            categoryTitle: "Создать категорию",
+            itemTitle: "Создать блюдо",
+            editCategory: "Редактировать категорию",
+            editItem: "Редактировать блюдо",
+            active: "Активна",
+            published: "Показывать",
+            signature: "Рекомендация",
+            vegetarian: "Вегетарианское",
+            uploadHint:
+              "JPEG, PNG, WebP, AVIF или GIF при сохранении автоматически конвертируются в WebP.",
+            priceVariantsHint:
+              "Один вариант на строку: 0,2l | 7,50",
           },
         },
         rooms: {

@@ -8,6 +8,7 @@ import {
   LogOut,
   Mail,
   ShieldCheck,
+  UtensilsCrossed,
 } from "lucide-react";
 import AdminLocaleSwitcher from "@/components/admin/AdminLocaleSwitcher";
 import AdminNoticeToast from "@/components/admin/AdminNoticeToast";
@@ -86,6 +87,13 @@ export default function AdminShell({
       detail: t.dashboard.navigation.events.detail,
       value: String(summary.upcomingEvents),
       Icon: CalendarClock,
+    },
+    {
+      href: "/admin/menu",
+      label: t.dashboard.navigation.menu.label,
+      detail: t.dashboard.navigation.menu.detail,
+      value: `${summary.publishedMenuItems}/${summary.totalMenuItems}`,
+      Icon: UtensilsCrossed,
     },
     {
       href: "/admin/rooms",

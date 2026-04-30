@@ -9,40 +9,82 @@ datasource db {
 }
 
 model ContactSubmission {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String
   email     String
   phone     String?
   subject   String
   message   String
-  locale    String   @default("de")
-  createdAt DateTime @default(now())
+  locale    String    @default("de")
+  createdAt DateTime  @default(now())
   readAt    DateTime?
 }
 
 model GiftVoucher {
-  id        String   @id @default(cuid())
-  code      String   @unique
-  amount    Float
-  buyerName String
+  id         String    @id @default(cuid())
+  code       String    @unique
+  amount     Float
+  buyerName  String
   buyerEmail String
-  recipient String?
-  message   String?
-  isRedeemed Boolean @default(false)
-  createdAt  DateTime @default(now())
+  recipient  String?
+  message    String?
+  isRedeemed Boolean   @default(false)
+  createdAt  DateTime  @default(now())
   redeemedAt DateTime?
 }
 
 model Event {
-  id          String   @id @default(cuid())
-  title       String
-  titleEn     String?
-  date        DateTime
-  description String?
+  id            String   @id @default(cuid())
+  title         String
+  titleEn       String?
+  date          DateTime
+  description   String?
   descriptionEn String?
-  imageUrl    String?
-  isPublished Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  imageUrl      String?
+  isPublished   Boolean  @default(false)
+  createdAt     DateTime @default(now())
+}
+
+model RestaurantMenuCategory {
+  id            String               @id @default(cuid())
+  slug          String               @unique
+  titleDe       String
+  titleEn       String?
+  descriptionDe String?
+  descriptionEn String?
+  sortOrder     Int                  @default(0)
+  isActive      Boolean              @default(true)
+  items         RestaurantMenuItem[]
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+model RestaurantMenuItem {
+  id            String                 @id @default(cuid())
+  slug          String                 @unique
+  categoryId    String
+  category      RestaurantMenuCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  nameDe        String
+  nameEn        String?
+  descriptionDe String?
+  descriptionEn String?
+  price         Decimal                @db.Decimal(10, 2)
+  priceVariants Json?
+  priceNoteDe   String?
+  priceNoteEn   String?
+  imageUrl      String?
+  allergens     String?
+  isSignature   Boolean                @default(false)
+  isVegetarian  Boolean                @default(false)
+  isPublished   Boolean                @default(true)
+  sortOrder     Int                    @default(0)
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+
+  @@index([categoryId, isPublished, sortOrder])
+  @@index([isPublished, sortOrder])
 }
 
 model Guest {
@@ -61,29 +103,29 @@ model Guest {
 }
 
 model Room {
-  id                  String    @id @default(cuid())
-  slug                String    @unique
-  type                RoomType
-  inventory           Int
-  maxGuests           Int
-  basePrice           Decimal   @db.Decimal(10, 2)
-  breakfastIncluded   Boolean   @default(true)
-  isActive            Boolean   @default(true)
-  sortOrder           Int       @default(0)
-  titleDe             String
-  titleEn             String
-  titleRu             String
-  descriptionDe       String
-  descriptionEn       String
-  descriptionRu       String
-  shortDescriptionDe  String?
-  shortDescriptionEn  String?
-  shortDescriptionRu  String?
-  imageUrl            String?
-  amenities           Json?
-  bookings            Booking[]
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  id                 String    @id @default(cuid())
+  slug               String    @unique
+  type               RoomType
+  inventory          Int
+  maxGuests          Int
+  basePrice          Decimal   @db.Decimal(10, 2)
+  breakfastIncluded  Boolean   @default(true)
+  isActive           Boolean   @default(true)
+  sortOrder          Int       @default(0)
+  titleDe            String
+  titleEn            String
+  titleRu            String
+  descriptionDe      String
+  descriptionEn      String
+  descriptionRu      String
+  shortDescriptionDe String?
+  shortDescriptionEn String?
+  shortDescriptionRu String?
+  imageUrl           String?
+  amenities          Json?
+  bookings           Booking[]
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   @@index([isActive, sortOrder])
 }
@@ -101,8 +143,8 @@ model Booking {
   basePricePerNight         Decimal       @db.Decimal(10, 2)
   baseTotal                 Decimal       @db.Decimal(10, 2)
   dogCount                  Int           @default(0)
-  dogFeePerNight            Decimal       @db.Decimal(10, 2) @default(15)
-  dogFeeTotal               Decimal       @db.Decimal(10, 2) @default(0)
+  dogFeePerNight            Decimal       @default(15) @db.Decimal(10, 2)
+  dogFeeTotal               Decimal       @default(0) @db.Decimal(10, 2)
   bicycleReserved           Boolean       @default(false)
   restaurantReservationTime String?
   totalAmount               Decimal       @db.Decimal(10, 2)
