@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "brand:assets": "node scripts/generate-brand-assets.mjs",
     "postinstall": "prisma generate && node scripts/fix-prisma-runtime.mjs",
     "db:generate": "prisma generate && node scripts/fix-prisma-runtime.mjs",
     "db:push": "prisma db push",

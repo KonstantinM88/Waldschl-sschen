@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="33%" cy="22%" r="82%">
+      <stop offset="0%" stop-color="#4a3a28"/>
+      <stop offset="52%" stop-color="#211914"/>
+      <stop offset="100%" stop-color="#0f0d0a"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="92" y1="70" x2="430" y2="448">
+      <stop offset="0%" stop-color="#fff1c6"/>
+      <stop offset="50%" stop-color="#d8bd84"/>
+      <stop offset="100%" stop-color="#8d6e35"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="118" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="189" stroke="url(#ring)" stroke-width="18"/>
+  <circle cx="256" cy="256" r="156" stroke="#f2d49b" stroke-opacity="0.24" stroke-width="3"/>
+  <g transform="translate(90 86) scale(4.6)" color="#f2d49b">
+    
+  <path d="M9 55.5H63" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M14 55.5V35.5L22.5 27.5L31 35.5V55.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M41 55.5V24L50 16L59 24V55.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M22.5 27.5H50" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M47 55.5V41.5H53V55.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M18.5 41H26.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M45.5 29.5H54.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M50 16V11.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M47 13.5H53" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+
+  </g>
+  <path d="M158 386C201 412 309 412 354 386" stroke="#d8bd84" stroke-width="10" stroke-linecap="round" opacity="0.72"/>
+</svg>

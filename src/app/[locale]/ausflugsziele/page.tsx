@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { siteConfig } from "@/data/site";
 import { locales, defaultLocale, type Locale } from "@/lib/i18n/config";
+import { defaultOpenGraphImages } from "@/lib/seo";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import DestinationsPageContent from "@/components/sections/DestinationsPageContent";
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: t("title"),
     description: t("description"),
     alternates: { canonical: `/${nl}/ausflugsziele`, languages: { de: "/de/ausflugsziele", en: "/en/ausflugsziele" } },
-    openGraph: { title: t("title"), description: t("description"), type: "website", locale: nl === "de" ? "de_DE" : "en_US", alternateLocale: nl === "de" ? "en_US" : "de_DE" },
+    openGraph: { title: t("title"), description: t("description"), type: "website", locale: nl === "de" ? "de_DE" : "en_US", alternateLocale: nl === "de" ? "en_US" : "de_DE", images: defaultOpenGraphImages },
   };
 }
 

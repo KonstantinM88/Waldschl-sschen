@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { siteConfig } from "@/data/site";
 import { locales, defaultLocale, type Locale } from "@/lib/i18n/config";
 import { getPublicRestaurantMenu } from "@/lib/restaurant-menu";
+import { defaultOpenGraphImages } from "@/lib/seo";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import RestaurantPageContent from "@/components/sections/RestaurantPageContent";
@@ -43,6 +44,7 @@ export async function generateMetadata({
       type: "website",
       locale: normalizedLocale === "de" ? "de_DE" : "en_US",
       alternateLocale: normalizedLocale === "de" ? "en_US" : "de_DE",
+      images: defaultOpenGraphImages,
     },
   };
 }

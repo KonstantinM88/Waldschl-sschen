@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Alex_Brush, Cormorant_Garamond, Outfit } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { siteConfig } from "@/data/site";
+import { defaultOpenGraphImages } from "@/lib/seo";
 import "./globals.css";
 
 const fontBody = Outfit({
@@ -44,6 +45,7 @@ const resolvedSiteUrl = (() => {
 
 export const metadata: Metadata = {
   metadataBase: resolvedSiteUrl,
+  applicationName: siteConfig.shortName,
   title: {
     default: "Hotel & Restaurant Waldschlösschen | Saale-Unstrut",
     template: "%s | Waldschlösschen",
@@ -58,14 +60,35 @@ export const metadata: Metadata = {
     locale: "de_DE",
     alternateLocale: "en_US",
     siteName: siteConfig.name,
+    images: defaultOpenGraphImages,
   },
   twitter: {
     card: "summary_large_image",
+    title: "Hotel & Restaurant Waldschlösschen | Saale-Unstrut",
+    description:
+      "Boutique-Hotel, Restaurant und Eventlocation in der Saale-Unstrut Region.",
+    images: defaultOpenGraphImages,
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    shortcut: ["/favicon.ico"],
+  },
+  manifest: "/site.webmanifest",
   robots: {
     index: true,
     follow: true,
   },
+};
+
+export const viewport: Viewport = {
+  colorScheme: "light",
+  themeColor: "#15120f",
 };
 
 export default async function RootLayout({

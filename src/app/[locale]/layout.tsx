@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { siteConfig } from "@/data/site";
 import { defaultLocale, locales, type Locale } from "@/lib/i18n/config";
+import { defaultOpenGraphImages } from "@/lib/seo";
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
@@ -54,6 +55,7 @@ export async function generateMetadata({
       url: openGraphUrl,
       locale: normalizedLocale === "de" ? "de_DE" : "en_US",
       alternateLocale: normalizedLocale === "de" ? "en_US" : "de_DE",
+      images: defaultOpenGraphImages,
     },
   };
 }
