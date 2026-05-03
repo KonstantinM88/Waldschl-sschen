@@ -3,6 +3,7 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import {
   BadgeEuro,
@@ -389,6 +390,12 @@ interface RestaurantMenuMediaProps {
   wrapperClassName: string;
 }
 
+interface RestaurantMenuDesktopPreview {
+  left: number;
+  top: number;
+  width: number;
+}
+
 function RestaurantMenuMedia({
   imageClassName = "object-cover",
   item,
@@ -396,7 +403,10 @@ function RestaurantMenuMedia({
   sizes,
   wrapperClassName,
 }: RestaurantMenuMediaProps) {
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [desktopPreview, setDesktopPreview] =
+    useState<RestaurantMenuDesktopPreview | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasVideoError, setHasVideoError] = useState(false);
   const posterUrl = item.imageUrl || MENU_FALLBACK_IMAGE;
@@ -433,82 +443,207 @@ function RestaurantMenuMedia({
     typeof window !== "undefined" &&
     window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-  return (
-    <button
-      type="button"
-      aria-label={item.name}
-      disabled={!canPlayVideo}
-      className={`group/media absolute inset-0 block h-full w-full overflow-hidden text-left disabled:cursor-default ${wrapperClassName}`}
-      onClick={() => {
-        if (!canPlayVideo || isDesktopPointer()) {
-          return;
-        }
+  const showDesktopPreview = () => {
+    if (!isDesktopPointer()) {
+      return;
+    }
 
-        if (isPlaying) {
-          pauseVideo(false);
-        } else {
-          playVideo();
-        }
-      }}
-      onMouseEnter={() => {
-        if (isDesktopPointer()) {
-          playVideo();
-        }
-      }}
-      onMouseLeave={() => {
-        if (isDesktopPointer()) {
-          pauseVideo(true);
-        }
-      }}
-    >
-      <Image
-        src={posterUrl}
-        alt={item.name}
-        fill
-        sizes={sizes}
-        priority={priority}
-        className={[
-          imageClassName,
-          "transition-all duration-700",
-          canPlayVideo && isPlaying
-            ? "scale-[1.08] opacity-0"
-            : "opacity-100 group-hover/media:scale-[1.04]",
-        ].join(" ")}
-      />
-      {canPlayVideo ? (
-        <video
-          ref={videoRef}
-          src={item.videoUrl ?? undefined}
-          poster={posterUrl}
-          muted
-          loop
-          playsInline
-          preload="metadata"
+    const mediaElement = buttonRef.current;
+
+    if (!mediaElement) {
+      return;
+    }
+
+    const rect = mediaElement.getBoundingClientRect();
+    const viewportPadding = 24;
+    const gap = 18;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const width = Math.min(
+      540,
+      Math.max(360, viewportWidth * 0.38),
+      viewportWidth - viewportPadding * 2
+    );
+    const estimatedHeight = width * 0.75 + 96;
+    const hasRoomRight = rect.right + gap + width <= viewportWidth - viewportPadding;
+    const hasRoomLeft = rect.left - gap - width >= viewportPadding;
+    const left = hasRoomRight
+      ? rect.right + gap
+      : hasRoomLeft
+        ? rect.left - gap - width
+        : (viewportWidth - width) / 2;
+    const minTop = Math.max(82, viewportPadding);
+    const maxTop = Math.max(minTop, viewportHeight - estimatedHeight - viewportPadding);
+    const top = Math.min(
+      Math.max(minTop, rect.top + rect.height / 2 - estimatedHeight / 2),
+      maxTop
+    );
+
+    setDesktopPreview({
+      left,
+      top,
+      width,
+    });
+  };
+
+  useEffect(() => {
+    if (!desktopPreview) {
+      return;
+    }
+
+    const closePreview = () => setDesktopPreview(null);
+
+    window.addEventListener("resize", closePreview);
+    window.addEventListener("scroll", closePreview, true);
+
+    return () => {
+      window.removeEventListener("resize", closePreview);
+      window.removeEventListener("scroll", closePreview, true);
+    };
+  }, [desktopPreview]);
+
+  return (
+    <>
+      <button
+        ref={buttonRef}
+        type="button"
+        aria-label={item.name}
+        className={`group/media absolute inset-0 block h-full w-full cursor-zoom-in overflow-hidden text-left ${wrapperClassName}`}
+        onClick={() => {
+          if (!canPlayVideo || isDesktopPointer()) {
+            return;
+          }
+
+          if (isPlaying) {
+            pauseVideo(false);
+          } else {
+            playVideo();
+          }
+        }}
+        onMouseEnter={() => {
+          showDesktopPreview();
+
+          if (isDesktopPointer()) {
+            playVideo();
+          }
+        }}
+        onMouseLeave={() => {
+          if (isDesktopPointer()) {
+            setDesktopPreview(null);
+            pauseVideo(true);
+          }
+        }}
+        onFocus={showDesktopPreview}
+        onBlur={() => setDesktopPreview(null)}
+      >
+        <Image
+          src={posterUrl}
+          alt={item.name}
+          fill
+          sizes={sizes}
+          priority={priority}
           className={[
-            "absolute inset-0 h-full w-full object-cover transition-all duration-700",
-            isPlaying ? "scale-[1.08] opacity-100" : "scale-100 opacity-0",
+            imageClassName,
+            "transition-all duration-700",
+            canPlayVideo && isPlaying
+              ? "scale-[1.08] opacity-0"
+              : "opacity-100 group-hover/media:scale-[1.04]",
           ].join(" ")}
-          onError={() => {
-            setHasVideoError(true);
-            setIsPlaying(false);
-          }}
         />
-      ) : null}
-      {canPlayVideo ? (
-        <span
-          className={[
-            "pointer-events-none absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white shadow-[0_16px_34px_rgba(0,0,0,0.22)] backdrop-blur-md transition-all duration-300",
-            isPlaying ? "scale-95 opacity-0" : "scale-100 opacity-100",
-          ].join(" ")}
-        >
-          {isPlaying ? (
-            <Pause className="h-4 w-4 fill-current stroke-[1.8]" />
-          ) : (
-            <Play className="h-4 w-4 fill-current stroke-[1.8]" />
-          )}
-        </span>
-      ) : null}
-    </button>
+        {canPlayVideo ? (
+          <video
+            ref={videoRef}
+            src={item.videoUrl ?? undefined}
+            poster={posterUrl}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            className={[
+              "absolute inset-0 h-full w-full object-cover transition-all duration-700",
+              isPlaying ? "scale-[1.08] opacity-100" : "scale-100 opacity-0",
+            ].join(" ")}
+            onError={() => {
+              setHasVideoError(true);
+              setIsPlaying(false);
+            }}
+          />
+        ) : null}
+        {canPlayVideo ? (
+          <span
+            className={[
+              "pointer-events-none absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white shadow-[0_16px_34px_rgba(0,0,0,0.22)] backdrop-blur-md transition-all duration-300",
+              isPlaying ? "scale-95 opacity-0" : "scale-100 opacity-100",
+            ].join(" ")}
+          >
+            {isPlaying ? (
+              <Pause className="h-4 w-4 fill-current stroke-[1.8]" />
+            ) : (
+              <Play className="h-4 w-4 fill-current stroke-[1.8]" />
+            )}
+          </span>
+        ) : null}
+      </button>
+
+      {desktopPreview && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              aria-hidden="true"
+              className="pointer-events-none fixed z-[90] overflow-hidden rounded-[1.7rem] border border-[#f2d49b]/25 bg-[#18120e]/95 p-2 shadow-[0_32px_90px_rgba(0,0,0,0.42)] backdrop-blur-xl"
+              style={{
+                left: desktopPreview.left,
+                top: desktopPreview.top,
+                width: desktopPreview.width,
+              }}
+            >
+              <div className="relative aspect-[4/3] overflow-hidden rounded-[1.35rem] bg-[#2b241c]">
+                {canPlayVideo ? (
+                  <video
+                    key={item.videoUrl}
+                    src={item.videoUrl ?? undefined}
+                    poster={posterUrl}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    className="h-full w-full scale-[1.015] object-cover"
+                  />
+                ) : (
+                  <Image
+                    src={posterUrl}
+                    alt=""
+                    fill
+                    sizes="540px"
+                    className="scale-[1.015] object-cover"
+                  />
+                )}
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_48%,rgba(10,8,6,0.6)_100%)]" />
+              </div>
+              <div className="px-3 pb-3 pt-4">
+                <div className="flex min-w-0 items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="break-words font-[var(--font-display)] text-[1.55rem] leading-none text-white">
+                      {item.name}
+                    </div>
+                  </div>
+                  {canPlayVideo ? (
+                    <span className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white">
+                      <Play className="h-4 w-4 fill-current stroke-[1.8]" />
+                    </span>
+                  ) : null}
+                </div>
+                {item.description ? (
+                  <p className="mt-3 max-h-[3.6rem] overflow-hidden text-sm font-light leading-relaxed text-white/62">
+                    {item.description}
+                  </p>
+                ) : null}
+              </div>
+            </div>,
+            document.body
+          )
+        : null}
+    </>
   );
 }
 
