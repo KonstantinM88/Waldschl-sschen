@@ -6,7 +6,10 @@ import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { requireAdminSession } from "@/lib/admin-dashboard";
 import { resolveAdminReturnTo, withAdminNotice } from "@/lib/admin-feedback";
-import { saveUploadedImageAsWebp } from "@/lib/admin-image-upload";
+import {
+  saveUploadedImageAsWebp,
+  saveUploadedVideoFile,
+} from "@/lib/admin-image-upload";
 import { slugifyMenuValue } from "@/lib/restaurant-menu";
 import { prisma } from "@/lib/prisma";
 
@@ -30,6 +33,7 @@ const itemBaseSchema = z.object({
   descriptionDe: z.string().trim().optional(),
   descriptionEn: z.string().trim().optional(),
   imageUrl: z.string().trim().optional(),
+  videoUrl: z.string().trim().optional(),
   isPublished: z.boolean().default(false),
   isSignature: z.boolean().default(false),
   isVegetarian: z.boolean().default(false),
@@ -53,6 +57,12 @@ const idSchema = z.object({
 
 function getImageFile(formData: FormData) {
   const file = formData.get("imageFile");
+
+  return file instanceof File ? file : null;
+}
+
+function getVideoFile(formData: FormData) {
+  const file = formData.get("videoFile");
 
   return file instanceof File ? file : null;
 }
@@ -104,14 +114,21 @@ function normalizeCategoryData(parsed: z.infer<typeof categoryBaseSchema>) {
 
 async function normalizeItemData(
   parsed: z.infer<typeof itemBaseSchema>,
-  imageFile: File | null
+  imageFile: File | null,
+  videoFile: File | null
 ) {
   const uploadedImageUrl = await saveUploadedImageAsWebp(
     imageFile,
     "restaurant-menu"
   );
+  const uploadedVideoUrl = await saveUploadedVideoFile(
+    videoFile,
+    "restaurant-menu"
+  );
   const manualImageUrl = parsed.imageUrl?.trim() || null;
+  const manualVideoUrl = parsed.videoUrl?.trim() || null;
   const imageUrl = uploadedImageUrl ?? manualImageUrl;
+  const videoUrl = uploadedVideoUrl ?? manualVideoUrl;
 
   return {
     allergens: parsed.allergens?.trim() || null,
@@ -119,6 +136,7 @@ async function normalizeItemData(
     descriptionDe: parsed.descriptionDe?.trim() || null,
     descriptionEn: parsed.descriptionEn?.trim() || null,
     imageUrl,
+    videoUrl,
     isPublished: parsed.isPublished,
     isSignature: parsed.isSignature,
     isVegetarian: parsed.isVegetarian,
@@ -220,6 +238,7 @@ export async function createMenuItemAction(formData: FormData) {
     descriptionDe: formData.get("descriptionDe"),
     descriptionEn: formData.get("descriptionEn"),
     imageUrl: formData.get("imageUrl"),
+    videoUrl: formData.get("videoUrl"),
     isPublished: formData.get("isPublished") === "on",
     isSignature: formData.get("isSignature") === "on",
     isVegetarian: formData.get("isVegetarian") === "on",
@@ -235,7 +254,11 @@ export async function createMenuItemAction(formData: FormData) {
 
   await prisma.restaurantMenuItem.create({
     data: {
-      ...(await normalizeItemData(parsed, getImageFile(formData))),
+      ...(await normalizeItemData(
+        parsed,
+        getImageFile(formData),
+        getVideoFile(formData)
+      )),
       slug: createSlug(parsed.slug, parsed.nameDe),
     },
   });
@@ -255,6 +278,7 @@ export async function updateMenuItemAction(formData: FormData) {
     descriptionEn: formData.get("descriptionEn"),
     id: formData.get("id"),
     imageUrl: formData.get("imageUrl"),
+    videoUrl: formData.get("videoUrl"),
     isPublished: formData.get("isPublished") === "on",
     isSignature: formData.get("isSignature") === "on",
     isVegetarian: formData.get("isVegetarian") === "on",
@@ -273,7 +297,11 @@ export async function updateMenuItemAction(formData: FormData) {
       id: parsed.id,
     },
     data: {
-      ...(await normalizeItemData(parsed, getImageFile(formData))),
+      ...(await normalizeItemData(
+        parsed,
+        getImageFile(formData),
+        getVideoFile(formData)
+      )),
       slug: createSlug(parsed.slug, parsed.nameDe),
     },
   });

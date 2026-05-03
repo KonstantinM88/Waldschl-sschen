@@ -75,6 +75,7 @@ model RestaurantMenuItem {
   priceNoteDe   String?
   priceNoteEn   String?
   imageUrl      String?
+  videoUrl      String?
   allergens     String?
   isSignature   Boolean                @default(false)
   isVegetarian  Boolean                @default(false)

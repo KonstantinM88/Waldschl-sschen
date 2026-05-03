@@ -14,6 +14,7 @@ import {
 } from "@/app/admin/menu-actions";
 import AdminConfirmButton from "@/components/admin/AdminConfirmButton";
 import MenuImageUploadPreview from "@/components/admin/MenuImageUploadPreview";
+import MenuVideoUploadField from "@/components/admin/MenuVideoUploadField";
 import AdminPendingFieldset from "@/components/admin/AdminPendingFieldset";
 import AdminShell from "@/components/admin/AdminShell";
 import {
@@ -58,6 +59,30 @@ const menuImageGuidelines = {
     "Рекомендация: 1600 x 1200 px в формате 4:3, минимум 1200 x 900 px. Максимальный размер загрузки: 8 MB. JPEG, PNG, WebP, AVIF и GIF автоматически уменьшаются до max. 1600 x 1200 px и сохраняются как WebP.",
 } as const;
 
+const menuVideoGuidelines = {
+  de:
+    "Empfehlung: MP4, WebM oder MOV, 6-12 Sekunden, 1080 x 1350 px oder 1920 x 1080 px. Maximale Upload-Größe: 40 MB. Das Video wird beim Speichern als WebM konvertiert.",
+  ru:
+    "Рекомендация: MP4, WebM или MOV, 6-12 секунд, 1080 x 1350 px или 1920 x 1080 px. Максимальный размер загрузки: 40 MB. Видео при сохранении конвертируется в WebM.",
+} as const;
+
+const menuVideoCopy = {
+  de: {
+    current: "Aktuelles Video",
+    file: "Video hochladen",
+    maxFileSize: "Video ist groesser als 40 MB",
+    newPreview: "Video-Vorschau",
+    url: "Video-URL",
+  },
+  ru: {
+    current: "Текущее видео",
+    file: "Загрузить видео",
+    maxFileSize: "Видео больше 40 MB",
+    newPreview: "Предпросмотр видео",
+    url: "URL видео",
+  },
+} as const;
+
 const menuFilterCopy = {
   de: {
     categoryAll: "Alle Kategorien",
@@ -68,6 +93,8 @@ const menuFilterCopy = {
     imageMissing: "Ohne Bild",
     imageWith: "Mit Bild",
     itemCount: (count: number) => `${count} ${count === 1 ? "Gericht" : "Gerichte"}`,
+    maxFileSize: "Datei ist größer als 8 MB",
+    maxVideoFileSize: "Video ist groesser als 40 MB",
     flagAll: "Alle Typen",
     flagLabel: "Typ",
     flagSignature: "Empfehlungen",
@@ -75,6 +102,10 @@ const menuFilterCopy = {
     previewCurrent: "Aktuelles Bild",
     previewNew: "Neue Vorschau",
     published: "Nur sichtbare",
+    videoCurrent: "Aktuelles Video",
+    videoFile: "Video hochladen",
+    videoNew: "Video-Vorschau",
+    videoUrl: "Video-URL",
     searchLabel: "Suche",
     searchPlaceholder: "Gericht, Kategorie, Beschreibung oder Allergene",
     statusAll: "Alle Status",
@@ -89,6 +120,7 @@ const menuFilterCopy = {
     imageMissing: "Без изображения",
     imageWith: "С изображением",
     itemCount: (count: number) => `${count} ${count === 1 ? "блюдо" : "блюд"}`,
+    maxFileSize: "Файл больше 8 MB",
     flagAll: "Все типы",
     flagLabel: "Тип",
     flagSignature: "Рекомендации",
@@ -339,6 +371,8 @@ export default async function AdminMenuPage({
     0
   );
   const imageGuidelineText = menuImageGuidelines[locale];
+  const videoGuidelineText = menuVideoGuidelines[locale];
+  const videoText = menuVideoCopy[locale];
 
   return (
     <AdminShell
@@ -426,7 +460,7 @@ export default async function AdminMenuPage({
         </AdminPanel>
 
         <AdminPanel badge={menuText.badge} title={menuText.form.itemTitle}>
-          <form action={createMenuItemAction} encType="multipart/form-data">
+          <form action={createMenuItemAction}>
             <input type="hidden" name="returnTo" value={returnTo} />
             <AdminPendingFieldset>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 sm:gap-4">
@@ -496,16 +530,26 @@ export default async function AdminMenuPage({
                 {menuText.form.priceVariantsHint}
               </p>
 
-              <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-[270px_minmax(0,1fr)] sm:gap-4">
+              <div className="mt-4 grid grid-cols-1 gap-3 xl:grid-cols-[270px_270px_minmax(0,1fr)] sm:gap-4">
                 <MenuImageUploadPreview
                   alt={menuText.form.itemTitle}
                   emptyLabel={filterText.previewNew}
                   fileLabel={menuText.fields.imageFile}
                   helpText={imageGuidelineText}
+                  maxFileSizeText={filterText.maxFileSize}
+                />
+                <MenuVideoUploadField
+                  emptyLabel={videoText.newPreview}
+                  fileLabel={videoText.file}
+                  helpText={videoGuidelineText}
+                  maxFileSizeText={videoText.maxFileSize}
                 />
                 <div className="grid content-start grid-cols-1 gap-3 lg:grid-cols-2 sm:gap-4">
                   <AdminField label={menuText.fields.imageUrl}>
                     <input name="imageUrl" type="text" className={inputClassName} />
+                  </AdminField>
+                  <AdminField label={videoText.url}>
+                    <input name="videoUrl" type="text" className={inputClassName} />
                   </AdminField>
                   <AdminField label={menuText.fields.allergens}>
                     <input name="allergens" type="text" className={inputClassName} />
@@ -705,18 +749,28 @@ export default async function AdminMenuPage({
                       key={item.id}
                       className="rounded-[1.2rem] border border-[#eee5d9] bg-white p-3 shadow-[0_12px_28px_rgba(28,21,16,0.04)] sm:rounded-[1.45rem] sm:p-4"
                     >
-                      <form action={updateMenuItemAction} encType="multipart/form-data">
+                      <form action={updateMenuItemAction}>
                         <input type="hidden" name="returnTo" value={returnTo} />
                         <input type="hidden" name="id" value={item.id} />
                         <AdminPendingFieldset>
-                          <div className="grid grid-cols-1 gap-3 2xl:grid-cols-[240px_minmax(0,1fr)] sm:gap-4">
-                            <MenuImageUploadPreview
-                              alt={item.nameDe}
-                              currentImageUrl={item.imageUrl}
-                              emptyLabel={filterText.previewCurrent}
-                              fileLabel={menuText.fields.imageFile}
-                              helpText={imageGuidelineText}
-                            />
+                          <div className="grid grid-cols-1 gap-3 2xl:grid-cols-[260px_minmax(0,1fr)] sm:gap-4">
+                            <div className="space-y-3">
+                              <MenuImageUploadPreview
+                                alt={item.nameDe}
+                                currentImageUrl={item.imageUrl}
+                                emptyLabel={filterText.previewCurrent}
+                                fileLabel={menuText.fields.imageFile}
+                                helpText={imageGuidelineText}
+                                maxFileSizeText={filterText.maxFileSize}
+                              />
+                              <MenuVideoUploadField
+                                currentVideoUrl={item.videoUrl}
+                                emptyLabel={videoText.current}
+                                fileLabel={videoText.file}
+                                helpText={videoGuidelineText}
+                                maxFileSizeText={videoText.maxFileSize}
+                              />
+                            </div>
 
                             <div className="min-w-0">
                               <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4 sm:gap-4">
@@ -782,6 +836,14 @@ export default async function AdminMenuPage({
                                     name="imageUrl"
                                     type="text"
                                     defaultValue={item.imageUrl ?? ""}
+                                    className={inputClassName}
+                                  />
+                                </AdminField>
+                                <AdminField label={videoText.url}>
+                                  <input
+                                    name="videoUrl"
+                                    type="text"
+                                    defaultValue={item.videoUrl ?? ""}
                                     className={inputClassName}
                                   />
                                 </AdminField>

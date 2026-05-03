@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Film } from "lucide-react";
 
-interface MenuImageUploadPreviewProps {
-  alt: string;
-  currentImageUrl?: string | null;
+interface MenuVideoUploadFieldProps {
+  currentVideoUrl?: string | null;
   emptyLabel: string;
   fileLabel: string;
   helpText: string;
@@ -12,17 +12,16 @@ interface MenuImageUploadPreviewProps {
   name?: string;
 }
 
-const MAX_IMAGE_UPLOAD_BYTES = 8 * 1024 * 1024;
+const MAX_VIDEO_UPLOAD_BYTES = 40 * 1024 * 1024;
 
-export default function MenuImageUploadPreview({
-  alt,
-  currentImageUrl,
+export default function MenuVideoUploadField({
+  currentVideoUrl,
   emptyLabel,
   fileLabel,
   helpText,
   maxFileSizeText,
-  name = "imageFile",
-}: MenuImageUploadPreviewProps) {
+  name = "videoFile",
+}: MenuVideoUploadFieldProps) {
   const objectUrlRef = useRef<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [fileMeta, setFileMeta] = useState<string | null>(null);
@@ -35,23 +34,36 @@ export default function MenuImageUploadPreview({
     };
   }, []);
 
-  const displayUrl = previewUrl || currentImageUrl || "/restaurant-menu/default.webp";
+  const displayUrl = previewUrl || currentVideoUrl || null;
   const hasSelectedFile = Boolean(previewUrl);
 
   return (
     <div className="min-w-0 rounded-[1.2rem] border border-[#eadfcf] bg-white p-2.5 sm:rounded-[1.35rem] sm:p-3">
-      <div
-        aria-label={alt}
-        className="relative aspect-[4/3] overflow-hidden rounded-[1.1rem] border border-[#eadfcf] bg-[#f3ede2] bg-cover bg-center"
-        role="img"
-        style={{ backgroundImage: `url("${displayUrl}")` }}
-      >
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_42%,rgba(18,12,8,0.46)_100%)]" />
-        <div className="absolute bottom-3 left-3 right-3">
-          <div className="truncate rounded-full border border-white/20 bg-black/35 px-3 py-1.5 text-xs font-medium text-white shadow-[0_10px_22px_rgba(0,0,0,0.18)] backdrop-blur-md">
-            {hasSelectedFile ? fileMeta : emptyLabel}
+      <div className="relative aspect-video overflow-hidden rounded-[1.1rem] border border-[#eadfcf] bg-[#211a14]">
+        {displayUrl ? (
+          <video
+            src={displayUrl}
+            className="h-full w-full object-cover"
+            controls
+            muted
+            playsInline
+            preload="metadata"
+          />
+        ) : (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-[radial-gradient(circle_at_50%_30%,rgba(216,189,132,0.2),transparent_38%),#211a14] px-4 text-center text-[#f2d49b]">
+            <Film className="h-8 w-8 stroke-[1.5]" />
+            <span className="text-xs font-medium uppercase tracking-[0.14em]">
+              {emptyLabel}
+            </span>
           </div>
-        </div>
+        )}
+        {displayUrl ? (
+          <div className="pointer-events-none absolute bottom-3 left-3 right-3">
+            <div className="truncate rounded-full border border-white/20 bg-black/45 px-3 py-1.5 text-xs font-medium text-white shadow-[0_10px_22px_rgba(0,0,0,0.18)] backdrop-blur-md">
+              {hasSelectedFile ? fileMeta : emptyLabel}
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <label className="mt-3 block rounded-[1rem] border border-[#eadfcf] bg-[#faf7f1] px-3 py-3">
@@ -61,7 +73,7 @@ export default function MenuImageUploadPreview({
         <input
           name={name}
           type="file"
-          accept="image/avif,image/gif,image/jpeg,image/png,image/webp"
+          accept="video/mp4,video/webm,video/quicktime,.mov"
           className="mt-2 block w-full min-w-0 overflow-hidden text-xs text-[#201b17] file:mr-3 file:rounded-full file:border-0 file:bg-white file:px-3 file:py-2 file:text-[0.58rem] file:font-medium file:uppercase file:tracking-[0.12em] file:text-[#7b6140] sm:text-sm sm:file:mr-4 sm:file:px-4 sm:file:text-[0.62rem] sm:file:tracking-[0.14em]"
           onChange={(event) => {
             const file = event.currentTarget.files?.[0] ?? null;
@@ -77,7 +89,7 @@ export default function MenuImageUploadPreview({
               return;
             }
 
-            if (file.size > MAX_IMAGE_UPLOAD_BYTES) {
+            if (file.size > MAX_VIDEO_UPLOAD_BYTES) {
               event.currentTarget.value = "";
               setPreviewUrl(null);
               setFileMeta(maxFileSizeText);
@@ -87,7 +99,7 @@ export default function MenuImageUploadPreview({
             const nextObjectUrl = URL.createObjectURL(file);
             objectUrlRef.current = nextObjectUrl;
             setPreviewUrl(nextObjectUrl);
-            setFileMeta(`${file.name} · ${(file.size / 1024 / 1024).toFixed(2)} MB`);
+            setFileMeta(`${file.name} - ${(file.size / 1024 / 1024).toFixed(2)} MB`);
           }}
         />
       </label>

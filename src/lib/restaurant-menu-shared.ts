@@ -5,6 +5,7 @@ export interface PublicRestaurantMenuItem {
   description: string | null;
   id: string;
   imageUrl: string | null;
+  videoUrl: string | null;
   isSignature: boolean;
   isVegetarian: boolean;
   name: string;

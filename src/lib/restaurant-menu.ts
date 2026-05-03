@@ -1626,6 +1626,7 @@ export async function getPublicRestaurantMenu(
         locale === "en" && item.priceNoteEn ? item.priceNoteEn : item.priceNoteDe,
       priceVariants: normalizeMenuPriceVariants(item.priceVariants),
       imageUrl: item.imageUrl,
+      videoUrl: item.videoUrl,
       allergens: item.allergens,
       isSignature: item.isSignature,
       isVegetarian: item.isVegetarian,

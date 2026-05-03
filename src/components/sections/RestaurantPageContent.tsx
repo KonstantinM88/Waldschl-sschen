@@ -21,6 +21,8 @@ import {
   Wheat,
   MilkOff,
   Heart,
+  Pause,
+  Play,
   Sparkles,
 } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
@@ -375,6 +377,141 @@ function RestaurantCuisine() {
 /* ================================================================
    MENU — Live menu from admin
    ================================================================ */
+const MENU_FALLBACK_IMAGE = "/restaurant-menu/default.webp";
+
+type PublicRestaurantMenuItem = PublicRestaurantMenuCategory["items"][number];
+
+interface RestaurantMenuMediaProps {
+  imageClassName?: string;
+  item: PublicRestaurantMenuItem;
+  priority?: boolean;
+  sizes: string;
+  wrapperClassName: string;
+}
+
+function RestaurantMenuMedia({
+  imageClassName = "object-cover",
+  item,
+  priority = false,
+  sizes,
+  wrapperClassName,
+}: RestaurantMenuMediaProps) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [hasVideoError, setHasVideoError] = useState(false);
+  const posterUrl = item.imageUrl || MENU_FALLBACK_IMAGE;
+  const canPlayVideo = Boolean(item.videoUrl) && !hasVideoError;
+
+  const playVideo = () => {
+    if (!canPlayVideo || !videoRef.current) {
+      return;
+    }
+
+    setIsPlaying(true);
+    void videoRef.current.play().catch(() => {
+      setIsPlaying(false);
+    });
+  };
+
+  const pauseVideo = (reset = false) => {
+    const video = videoRef.current;
+
+    if (!video) {
+      return;
+    }
+
+    video.pause();
+
+    if (reset) {
+      video.currentTime = 0;
+    }
+
+    setIsPlaying(false);
+  };
+
+  const isDesktopPointer = () =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+  return (
+    <button
+      type="button"
+      aria-label={item.name}
+      disabled={!canPlayVideo}
+      className={`group/media absolute inset-0 block h-full w-full overflow-hidden text-left disabled:cursor-default ${wrapperClassName}`}
+      onClick={() => {
+        if (!canPlayVideo || isDesktopPointer()) {
+          return;
+        }
+
+        if (isPlaying) {
+          pauseVideo(false);
+        } else {
+          playVideo();
+        }
+      }}
+      onMouseEnter={() => {
+        if (isDesktopPointer()) {
+          playVideo();
+        }
+      }}
+      onMouseLeave={() => {
+        if (isDesktopPointer()) {
+          pauseVideo(true);
+        }
+      }}
+    >
+      <Image
+        src={posterUrl}
+        alt={item.name}
+        fill
+        sizes={sizes}
+        priority={priority}
+        className={[
+          imageClassName,
+          "transition-all duration-700",
+          canPlayVideo && isPlaying
+            ? "scale-[1.08] opacity-0"
+            : "opacity-100 group-hover/media:scale-[1.04]",
+        ].join(" ")}
+      />
+      {canPlayVideo ? (
+        <video
+          ref={videoRef}
+          src={item.videoUrl ?? undefined}
+          poster={posterUrl}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          className={[
+            "absolute inset-0 h-full w-full object-cover transition-all duration-700",
+            isPlaying ? "scale-[1.08] opacity-100" : "scale-100 opacity-0",
+          ].join(" ")}
+          onError={() => {
+            setHasVideoError(true);
+            setIsPlaying(false);
+          }}
+        />
+      ) : null}
+      {canPlayVideo ? (
+        <span
+          className={[
+            "pointer-events-none absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white shadow-[0_16px_34px_rgba(0,0,0,0.22)] backdrop-blur-md transition-all duration-300",
+            isPlaying ? "scale-95 opacity-0" : "scale-100 opacity-100",
+          ].join(" ")}
+        >
+          {isPlaying ? (
+            <Pause className="h-4 w-4 fill-current stroke-[1.8]" />
+          ) : (
+            <Play className="h-4 w-4 fill-current stroke-[1.8]" />
+          )}
+        </span>
+      ) : null}
+    </button>
+  );
+}
+
 function RestaurantMenuShowcase({
   categories,
 }: {
@@ -671,16 +808,15 @@ function RestaurantMenuShowcase({
               <Reveal delay={0.18}>
                 <article className="overflow-hidden rounded-[2.15rem] border border-white/[0.12] bg-[linear-gradient(145deg,rgba(255,255,255,0.12),rgba(255,255,255,0.055))] shadow-[0_34px_92px_rgba(0,0,0,0.31)] backdrop-blur-xl">
                   <div className="grid min-h-[520px] xl:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)]">
-                    <div className="group relative min-h-[520px] overflow-hidden bg-[#2b241c]">
-                      <Image
-                        src={featuredItem.imageUrl || "/restaurant-menu/default.webp"}
-                        alt={featuredItem.name}
-                        fill
+                    <div className="relative min-h-[520px] overflow-hidden bg-[#2b241c]">
+                      <RestaurantMenuMedia
+                        key={featuredItem.id}
+                        item={featuredItem}
                         sizes="(max-width: 1280px) 62vw, 46vw"
-                        className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                        wrapperClassName=""
                       />
-                      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,8,6,0.04)_0%,rgba(10,8,6,0.16)_45%,rgba(10,8,6,0.58)_100%)]" />
-                      <div className="absolute left-6 top-6 inline-flex max-w-[calc(100%-3rem)] items-center gap-2 rounded-full border border-[#f2d49b]/[0.28] bg-[#15120f]/[0.48] px-4 py-2 text-xs font-medium text-[#ffe7b2] backdrop-blur-md">
+                      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(10,8,6,0.04)_0%,rgba(10,8,6,0.16)_45%,rgba(10,8,6,0.58)_100%)]" />
+                      <div className="pointer-events-none absolute left-6 top-6 inline-flex max-w-[calc(100%-3rem)] items-center gap-2 rounded-full border border-[#f2d49b]/[0.28] bg-[#15120f]/[0.48] px-4 py-2 text-xs font-medium text-[#ffe7b2] backdrop-blur-md">
                         {featuredItem.isSignature ? (
                           <Sparkles className="h-3.5 w-3.5 shrink-0 stroke-[1.8]" />
                         ) : (
@@ -777,14 +913,13 @@ function RestaurantMenuShowcase({
                       className="group/item grid grid-cols-[88px_minmax(0,1fr)] gap-4 py-5 transition-colors duration-300 hover:bg-white/[0.035] xl:grid-cols-[104px_minmax(0,1fr)] xl:gap-5"
                     >
                       <div className="relative aspect-square overflow-hidden rounded-[1.15rem] bg-[#2b241c]">
-                        <Image
-                          src={item.imageUrl || "/restaurant-menu/default.webp"}
-                          alt={item.name}
-                          fill
+                        <RestaurantMenuMedia
+                          item={item}
                           sizes="104px"
-                          className="object-cover transition-transform duration-500 group-hover/item:scale-[1.07]"
+                          wrapperClassName=""
+                          imageClassName="object-cover"
                         />
-                        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_54%,rgba(10,8,6,0.32)_100%)]" />
+                        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_54%,rgba(10,8,6,0.32)_100%)]" />
                       </div>
 
                       <div className="min-w-0">
@@ -842,15 +977,14 @@ function RestaurantMenuShowcase({
           {featuredItem ? (
             <Reveal delay={0.16}>
               <article className="group relative min-h-[520px] overflow-hidden rounded-[2rem] border border-white/[0.12] bg-white/[0.08] shadow-[0_28px_80px_rgba(0,0,0,0.28)] backdrop-blur-md">
-                <Image
-                  src={featuredItem.imageUrl || "/restaurant-menu/default.webp"}
-                  alt={featuredItem.name}
-                  fill
+                <RestaurantMenuMedia
+                  key={featuredItem.id}
+                  item={featuredItem}
                   sizes="(max-width: 1280px) 100vw, 42vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                  wrapperClassName=""
                 />
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,8,6,0.08)_0%,rgba(10,8,6,0.38)_42%,rgba(10,8,6,0.9)_100%)]" />
-                <div className="absolute inset-x-0 bottom-0 p-5 sm:p-8">
+                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(10,8,6,0.08)_0%,rgba(10,8,6,0.38)_42%,rgba(10,8,6,0.9)_100%)]" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5 sm:p-8">
                   <div className="mb-4 flex flex-wrap gap-2">
                     {featuredItem.isSignature ? (
                       <span className="inline-flex items-center gap-2 rounded-full border border-[#f2d49b]/30 bg-[#f2d49b]/[0.18] px-3 py-1.5 text-xs font-medium text-[#ffe7b2]">
@@ -903,15 +1037,13 @@ function RestaurantMenuShowcase({
               <Reveal key={item.id} delay={0.1 + (index % 6) * 0.04}>
                 <article className="group h-full overflow-hidden rounded-[1.6rem] border border-white/10 bg-white/[0.075] shadow-[0_20px_54px_rgba(0,0,0,0.18)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.18]">
                   <div className="relative aspect-[4/3] overflow-hidden bg-[#2b241c]">
-                    <Image
-                      src={item.imageUrl || "/restaurant-menu/default.webp"}
-                      alt={item.name}
-                      fill
+                    <RestaurantMenuMedia
+                      item={item}
                       sizes="(max-width: 768px) 100vw, 30vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                      wrapperClassName=""
                     />
-                    <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_48%,rgba(10,8,6,0.48)_100%)]" />
-                    <div className="absolute bottom-3 right-3 flex max-w-[calc(100%-1.5rem)] items-center gap-2 rounded-[1.2rem] text-white">
+                    <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_48%,rgba(10,8,6,0.48)_100%)]" />
+                    <div className="pointer-events-none absolute bottom-3 right-3 flex max-w-[calc(100%-1.5rem)] items-center gap-2 rounded-[1.2rem] text-white">
                       <BadgeEuro className="h-4 w-4 stroke-[1.8]" />
                       {renderPrice(item, true)}
                     </div>
