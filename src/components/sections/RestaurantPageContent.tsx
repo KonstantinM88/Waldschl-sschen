@@ -33,6 +33,7 @@ import type { PublicRestaurantMenuCategory } from "@/lib/restaurant-menu-shared"
 type ScrollDirection = "up" | "down";
 
 const MOBILE_WAVE_QUERY = "(max-width: 1024px), (hover: none) and (pointer: coarse)";
+const RESTAURANT_ROOM_IMAGE = "/restaurant_room_1920w.webp";
 
 interface RestaurantWaveFrameProps {
   src: string;
@@ -162,6 +163,7 @@ function RestaurantWaveFrame({
     .join(" ");
 
   const mediaSurfaceClassName = ["restaurant-wave-surface", surfaceClassName].filter(Boolean).join(" ");
+  const shouldLoadEager = priority || src === RESTAURANT_ROOM_IMAGE;
 
   return (
     <div
@@ -177,6 +179,8 @@ function RestaurantWaveFrame({
           alt={alt}
           fill
           priority={priority}
+          loading={shouldLoadEager ? "eager" : "lazy"}
+          fetchPriority={shouldLoadEager ? "high" : "auto"}
           className={imageClassName}
           sizes={sizes}
         />
@@ -202,7 +206,7 @@ function RestaurantHero() {
 
   return (
     <RestaurantWaveFrame
-      src="/restaurant_room_1920w.webp"
+      src={RESTAURANT_ROOM_IMAGE}
       alt="Restaurant Waldschlösschen — Gastraum"
       sizes="100vw"
       priority
@@ -759,10 +763,12 @@ function RestaurantMenuShowcase({
     >
       <div className="absolute inset-0 opacity-[0.18]">
         <Image
-          src="/restaurant_room_1920w.webp"
+          src={RESTAURANT_ROOM_IMAGE}
           alt=""
           fill
           sizes="100vw"
+          loading="eager"
+          fetchPriority="high"
           className="object-cover"
         />
       </div>
@@ -1234,7 +1240,7 @@ function RestaurantSpaces() {
   const spaces = [
     {
       key: "restaurant" as const,
-      image: "/restaurant_room_1920w.webp",
+      image: RESTAURANT_ROOM_IMAGE,
       Icon: UtensilsCrossed,
       span: "lg:col-span-2 lg:row-span-2",
       aspect: "aspect-[16/10] lg:aspect-auto lg:h-full",
@@ -1308,7 +1314,7 @@ function RestaurantSpaces() {
    ================================================================ */
 function RestaurantGallery() {
   const images = [
-    { src: "/restaurant_room_1920w.webp", alt: "Gastraum", span: "col-span-2" },
+    { src: RESTAURANT_ROOM_IMAGE, alt: "Gastraum", span: "col-span-2" },
     { src: "/restaurant_private_room_1920w.webp", alt: "Separée", span: "col-span-1" },
     { src: "/restaurant_terrace_1920w.webp", alt: "Terrasse", span: "col-span-1" },
     { src: "/Schachtstube_mural_1920w.webp", alt: "Schachtstube", span: "col-span-1" },
