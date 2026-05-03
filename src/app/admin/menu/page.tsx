@@ -41,11 +41,11 @@ export const dynamic = "force-dynamic";
 
 const inputClassName = "w-full bg-transparent text-sm text-[#201b17] outline-none";
 const actionButtonClassName =
-  "inline-flex min-h-11 items-center justify-center rounded-full border border-[rgba(184,136,76,0.22)] bg-[linear-gradient(135deg,#d8bd84_0%,#c9a96e_48%,#b4884c_100%)] px-5 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-white shadow-[0_16px_30px_rgba(128,92,39,0.22)] transition-all duration-300 hover:translate-y-[-1px] hover:shadow-[0_20px_36px_rgba(128,92,39,0.3)]";
+  "inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[rgba(184,136,76,0.22)] bg-[linear-gradient(135deg,#d8bd84_0%,#c9a96e_48%,#b4884c_100%)] px-5 text-center text-[0.68rem] font-medium uppercase tracking-[0.16em] text-white shadow-[0_16px_30px_rgba(128,92,39,0.22)] transition-all duration-300 hover:translate-y-[-1px] hover:shadow-[0_20px_36px_rgba(128,92,39,0.3)] sm:w-auto";
 const subtleButtonClassName =
-  "inline-flex min-h-10 items-center justify-center rounded-full border border-[#dfd4c2] bg-white px-4 text-[0.64rem] font-medium uppercase tracking-[0.16em] text-[#6c6459] transition-all duration-300 hover:border-[#cdbca4] hover:text-[#201b17]";
+  "inline-flex min-h-10 w-full items-center justify-center rounded-full border border-[#dfd4c2] bg-white px-4 text-center text-[0.64rem] font-medium uppercase tracking-[0.16em] text-[#6c6459] transition-all duration-300 hover:border-[#cdbca4] hover:text-[#201b17] sm:w-auto";
 const dangerButtonClassName =
-  "inline-flex min-h-10 items-center justify-center rounded-full border border-[#ead5d1] bg-[#fff7f5] px-4 text-[0.64rem] font-medium uppercase tracking-[0.16em] text-[#9b4a3c] transition-all duration-300 hover:border-[#d8aaa1] hover:text-[#6f2e25]";
+  "inline-flex min-h-10 w-full items-center justify-center rounded-full border border-[#ead5d1] bg-[#fff7f5] px-4 text-center text-[0.64rem] font-medium uppercase tracking-[0.16em] text-[#9b4a3c] transition-all duration-300 hover:border-[#d8aaa1] hover:text-[#6f2e25] sm:w-auto";
 
 type MenuVisibilityFilter = "all" | "draft" | "published";
 type MenuImageFilter = "all" | "missing" | "with";
@@ -178,14 +178,14 @@ function BooleanField({
   name: string;
 }) {
   return (
-    <label className="inline-flex min-h-12 items-center gap-3 rounded-[1.2rem] border border-[#eadfcf] bg-white px-4 py-3 text-sm font-light text-[#4f483f]">
+    <label className="inline-flex min-h-12 w-full min-w-0 items-center gap-3 rounded-[1.2rem] border border-[#eadfcf] bg-white px-4 py-3 text-sm font-light text-[#4f483f]">
       <input
         name={name}
         type="checkbox"
         defaultChecked={defaultChecked}
-        className="h-4 w-4 rounded border-[#cdbca4] text-[#b4884c] focus:ring-[#d6c4a4]"
+        className="h-4 w-4 shrink-0 rounded border-[#cdbca4] text-[#b4884c] focus:ring-[#d6c4a4]"
       />
-      {label}
+      <span className="min-w-0 break-words">{label}</span>
     </label>
   );
 }
@@ -351,7 +351,7 @@ export default async function AdminMenuPage({
       summary={summary}
       title={menuText.title}
     >
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
         <AdminMetricCard
           detail={menuText.stats.categories}
           Icon={Layers3}
@@ -372,12 +372,12 @@ export default async function AdminMenuPage({
         />
       </section>
 
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+      <div className="grid grid-cols-1 gap-4 2xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] 2xl:gap-5">
         <AdminPanel badge={menuText.badge} title={menuText.form.categoryTitle}>
           <form action={createMenuCategoryAction}>
             <input type="hidden" name="returnTo" value={returnTo} />
             <AdminPendingFieldset>
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 sm:gap-4">
                 <AdminField label={menuText.fields.titleDe}>
                   <input name="titleDe" type="text" required className={inputClassName} />
                 </AdminField>
@@ -396,7 +396,7 @@ export default async function AdminMenuPage({
                   />
                 </AdminField>
               </div>
-              <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 sm:gap-4">
                 <AdminField label={menuText.fields.descriptionDe}>
                   <textarea
                     name="descriptionDe"
@@ -412,7 +412,7 @@ export default async function AdminMenuPage({
                   />
                 </AdminField>
               </div>
-              <div className="mt-4 flex flex-col gap-4 border-t border-[#eee5d9] pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="mt-4 flex flex-col gap-3 border-t border-[#eee5d9] pt-4 sm:flex-row sm:items-center sm:justify-between">
                 <BooleanField label={menuText.form.active} name="isActive" defaultChecked />
                 <AdminSubmitButton
                   pendingLabel={`${t.dashboard.controls.create}...`}
@@ -429,7 +429,7 @@ export default async function AdminMenuPage({
           <form action={createMenuItemAction} encType="multipart/form-data">
             <input type="hidden" name="returnTo" value={returnTo} />
             <AdminPendingFieldset>
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 sm:gap-4">
                 <CategorySelect
                   categories={categories}
                   label={menuText.fields.category}
@@ -458,7 +458,7 @@ export default async function AdminMenuPage({
                 </AdminField>
               </div>
 
-              <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
+              <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-2 sm:gap-4">
                 <AdminField label={menuText.fields.descriptionDe}>
                   <textarea
                     name="descriptionDe"
@@ -475,7 +475,7 @@ export default async function AdminMenuPage({
                 </AdminField>
               </div>
 
-              <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-3">
+              <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-3 sm:gap-4">
                 <AdminField label={menuText.fields.priceVariants}>
                   <textarea
                     name="priceVariants"
@@ -496,14 +496,14 @@ export default async function AdminMenuPage({
                 {menuText.form.priceVariantsHint}
               </p>
 
-              <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[270px_minmax(0,1fr)]">
+              <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-[270px_minmax(0,1fr)] sm:gap-4">
                 <MenuImageUploadPreview
                   alt={menuText.form.itemTitle}
                   emptyLabel={filterText.previewNew}
                   fileLabel={menuText.fields.imageFile}
                   helpText={imageGuidelineText}
                 />
-                <div className="grid grid-cols-1 gap-4 content-start lg:grid-cols-2">
+                <div className="grid content-start grid-cols-1 gap-3 lg:grid-cols-2 sm:gap-4">
                   <AdminField label={menuText.fields.imageUrl}>
                     <input name="imageUrl" type="text" className={inputClassName} />
                   </AdminField>
@@ -516,8 +516,8 @@ export default async function AdminMenuPage({
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-col gap-4 border-t border-[#eee5d9] pt-4 xl:flex-row xl:items-center xl:justify-between">
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div className="mt-4 flex flex-col gap-3 border-t border-[#eee5d9] pt-4 xl:flex-row xl:items-center xl:justify-between">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                   <BooleanField label={menuText.form.published} name="isPublished" defaultChecked />
                   <BooleanField label={menuText.form.signature} name="isSignature" />
                   <BooleanField label={menuText.form.vegetarian} name="isVegetarian" />
@@ -596,14 +596,28 @@ export default async function AdminMenuPage({
             {filteredCategories.map((category) => (
               <section
                 key={category.id}
-                className="rounded-[1.6rem] border border-[#eadfcf] bg-[#fcfaf6] p-4 sm:p-5"
+                className="rounded-[1.35rem] border border-[#eadfcf] bg-[#fcfaf6] p-3 sm:rounded-[1.6rem] sm:p-5"
               >
-                <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_auto]">
+                <div className="mb-4 flex flex-col gap-2 border-b border-[#eee5d9] pb-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
+                    <h3 className="break-words font-[var(--font-display)] text-[1.55rem] leading-none text-[#201b17]">
+                      {category.titleDe}
+                    </h3>
+                    <p className="mt-1 text-xs font-light uppercase tracking-[0.14em] text-[#9e927f]">
+                      {filterText.itemCount(category.items.length)}
+                    </p>
+                  </div>
+                  <div className="rounded-full border border-[#eadfcf] bg-white px-3 py-1.5 text-xs font-medium uppercase tracking-[0.14em] text-[#8f836f]">
+                    {category.isActive ? menuText.form.active : "-"}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 2xl:grid-cols-[minmax(0,1fr)_auto]">
                   <form action={updateMenuCategoryAction}>
                     <input type="hidden" name="returnTo" value={returnTo} />
                     <input type="hidden" name="id" value={category.id} />
                     <AdminPendingFieldset>
-                      <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
+                      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4 sm:gap-4">
                         <AdminField label={menuText.fields.titleDe}>
                           <input
                             name="titleDe"
@@ -638,7 +652,7 @@ export default async function AdminMenuPage({
                           />
                         </AdminField>
                       </div>
-                      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                      <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-2 sm:gap-4">
                         <AdminField label={menuText.fields.descriptionDe}>
                           <textarea
                             name="descriptionDe"
@@ -656,7 +670,7 @@ export default async function AdminMenuPage({
                           />
                         </AdminField>
                       </div>
-                      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="mt-4 flex flex-col gap-3 border-t border-[#eee5d9] pt-4 sm:flex-row sm:items-center sm:justify-between">
                         <BooleanField
                           label={menuText.form.active}
                           name="isActive"
@@ -672,7 +686,7 @@ export default async function AdminMenuPage({
                     </AdminPendingFieldset>
                   </form>
 
-                  <form action={deleteMenuCategoryAction} className="xl:pt-1">
+                  <form action={deleteMenuCategoryAction} className="2xl:pt-1">
                     <input type="hidden" name="returnTo" value={returnTo} />
                     <input type="hidden" name="id" value={category.id} />
                     <AdminConfirmButton
@@ -685,17 +699,17 @@ export default async function AdminMenuPage({
                   </form>
                 </div>
 
-                <div className="mt-5 space-y-4">
+                <div className="mt-5 space-y-3 sm:space-y-4">
                   {category.items.map((item) => (
                     <article
                       key={item.id}
-                      className="rounded-[1.45rem] border border-[#eee5d9] bg-white p-4 shadow-[0_12px_28px_rgba(28,21,16,0.04)]"
+                      className="rounded-[1.2rem] border border-[#eee5d9] bg-white p-3 shadow-[0_12px_28px_rgba(28,21,16,0.04)] sm:rounded-[1.45rem] sm:p-4"
                     >
                       <form action={updateMenuItemAction} encType="multipart/form-data">
                         <input type="hidden" name="returnTo" value={returnTo} />
                         <input type="hidden" name="id" value={item.id} />
                         <AdminPendingFieldset>
-                          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[240px_minmax(0,1fr)]">
+                          <div className="grid grid-cols-1 gap-3 2xl:grid-cols-[240px_minmax(0,1fr)] sm:gap-4">
                             <MenuImageUploadPreview
                               alt={item.nameDe}
                               currentImageUrl={item.imageUrl}
@@ -705,7 +719,7 @@ export default async function AdminMenuPage({
                             />
 
                             <div className="min-w-0">
-                              <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
+                              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4 sm:gap-4">
                                 <CategorySelect
                                   categories={categories}
                                   defaultValue={item.categoryId}
@@ -773,7 +787,7 @@ export default async function AdminMenuPage({
                                 </AdminField>
                               </div>
 
-                              <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
+                              <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-2 sm:gap-4">
                                 <AdminField label={menuText.fields.descriptionDe}>
                                   <textarea
                                     name="descriptionDe"
@@ -792,7 +806,7 @@ export default async function AdminMenuPage({
                                 </AdminField>
                               </div>
 
-                              <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-3">
+                              <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-3 sm:gap-4">
                                 <AdminField label={menuText.fields.priceVariants}>
                                   <textarea
                                     name="priceVariants"
@@ -822,8 +836,8 @@ export default async function AdminMenuPage({
                                 </AdminField>
                               </div>
 
-                              <div className="mt-4 flex flex-col gap-4 border-t border-[#eee5d9] pt-4 xl:flex-row xl:items-center xl:justify-between">
-                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                              <div className="mt-4 flex flex-col gap-3 border-t border-[#eee5d9] pt-4 xl:flex-row xl:items-center xl:justify-between">
+                                <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                                   <BooleanField
                                     label={menuText.form.published}
                                     name="isPublished"
@@ -841,7 +855,7 @@ export default async function AdminMenuPage({
                                   />
                                 </div>
                                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                                  <div className="flex items-center gap-2 rounded-full border border-[#eadfcf] bg-[#faf7f1] px-4 py-2.5 text-sm text-[#5d564c]">
+                                  <div className="flex min-h-10 w-full items-center justify-center gap-2 rounded-full border border-[#eadfcf] bg-[#faf7f1] px-4 py-2.5 text-sm text-[#5d564c] sm:w-auto">
                                     <ImageIcon className="h-4 w-4 text-[#b4884c]" />
                                     {formatAdminCurrency(item.price.toString(), locale)}
                                   </div>

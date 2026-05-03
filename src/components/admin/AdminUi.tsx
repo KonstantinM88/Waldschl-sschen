@@ -34,16 +34,16 @@ export function AdminMetricCard({
   value,
 }: AdminMetricCardProps) {
   const content = (
-    <article className="rounded-[1.7rem] border border-[#dfd4c2] bg-white px-5 py-5 shadow-[0_18px_40px_rgba(28,21,16,0.06)] transition-all duration-300 hover:translate-y-[-1px] hover:shadow-[0_22px_44px_rgba(28,21,16,0.1)]">
+    <article className="rounded-[1.35rem] border border-[#dfd4c2] bg-white px-4 py-4 shadow-[0_18px_40px_rgba(28,21,16,0.06)] transition-all duration-300 hover:translate-y-[-1px] hover:shadow-[0_22px_44px_rgba(28,21,16,0.1)] sm:rounded-[1.7rem] sm:px-5 sm:py-5">
       <div className="flex items-start justify-between gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f3ede2] text-[#b4884c]">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#f3ede2] text-[#b4884c] sm:h-12 sm:w-12">
           <Icon className="h-5 w-5 stroke-[1.7]" />
         </div>
-        <div className="text-right text-[0.62rem] font-medium uppercase tracking-[0.16em] text-[#9e927f]">
+        <div className="min-w-0 break-words text-right text-[0.58rem] font-medium uppercase tracking-[0.14em] text-[#9e927f] sm:text-[0.62rem] sm:tracking-[0.16em]">
           {detail}
         </div>
       </div>
-      <div className="mt-6 font-[var(--font-display)] text-[2.4rem] leading-none text-[#201b17]">
+      <div className="mt-5 font-[var(--font-display)] text-[clamp(2rem,10vw,2.4rem)] leading-none text-[#201b17] sm:mt-6">
         {value}
       </div>
       <div className="mt-2 text-sm font-light text-[#5d564c]">{label}</div>
@@ -70,7 +70,7 @@ export function AdminPanel({
   title,
 }: AdminPanelProps) {
   return (
-    <section className="overflow-hidden rounded-[1.9rem] border border-[#dfd4c2] bg-white p-4 shadow-[0_18px_40px_rgba(28,21,16,0.06)] sm:p-6">
+    <section className="overflow-hidden rounded-[1.45rem] border border-[#dfd4c2] bg-white p-3 shadow-[0_18px_40px_rgba(28,21,16,0.06)] sm:rounded-[1.9rem] sm:p-6">
       <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           {badge ? (
@@ -78,7 +78,7 @@ export function AdminPanel({
               {badge}
             </div>
           ) : null}
-          <h2 className="mt-2 break-words font-[var(--font-display)] text-[clamp(1.55rem,7vw,1.9rem)] leading-[0.95] text-[#201b17] [overflow-wrap:anywhere]">
+          <h2 className="mt-2 break-words font-[var(--font-display)] text-[clamp(1.45rem,7vw,1.9rem)] leading-[0.95] text-[#201b17] [overflow-wrap:anywhere]">
             {title}
           </h2>
           {description ? (
@@ -131,10 +131,10 @@ export function AdminFilterBar({
   return (
     <form
       method="get"
-      className="mb-5 rounded-[1.45rem] border border-[#eadfcf] bg-[#faf7f1] p-4"
+      className="mb-5 rounded-[1.25rem] border border-[#eadfcf] bg-[#faf7f1] p-3 sm:rounded-[1.45rem] sm:p-4"
     >
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,0.8fr))]">
-        <label className="rounded-[1.1rem] border border-[#eadfcf] bg-white px-4 py-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-[minmax(280px,1.35fr)_repeat(4,minmax(150px,0.8fr))_auto]">
+        <label className="min-w-0 rounded-[1.1rem] border border-[#eadfcf] bg-white px-4 py-3 sm:col-span-2 lg:col-span-3 2xl:col-span-1">
           <span className="text-[0.58rem] font-medium uppercase tracking-[0.14em] text-[#9e927f]">
             {searchLabel}
           </span>
@@ -143,22 +143,22 @@ export function AdminFilterBar({
             type="search"
             defaultValue={searchValue}
             placeholder={searchPlaceholder}
-            className="mt-2 w-full bg-transparent text-sm text-[#201b17] outline-none"
+            className="mt-2 w-full min-w-0 bg-transparent text-sm text-[#201b17] outline-none"
           />
         </label>
 
         {children}
 
-        <div className="flex flex-col gap-3 sm:flex-row xl:col-span-1 xl:justify-end">
+        <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row lg:col-span-3 2xl:col-span-1 2xl:justify-end">
           <AdminSubmitButton
             pendingLabel={`${submitLabel}...`}
-            className="inline-flex min-h-12 items-center justify-center rounded-full border border-[rgba(184,136,76,0.22)] bg-[linear-gradient(135deg,#d8bd84_0%,#c9a96e_48%,#b4884c_100%)] px-5 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-white shadow-[0_16px_30px_rgba(128,92,39,0.22)] transition-all duration-300 hover:translate-y-[-1px] hover:shadow-[0_20px_36px_rgba(128,92,39,0.3)]"
+            className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-[rgba(184,136,76,0.22)] bg-[linear-gradient(135deg,#d8bd84_0%,#c9a96e_48%,#b4884c_100%)] px-5 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-white shadow-[0_16px_30px_rgba(128,92,39,0.22)] transition-all duration-300 hover:translate-y-[-1px] hover:shadow-[0_20px_36px_rgba(128,92,39,0.3)] sm:w-auto"
           >
             {submitLabel}
           </AdminSubmitButton>
           <Link
             href={resetHref}
-            className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#dfd4c2] bg-white px-5 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[#6c6459] transition-all duration-300 hover:border-[#d3c4b0] hover:text-[#201b17]"
+            className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-[#dfd4c2] bg-white px-5 text-[0.68rem] font-medium uppercase tracking-[0.16em] text-[#6c6459] transition-all duration-300 hover:border-[#d3c4b0] hover:text-[#201b17] sm:w-auto"
           >
             {resetLabel}
           </Link>
@@ -180,14 +180,14 @@ export function AdminSelectField({
   value: string;
 }) {
   return (
-    <label className="rounded-[1.1rem] border border-[#eadfcf] bg-white px-4 py-3">
+    <label className="min-w-0 rounded-[1.1rem] border border-[#eadfcf] bg-white px-4 py-3">
       <span className="text-[0.58rem] font-medium uppercase tracking-[0.14em] text-[#9e927f]">
         {label}
       </span>
       <select
         name={name}
         defaultValue={value}
-        className="mt-2 w-full bg-transparent text-sm text-[#201b17] outline-none"
+        className="mt-2 w-full min-w-0 bg-transparent text-sm text-[#201b17] outline-none"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -207,11 +207,11 @@ export function AdminField({
   label: string;
 }) {
   return (
-    <label className="rounded-[1.2rem] border border-[#eadfcf] bg-white px-4 py-3">
+    <label className="min-w-0 rounded-[1.2rem] border border-[#eadfcf] bg-white px-4 py-3">
       <span className="text-[0.58rem] font-medium uppercase tracking-[0.14em] text-[#9e927f]">
         {label}
       </span>
-      <div className="mt-2">{children}</div>
+      <div className="mt-2 min-w-0">{children}</div>
     </label>
   );
 }

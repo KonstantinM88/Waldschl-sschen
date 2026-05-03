@@ -113,9 +113,9 @@ export default function AdminShell({
         />
       ) : null}
       <div className="mx-auto max-w-[1600px]">
-        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[320px_minmax(0,1fr)]">
-          <aside className="rounded-[2rem] border border-[#d9cdb9] bg-[linear-gradient(165deg,#191613_0%,#221c18_48%,#151210_100%)] p-5 text-white shadow-[0_28px_80px_rgba(18,12,9,0.18)] sm:p-6 xl:sticky xl:top-5 xl:h-fit">
-            <div className="rounded-[1.6rem] border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-[320px_minmax(0,1fr)] xl:gap-5">
+          <aside className="rounded-[1.45rem] border border-[#d9cdb9] bg-[linear-gradient(165deg,#191613_0%,#221c18_48%,#151210_100%)] p-3 text-white shadow-[0_28px_80px_rgba(18,12,9,0.18)] sm:rounded-[2rem] sm:p-4 xl:sticky xl:top-5 xl:h-fit xl:p-6">
+            <div className="hidden rounded-[1.6rem] border border-white/10 bg-white/5 p-4 backdrop-blur-sm xl:block">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-[0.62rem] font-medium uppercase tracking-[0.18em] text-[rgba(232,214,183,0.88)]">
                 <ShieldCheck className="h-3.5 w-3.5 stroke-[1.85]" />
                 {t.dashboard.badge}
@@ -128,7 +128,7 @@ export default function AdminShell({
               </p>
             </div>
 
-            <div className="mt-5 rounded-[1.6rem] border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+            <div className="mt-5 hidden rounded-[1.6rem] border border-white/10 bg-white/5 p-4 backdrop-blur-sm xl:block">
               <div className="text-[0.62rem] font-medium uppercase tracking-[0.18em] text-[rgba(232,214,183,0.78)]">
                 {t.dashboard.shell.sessionLabel}
               </div>
@@ -153,11 +153,11 @@ export default function AdminShell({
               </div>
             </div>
 
-            <nav className="mt-5">
-              <div className="mb-3 px-1 text-[0.62rem] font-medium uppercase tracking-[0.18em] text-[rgba(232,214,183,0.72)]">
+            <nav className="xl:mt-5">
+              <div className="mb-3 hidden px-1 text-[0.62rem] font-medium uppercase tracking-[0.18em] text-[rgba(232,214,183,0.72)] xl:block">
                 {t.dashboard.navigationLabel}
               </div>
-              <div className="space-y-2">
+              <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:thin] [scrollbar-color:rgba(216,189,132,0.6)_transparent] xl:mx-0 xl:block xl:space-y-2 xl:overflow-visible xl:px-0 xl:pb-0">
                 {navigationItems.map((item) => {
                   const active = isActivePath(currentPath, item.href);
 
@@ -166,7 +166,7 @@ export default function AdminShell({
                       key={item.href}
                       href={item.href}
                       className={[
-                        "group flex items-center justify-between gap-3 rounded-[1.35rem] border px-4 py-3.5 transition-all duration-300",
+                        "group flex min-w-[10.5rem] shrink-0 items-center justify-between gap-3 rounded-[1.15rem] border px-3 py-3 transition-all duration-300 sm:min-w-[12rem] xl:min-w-0 xl:rounded-[1.35rem] xl:px-4 xl:py-3.5",
                         active
                           ? "border-[rgba(212,188,142,0.28)] bg-[rgba(212,188,142,0.14)] shadow-[0_14px_28px_rgba(0,0,0,0.16)]"
                           : "border-white/8 bg-white/[0.035] hover:border-white/14 hover:bg-white/[0.06]",
@@ -183,16 +183,16 @@ export default function AdminShell({
                         >
                           <item.Icon className="h-4.5 w-4.5 stroke-[1.8]" />
                         </div>
-                        <div>
-                          <div className="text-sm font-medium text-white">{item.label}</div>
-                          <div className="text-xs font-light leading-relaxed text-white/54">
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-medium text-white">{item.label}</div>
+                          <div className="hidden text-xs font-light leading-relaxed text-white/54 sm:block">
                             {item.detail}
                           </div>
                         </div>
                       </div>
                       <div
                         className={[
-                          "rounded-full border px-3 py-1 text-[0.6rem] font-medium uppercase tracking-[0.14em]",
+                          "rounded-full border px-2.5 py-1 text-[0.56rem] font-medium uppercase tracking-[0.12em] xl:px-3 xl:text-[0.6rem] xl:tracking-[0.14em]",
                           active
                             ? "border-[rgba(233,216,186,0.2)] bg-[rgba(233,216,186,0.12)] text-[rgba(255,248,235,0.96)]"
                             : "border-white/10 bg-black/10 text-white/68",
@@ -207,14 +207,14 @@ export default function AdminShell({
             </nav>
           </aside>
 
-          <div className="min-w-0 space-y-5">
-            <header className="rounded-[2rem] border border-[#dfd4c2] bg-white px-4 py-4 shadow-[0_18px_40px_rgba(28,21,16,0.06)] sm:px-7 sm:py-6">
+          <div className="min-w-0 space-y-4 xl:space-y-5">
+            <header className="rounded-[1.45rem] border border-[#dfd4c2] bg-white px-4 py-4 shadow-[0_18px_40px_rgba(28,21,16,0.06)] sm:rounded-[2rem] sm:px-7 sm:py-6">
               <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
                 <div className="min-w-0 max-w-[54rem]">
                   <div className="inline-flex items-center gap-2 rounded-full border border-[#eadfcf] bg-[#faf7f1] px-3.5 py-2 text-[0.62rem] font-medium uppercase tracking-[0.18em] text-[#b4884c]">
                     {badge}
                   </div>
-                  <h2 className="mt-4 break-words font-[var(--font-display)] text-[clamp(2rem,9vw,3.7rem)] leading-[0.94] text-[#201b17] [overflow-wrap:anywhere]">
+                  <h2 className="mt-4 break-words font-[var(--font-display)] text-[clamp(1.85rem,9vw,3.7rem)] leading-[0.94] text-[#201b17] [overflow-wrap:anywhere]">
                     {title}
                   </h2>
                   <p className="mt-3 text-sm font-light leading-relaxed text-[#5d564c] sm:text-[0.98rem]">

@@ -35,7 +35,7 @@ export default function MenuImageUploadPreview({
   const hasSelectedFile = Boolean(previewUrl);
 
   return (
-    <div className="rounded-[1.35rem] border border-[#eadfcf] bg-white p-3">
+    <div className="min-w-0 rounded-[1.2rem] border border-[#eadfcf] bg-white p-2.5 sm:rounded-[1.35rem] sm:p-3">
       <div
         aria-label={alt}
         className="relative aspect-[4/3] overflow-hidden rounded-[1.1rem] border border-[#eadfcf] bg-[#f3ede2] bg-cover bg-center"
@@ -44,7 +44,7 @@ export default function MenuImageUploadPreview({
       >
         <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_42%,rgba(18,12,8,0.46)_100%)]" />
         <div className="absolute bottom-3 left-3 right-3">
-          <div className="rounded-full border border-white/20 bg-black/35 px-3 py-1.5 text-xs font-medium text-white shadow-[0_10px_22px_rgba(0,0,0,0.18)] backdrop-blur-md">
+          <div className="truncate rounded-full border border-white/20 bg-black/35 px-3 py-1.5 text-xs font-medium text-white shadow-[0_10px_22px_rgba(0,0,0,0.18)] backdrop-blur-md">
             {hasSelectedFile ? fileMeta : emptyLabel}
           </div>
         </div>
@@ -58,7 +58,7 @@ export default function MenuImageUploadPreview({
           name={name}
           type="file"
           accept="image/avif,image/gif,image/jpeg,image/png,image/webp"
-          className="mt-2 w-full text-sm text-[#201b17] file:mr-4 file:rounded-full file:border-0 file:bg-white file:px-4 file:py-2 file:text-[0.62rem] file:font-medium file:uppercase file:tracking-[0.14em] file:text-[#7b6140]"
+          className="mt-2 block w-full min-w-0 overflow-hidden text-xs text-[#201b17] file:mr-3 file:rounded-full file:border-0 file:bg-white file:px-3 file:py-2 file:text-[0.58rem] file:font-medium file:uppercase file:tracking-[0.12em] file:text-[#7b6140] sm:text-sm sm:file:mr-4 sm:file:px-4 sm:file:text-[0.62rem] sm:file:tracking-[0.14em]"
           onChange={(event) => {
             const file = event.currentTarget.files?.[0] ?? null;
 
@@ -81,7 +81,7 @@ export default function MenuImageUploadPreview({
         />
       </label>
 
-      <p className="mt-3 text-xs font-light leading-relaxed text-[#7a7165]">
+      <p className="mt-3 break-words text-xs font-light leading-relaxed text-[#7a7165]">
         {helpText}
       </p>
     </div>
