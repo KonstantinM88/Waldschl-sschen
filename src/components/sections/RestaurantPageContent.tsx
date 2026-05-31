@@ -389,6 +389,7 @@ type PublicRestaurantMenuItem = PublicRestaurantMenuCategory["items"][number];
 interface RestaurantMenuMediaProps {
   imageClassName?: string;
   item: PublicRestaurantMenuItem;
+  playInlineOnDesktopHover?: boolean;
   priority?: boolean;
   sizes: string;
   wrapperClassName: string;
@@ -403,6 +404,7 @@ interface RestaurantMenuDesktopPreview {
 function RestaurantMenuMedia({
   imageClassName = "object-cover",
   item,
+  playInlineOnDesktopHover = true,
   priority = false,
   sizes,
   wrapperClassName,
@@ -527,7 +529,7 @@ function RestaurantMenuMedia({
         onMouseEnter={() => {
           showDesktopPreview();
 
-          if (isDesktopPointer()) {
+          if (isDesktopPointer() && playInlineOnDesktopHover) {
             playVideo();
           }
         }}
@@ -953,6 +955,7 @@ function RestaurantMenuShowcase({
                       <RestaurantMenuMedia
                         key={featuredItem.id}
                         item={featuredItem}
+                        playInlineOnDesktopHover={false}
                         sizes="(max-width: 1280px) 62vw, 46vw"
                         wrapperClassName=""
                       />
@@ -977,7 +980,10 @@ function RestaurantMenuShowcase({
                           <span>{activeCategory.title}</span>
                         </div>
 
-                        <h3 className="mt-7 break-words font-[var(--font-display)] text-[clamp(3rem,4.5vw,4.75rem)] leading-[0.88] text-white">
+                        <h3
+                          lang={locale}
+                          className="mt-7 max-w-[18ch] font-[var(--font-display)] text-[clamp(2.35rem,3.05vw,3.7rem)] leading-[0.98] text-white [hyphens:auto] [overflow-wrap:normal] [text-wrap:balance]"
+                        >
                           {featuredItem.name}
                         </h3>
 
@@ -1115,66 +1121,8 @@ function RestaurantMenuShowcase({
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-5 lg:hidden">
-          {featuredItem ? (
-            <Reveal delay={0.16}>
-              <article className="group relative min-h-[520px] overflow-hidden rounded-[2rem] border border-white/[0.12] bg-white/[0.08] shadow-[0_28px_80px_rgba(0,0,0,0.28)] backdrop-blur-md">
-                <RestaurantMenuMedia
-                  key={featuredItem.id}
-                  item={featuredItem}
-                  sizes="(max-width: 1280px) 100vw, 42vw"
-                  wrapperClassName=""
-                />
-                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(10,8,6,0.08)_0%,rgba(10,8,6,0.38)_42%,rgba(10,8,6,0.9)_100%)]" />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5 sm:p-8">
-                  <div className="mb-4 flex flex-wrap gap-2">
-                    {featuredItem.isSignature ? (
-                      <span className="inline-flex items-center gap-2 rounded-full border border-[#f2d49b]/30 bg-[#f2d49b]/[0.18] px-3 py-1.5 text-xs font-medium text-[#ffe7b2]">
-                        <Sparkles className="h-3.5 w-3.5 stroke-[1.8]" />
-                        {copy.signature}
-                      </span>
-                    ) : null}
-                    {featuredItem.isVegetarian ? (
-                      <span className="inline-flex items-center gap-2 rounded-full border border-[#9bc98c]/30 bg-[#9bc98c]/[0.16] px-3 py-1.5 text-xs font-medium text-[#d8f4cc]">
-                        <Leaf className="h-3.5 w-3.5 stroke-[1.8]" />
-                        {copy.vegetarian}
-                      </span>
-                    ) : null}
-                  </div>
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                    <div className="min-w-0">
-                      <div className="text-sm font-light text-white/[0.58]">
-                        {copy.fromPdf}
-                      </div>
-                      <h3 className="mt-2 break-words font-[var(--font-display)] text-[clamp(2rem,7vw,3.6rem)] leading-[0.92] text-white">
-                        {featuredItem.name}
-                      </h3>
-                    </div>
-                    <div className="shrink-0">
-                      {renderPrice(featuredItem)}
-                    </div>
-                  </div>
-                  {featuredItem.description ? (
-                    <p className="mt-4 max-w-[680px] text-sm font-light leading-relaxed text-white/72 sm:text-base">
-                      {featuredItem.description}
-                    </p>
-                  ) : null}
-                  {featuredItem.allergens ? (
-                    <div className="mt-4 text-xs font-light text-white/[0.45]">
-                      {copy.allergens}: {featuredItem.allergens}
-                    </div>
-                  ) : null}
-                  {featuredItem.priceNote ? (
-                    <div className="mt-2 text-xs font-light text-white/[0.45]">
-                      {featuredItem.priceNote}
-                    </div>
-                  ) : null}
-                </div>
-              </article>
-            </Reveal>
-          ) : null}
-
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            {supportingItems.map((item, index) => (
+            {activeCategory.items.map((item, index) => (
               <Reveal key={item.id} delay={0.1 + (index % 6) * 0.04}>
                 <article className="group h-full overflow-hidden rounded-[1.6rem] border border-white/10 bg-white/[0.075] shadow-[0_20px_54px_rgba(0,0,0,0.18)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.18]">
                   <div className="relative aspect-[4/3] overflow-hidden bg-[#2b241c]">
