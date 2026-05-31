@@ -1,4 +1,5 @@
 import {
+  ChevronDown,
   Image as ImageIcon,
   Layers3,
   Tags,
@@ -47,6 +48,8 @@ const subtleButtonClassName =
   "inline-flex min-h-10 w-full items-center justify-center rounded-full border border-[#dfd4c2] bg-white px-4 text-center text-[0.64rem] font-medium uppercase tracking-[0.16em] text-[#6c6459] transition-all duration-300 hover:border-[#cdbca4] hover:text-[#201b17] sm:w-auto";
 const dangerButtonClassName =
   "inline-flex min-h-10 w-full items-center justify-center rounded-full border border-[#ead5d1] bg-[#fff7f5] px-4 text-center text-[0.64rem] font-medium uppercase tracking-[0.16em] text-[#9b4a3c] transition-all duration-300 hover:border-[#d8aaa1] hover:text-[#6f2e25] sm:w-auto";
+const detailsSummaryClassName =
+  "flex cursor-pointer list-none items-center justify-between gap-3 rounded-[1.15rem] border border-[#eadfcf] bg-[#faf7f1] px-4 py-3 transition-all duration-300 hover:border-[#d8c8b2] hover:bg-white [&::-webkit-details-marker]:hidden";
 
 type MenuVisibilityFilter = "all" | "draft" | "published";
 type MenuImageFilter = "all" | "missing" | "with";
@@ -373,6 +376,8 @@ export default async function AdminMenuPage({
   const imageGuidelineText = menuImageGuidelines[locale];
   const videoGuidelineText = menuVideoGuidelines[locale];
   const videoText = menuVideoCopy[locale];
+  const expandFilteredCategories =
+    query.length > 0 || categoryFilter !== "all" || hasItemFilter;
 
   return (
     <AdminShell
@@ -408,9 +413,17 @@ export default async function AdminMenuPage({
 
       <div className="grid grid-cols-1 gap-4 2xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] 2xl:gap-5">
         <AdminPanel badge={menuText.badge} title={menuText.form.categoryTitle}>
-          <form action={createMenuCategoryAction}>
-            <input type="hidden" name="returnTo" value={returnTo} />
-            <AdminPendingFieldset>
+          <details className="group/create-category rounded-[1.35rem] border border-[#eadfcf] bg-[#fcfaf6] p-3 sm:p-4">
+            <summary className={detailsSummaryClassName}>
+              <span className="text-[0.64rem] font-medium uppercase tracking-[0.16em] text-[#8f836f]">
+                {t.dashboard.controls.create}
+              </span>
+              <ChevronDown className="h-4 w-4 shrink-0 text-[#b4884c] transition-transform duration-300 group-open/create-category:rotate-180" />
+            </summary>
+
+            <form action={createMenuCategoryAction} className="mt-4 border-t border-[#eee5d9] pt-4">
+              <input type="hidden" name="returnTo" value={returnTo} />
+              <AdminPendingFieldset>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2 sm:gap-4">
                 <AdminField label={menuText.fields.titleDe}>
                   <input name="titleDe" type="text" required className={inputClassName} />
@@ -455,14 +468,23 @@ export default async function AdminMenuPage({
                   {t.dashboard.controls.create}
                 </AdminSubmitButton>
               </div>
-            </AdminPendingFieldset>
-          </form>
+              </AdminPendingFieldset>
+            </form>
+          </details>
         </AdminPanel>
 
         <AdminPanel badge={menuText.badge} title={menuText.form.itemTitle}>
-          <form action={createMenuItemAction}>
-            <input type="hidden" name="returnTo" value={returnTo} />
-            <AdminPendingFieldset>
+          <details className="group/create-item rounded-[1.35rem] border border-[#eadfcf] bg-[#fcfaf6] p-3 sm:p-4">
+            <summary className={detailsSummaryClassName}>
+              <span className="text-[0.64rem] font-medium uppercase tracking-[0.16em] text-[#8f836f]">
+                {t.dashboard.controls.create}
+              </span>
+              <ChevronDown className="h-4 w-4 shrink-0 text-[#b4884c] transition-transform duration-300 group-open/create-item:rotate-180" />
+            </summary>
+
+            <form action={createMenuItemAction} className="mt-4 border-t border-[#eee5d9] pt-4">
+              <input type="hidden" name="returnTo" value={returnTo} />
+              <AdminPendingFieldset>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 sm:gap-4">
                 <CategorySelect
                   categories={categories}
@@ -573,8 +595,9 @@ export default async function AdminMenuPage({
                   {t.dashboard.controls.create}
                 </AdminSubmitButton>
               </div>
-            </AdminPendingFieldset>
-          </form>
+              </AdminPendingFieldset>
+            </form>
+          </details>
         </AdminPanel>
       </div>
 
@@ -638,11 +661,12 @@ export default async function AdminMenuPage({
         {filteredCategories.length ? (
           <div className="space-y-5">
             {filteredCategories.map((category) => (
-              <section
+              <details
                 key={category.id}
-                className="rounded-[1.35rem] border border-[#eadfcf] bg-[#fcfaf6] p-3 sm:rounded-[1.6rem] sm:p-5"
+                open={expandFilteredCategories}
+                className="group/category rounded-[1.35rem] border border-[#eadfcf] bg-[#fcfaf6] p-3 sm:rounded-[1.6rem] sm:p-5"
               >
-                <div className="mb-4 flex flex-col gap-2 border-b border-[#eee5d9] pb-4 sm:flex-row sm:items-center sm:justify-between">
+                <summary className="flex cursor-pointer list-none flex-col gap-3 rounded-[1.15rem] border border-transparent px-1 py-1 transition-all duration-300 hover:border-[#eadfcf] hover:bg-white sm:flex-row sm:items-center sm:justify-between sm:px-3 sm:py-3 [&::-webkit-details-marker]:hidden">
                   <div className="min-w-0">
                     <h3 className="break-words font-[var(--font-display)] text-[1.55rem] leading-none text-[#201b17]">
                       {category.titleDe}
@@ -651,16 +675,28 @@ export default async function AdminMenuPage({
                       {filterText.itemCount(category.items.length)}
                     </p>
                   </div>
-                  <div className="rounded-full border border-[#eadfcf] bg-white px-3 py-1.5 text-xs font-medium uppercase tracking-[0.14em] text-[#8f836f]">
-                    {category.isActive ? menuText.form.active : "-"}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="rounded-full border border-[#eadfcf] bg-white px-3 py-1.5 text-xs font-medium uppercase tracking-[0.14em] text-[#8f836f]">
+                      {category.isActive ? menuText.form.active : "-"}
+                    </div>
+                    <ChevronDown className="h-4 w-4 shrink-0 text-[#b4884c] transition-transform duration-300 group-open/category:rotate-180" />
                   </div>
-                </div>
+                </summary>
 
-                <div className="grid grid-cols-1 gap-4 2xl:grid-cols-[minmax(0,1fr)_auto]">
-                  <form action={updateMenuCategoryAction}>
-                    <input type="hidden" name="returnTo" value={returnTo} />
-                    <input type="hidden" name="id" value={category.id} />
-                    <AdminPendingFieldset>
+                <div className="mt-4 border-t border-[#eee5d9] pt-4">
+                  <details className="group/category-editor rounded-[1.25rem] border border-[#eadfcf] bg-white p-3 sm:p-4">
+                    <summary className={detailsSummaryClassName}>
+                      <span className="min-w-0 break-words text-sm font-medium text-[#4f483f]">
+                        {menuText.form.editCategory}
+                      </span>
+                      <ChevronDown className="h-4 w-4 shrink-0 text-[#b4884c] transition-transform duration-300 group-open/category-editor:rotate-180" />
+                    </summary>
+
+                    <div className="mt-4 grid grid-cols-1 gap-4 border-t border-[#eee5d9] pt-4 2xl:grid-cols-[minmax(0,1fr)_auto]">
+                      <form action={updateMenuCategoryAction}>
+                        <input type="hidden" name="returnTo" value={returnTo} />
+                        <input type="hidden" name="id" value={category.id} />
+                        <AdminPendingFieldset>
                       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4 sm:gap-4">
                         <AdminField label={menuText.fields.titleDe}>
                           <input
@@ -727,32 +763,68 @@ export default async function AdminMenuPage({
                           {t.dashboard.controls.save}
                         </AdminSubmitButton>
                       </div>
-                    </AdminPendingFieldset>
-                  </form>
+                        </AdminPendingFieldset>
+                      </form>
 
-                  <form action={deleteMenuCategoryAction} className="2xl:pt-1">
-                    <input type="hidden" name="returnTo" value={returnTo} />
-                    <input type="hidden" name="id" value={category.id} />
-                    <AdminConfirmButton
-                      confirmMessage={t.dashboard.controls.confirmDelete}
-                      pendingLabel={`${t.dashboard.controls.delete}...`}
-                      className={dangerButtonClassName}
-                    >
-                      {t.dashboard.controls.delete}
-                    </AdminConfirmButton>
-                  </form>
-                </div>
+                      <form action={deleteMenuCategoryAction} className="2xl:pt-1">
+                        <input type="hidden" name="returnTo" value={returnTo} />
+                        <input type="hidden" name="id" value={category.id} />
+                        <AdminConfirmButton
+                          confirmMessage={t.dashboard.controls.confirmDelete}
+                          pendingLabel={`${t.dashboard.controls.delete}...`}
+                          className={dangerButtonClassName}
+                        >
+                          {t.dashboard.controls.delete}
+                        </AdminConfirmButton>
+                      </form>
+                    </div>
+                  </details>
 
                 <div className="mt-5 space-y-3 sm:space-y-4">
                   {category.items.map((item) => (
-                    <article
+                    <details
                       key={item.id}
-                      className="rounded-[1.2rem] border border-[#eee5d9] bg-white p-3 shadow-[0_12px_28px_rgba(28,21,16,0.04)] sm:rounded-[1.45rem] sm:p-4"
+                      className="group/item rounded-[1.2rem] border border-[#eee5d9] bg-white p-3 shadow-[0_12px_28px_rgba(28,21,16,0.04)] sm:rounded-[1.45rem] sm:p-4"
                     >
-                      <form action={updateMenuItemAction}>
-                        <input type="hidden" name="returnTo" value={returnTo} />
-                        <input type="hidden" name="id" value={item.id} />
-                        <AdminPendingFieldset>
+                      <summary className="flex cursor-pointer list-none flex-col gap-3 rounded-[1rem] border border-transparent px-1 py-1 transition-all duration-300 hover:border-[#eadfcf] hover:bg-[#fcfaf6] sm:flex-row sm:items-center sm:justify-between sm:px-3 sm:py-3 [&::-webkit-details-marker]:hidden">
+                        <div className="min-w-0">
+                          <h4 className="break-words font-[var(--font-display)] text-[1.35rem] leading-none text-[#201b17]">
+                            {item.nameDe}
+                          </h4>
+                          <p className="mt-1 truncate text-xs font-light uppercase tracking-[0.14em] text-[#9e927f]">
+                            {item.slug}
+                          </p>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div className="inline-flex min-h-9 items-center gap-2 rounded-full border border-[#eadfcf] bg-[#faf7f1] px-3 py-1.5 text-sm text-[#5d564c]">
+                            <ImageIcon className="h-4 w-4 text-[#b4884c]" />
+                            {formatAdminCurrency(item.price.toString(), locale)}
+                          </div>
+                          {item.isPublished ? (
+                            <div className="rounded-full border border-[#d9e3cd] bg-[#f4faec] px-3 py-1.5 text-[0.62rem] font-medium uppercase tracking-[0.14em] text-[#53683c]">
+                              {menuText.form.published}
+                            </div>
+                          ) : null}
+                          {item.isSignature ? (
+                            <div className="rounded-full border border-[#eadfcf] bg-white px-3 py-1.5 text-[0.62rem] font-medium uppercase tracking-[0.14em] text-[#8f836f]">
+                              {menuText.form.signature}
+                            </div>
+                          ) : null}
+                          {item.isVegetarian ? (
+                            <div className="rounded-full border border-[#d9e3cd] bg-white px-3 py-1.5 text-[0.62rem] font-medium uppercase tracking-[0.14em] text-[#53683c]">
+                              {menuText.form.vegetarian}
+                            </div>
+                          ) : null}
+                          <ChevronDown className="h-4 w-4 shrink-0 text-[#b4884c] transition-transform duration-300 group-open/item:rotate-180" />
+                        </div>
+                      </summary>
+
+                      <div className="mt-4 border-t border-[#eee5d9] pt-4">
+                        <form action={updateMenuItemAction}>
+                          <input type="hidden" name="returnTo" value={returnTo} />
+                          <input type="hidden" name="id" value={item.id} />
+                          <AdminPendingFieldset>
                           <div className="grid grid-cols-1 gap-3 2xl:grid-cols-[260px_minmax(0,1fr)] sm:gap-4">
                             <div className="space-y-3">
                               <MenuImageUploadPreview
@@ -931,24 +1003,26 @@ export default async function AdminMenuPage({
                               </div>
                             </div>
                           </div>
-                        </AdminPendingFieldset>
-                      </form>
+                          </AdminPendingFieldset>
+                        </form>
 
-                      <form action={deleteMenuItemAction} className="mt-4 flex justify-end">
-                        <input type="hidden" name="returnTo" value={returnTo} />
-                        <input type="hidden" name="id" value={item.id} />
-                        <AdminConfirmButton
-                          confirmMessage={t.dashboard.controls.confirmDelete}
-                          pendingLabel={`${t.dashboard.controls.delete}...`}
-                          className={dangerButtonClassName}
-                        >
-                          {t.dashboard.controls.delete}
-                        </AdminConfirmButton>
-                      </form>
-                    </article>
+                        <form action={deleteMenuItemAction} className="mt-4 flex justify-end">
+                          <input type="hidden" name="returnTo" value={returnTo} />
+                          <input type="hidden" name="id" value={item.id} />
+                          <AdminConfirmButton
+                            confirmMessage={t.dashboard.controls.confirmDelete}
+                            pendingLabel={`${t.dashboard.controls.delete}...`}
+                            className={dangerButtonClassName}
+                          >
+                            {t.dashboard.controls.delete}
+                          </AdminConfirmButton>
+                        </form>
+                      </div>
+                    </details>
                   ))}
                 </div>
-              </section>
+                </div>
+              </details>
             ))}
           </div>
         ) : (
