@@ -172,6 +172,14 @@ model Booking {
   breakfastIncluded         Boolean         @default(true)
   notes                     String?
   status                    BookingStatus   @default(PENDING)
+  source                    BookingSource   @default(WEB)
+  adminNotes                String?
+  cancellationReason        String?
+  confirmedAt               DateTime?
+  cancelledAt               DateTime?
+  checkedInAt               DateTime?
+  checkedOutAt              DateTime?
+  autoCompletedAt           DateTime?
   locale                    String          @default("de")
   createdAt                 DateTime        @default(now())
   updatedAt                 DateTime        @updatedAt
@@ -179,6 +187,8 @@ model Booking {
   @@index([roomId, checkIn, checkOut])
   @@index([guestId, createdAt])
   @@index([status, checkIn, checkOut])
+  @@index([status, checkOut])
+  @@index([source, createdAt])
 }
 
 enum RoomType {
@@ -199,4 +209,12 @@ enum BookingStatus {
   CHECKED_IN
   CHECKED_OUT
   NO_SHOW
+}
+
+enum BookingSource {
+  WEB
+  ADMIN
+  PHONE
+  EMAIL
+  WALK_IN
 }

@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { BookingStatus } from "@prisma/client";
-import { CalendarDays, Mail, PawPrint, Users } from "lucide-react";
+import {
+  CalendarDays,
+  CalendarRange,
+  Mail,
+  PawPrint,
+  Plus,
+  Users,
+} from "lucide-react";
 import { bulkUpdateBookingStatusAction } from "@/app/admin/booking-actions";
 import AdminBookingStatusBadge from "@/components/admin/AdminBookingStatusBadge";
 import AdminPendingFieldset from "@/components/admin/AdminPendingFieldset";
@@ -103,6 +110,23 @@ export default async function AdminBookingsPage({
       summary={summary}
       title={t.dashboard.pages.bookings.title}
     >
+      <div className="flex flex-wrap items-center gap-2">
+        <Link
+          href="/admin/bookings/new"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#cda867] bg-[#bf9556] px-5 text-[0.64rem] font-semibold uppercase tracking-[0.16em] text-white shadow-[0_14px_28px_rgba(128,92,39,0.18)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#ad8448]"
+        >
+          <Plus className="h-3.5 w-3.5 stroke-[2.2]" />
+          {t.dashboard.pages.newBooking.cta}
+        </Link>
+        <Link
+          href="/admin/bookings/calendar"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#dfd2c0] bg-[#faf7f1] px-5 text-[0.64rem] font-semibold uppercase tracking-[0.16em] text-[#6c6459] transition-all duration-300 hover:border-[#cdb99d] hover:bg-white hover:text-[#201b17]"
+        >
+          <CalendarRange className="h-3.5 w-3.5 stroke-[2]" />
+          {t.dashboard.navigation.calendar.label}
+        </Link>
+      </div>
+
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-4">
         <AdminMetricCard
           detail={t.dashboard.statCards.bookings.detail(summary.pendingBookings)}
@@ -213,6 +237,11 @@ export default async function AdminBookingsPage({
                           <span className="rounded-full border border-[#eadfcf] bg-white px-2.5 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-[#8f836f]">
                             {booking.locale.toUpperCase()}
                           </span>
+                          {booking.source !== "WEB" ? (
+                            <span className="rounded-full border border-[#e0d6ef] bg-[#f4f0fb] px-2.5 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-[#6a5a93]">
+                              {t.dashboard.bookingSources[booking.source]}
+                            </span>
+                          ) : null}
                           </div>
 
                           <div className="mt-2 text-sm font-light text-[#5d564c]">

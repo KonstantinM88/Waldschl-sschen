@@ -8,7 +8,12 @@ export type AdminNoticeCode =
   | "delete-blocked"
   | "status-updated"
   | "bulk-updated"
-  | "selection-required";
+  | "selection-required"
+  | "invalid-transition"
+  | "invalid-input"
+  | "sold-out"
+  | "capacity"
+  | "error";
 
 export type AdminNoticeTone = "success" | "warning" | "error";
 
@@ -119,6 +124,41 @@ export function getAdminFeedbackFromSearchParams(
         description: t.dashboard.feedback.selectionRequired.description,
         title: t.dashboard.feedback.selectionRequired.title,
         tone: "warning",
+      };
+    case "invalid-transition":
+      return {
+        code: "invalid-transition",
+        description: t.dashboard.feedback.invalidTransition.description,
+        title: t.dashboard.feedback.invalidTransition.title,
+        tone: "warning",
+      };
+    case "invalid-input":
+      return {
+        code: "invalid-input",
+        description: t.dashboard.feedback.invalidInput.description,
+        title: t.dashboard.feedback.invalidInput.title,
+        tone: "warning",
+      };
+    case "sold-out":
+      return {
+        code: "sold-out",
+        description: t.dashboard.feedback.soldOut.description,
+        title: t.dashboard.feedback.soldOut.title,
+        tone: "warning",
+      };
+    case "capacity":
+      return {
+        code: "capacity",
+        description: t.dashboard.feedback.capacity.description,
+        title: t.dashboard.feedback.capacity.title,
+        tone: "warning",
+      };
+    case "error":
+      return {
+        code: "error",
+        description: t.dashboard.feedback.error.description,
+        title: t.dashboard.feedback.error.title,
+        tone: "error",
       };
     default:
       return null;

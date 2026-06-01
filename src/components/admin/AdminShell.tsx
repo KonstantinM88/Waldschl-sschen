@@ -1,8 +1,10 @@
 import Link from "next/link";
 import {
+  BarChart3,
   BedDouble,
   CalendarClock,
   CalendarDays,
+  CalendarRange,
   Gift,
   LayoutDashboard,
   LogOut,
@@ -30,11 +32,23 @@ interface AdminShellProps {
   title: string;
 }
 
+const NESTED_NAV_PATHS = ["/admin/bookings/calendar", "/admin/bookings/new"];
+
 function isActivePath(currentPath: string, href: string) {
   const normalizedPath = currentPath.split("?")[0];
 
   if (href === "/admin") {
     return normalizedPath === href;
+  }
+
+  // Sub-pages that own a dedicated nav entry must not also activate their parent.
+  if (
+    href === "/admin/bookings" &&
+    NESTED_NAV_PATHS.some(
+      (nested) => normalizedPath === nested || normalizedPath.startsWith(`${nested}/`)
+    )
+  ) {
+    return false;
   }
 
   return normalizedPath === href || normalizedPath.startsWith(`${href}/`);
@@ -74,6 +88,20 @@ export default function AdminShell({
       detail: t.dashboard.navigation.bookings.detail,
       value: String(summary.pendingBookings),
       Icon: CalendarDays,
+    },
+    {
+      href: "/admin/bookings/calendar",
+      label: t.dashboard.navigation.calendar.label,
+      detail: t.dashboard.navigation.calendar.detail,
+      value: `${summary.occupancyRate}%`,
+      Icon: CalendarRange,
+    },
+    {
+      href: "/admin/analytics",
+      label: t.dashboard.navigation.analytics.label,
+      detail: t.dashboard.navigation.analytics.detail,
+      value: String(summary.totalBookings),
+      Icon: BarChart3,
     },
     {
       href: "/admin/vouchers",

@@ -62,8 +62,10 @@
   `ausflugsziele`.
 - `src/app/api/contact/route.ts` сохраняет contact submissions через Prisma.
 - `src/app/admin` содержит dashboard и рабочие admin-разделы:
-  `contacts`, `bookings`, `vouchers`, `events`, `rooms`, `menu`, `login`.
-- `src/app/api/admin` содержит login/logout, admin locale route и CSV export.
+  `contacts`, `bookings`, `bookings/calendar`, `bookings/new`, `analytics`,
+  `vouchers`, `events`, `rooms`, `menu`, `login`.
+- `src/app/api/admin` содержит login/logout, admin locale route, CSV export и
+  защищенный cron route `/api/admin/cron` для авто-освобождения номеров.
 
 ### `src/components`
 
@@ -81,6 +83,11 @@
   `/admin`.
 - `booking-*` - availability, booking creation, date parsing, shared types,
   navigation и server action бронирования.
+- `booking-lifecycle.ts` - admin lifecycle бронирований: допустимые переходы
+  статусов, ручное создание брони, auto-sweep прошедших броней, календарь и
+  аналитика.
+- `admin-booking-views.ts` - server-side helpers для admin calendar/new
+  booking/analytics страниц и lazy auto-sweep.
 - `restaurant-menu*` - default menu data, public/admin menu queries и shared
   menu types.
 - `admin-*` - admin auth, dashboard data, feedback, i18n и media upload logic.
@@ -130,8 +137,17 @@
   `mealPlanPricePerGuest`, `mealPlanTotal`, `extraBeds`,
   `extraBedPricePerNight`, `extraBedTotal`. Исторические брони не должны
   пересчитываться от новых тарифов комнаты.
+- `BookingSource`: `WEB`, `ADMIN`, `PHONE`, `EMAIL`, `WALK_IN`.
+- `Booking` также хранит lifecycle/admin-поля: `source`, `adminNotes`,
+  `cancellationReason`, `confirmedAt`, `cancelledAt`, `checkedInAt`,
+  `checkedOutAt`, `autoCompletedAt`.
 - `BookingStatus`: `PENDING`, `CONFIRMED`, `CANCELLED`, `CHECKED_IN`,
   `CHECKED_OUT`, `NO_SHOW`.
+- Admin lifecycle переходы держать в `BOOKING_STATUS_TRANSITIONS` внутри
+  `src/lib/booking-lifecycle.ts`; UI не должен предлагать переходы, которые
+  сервер запрещает.
+- Auto-sweep: `CHECKED_IN` с прошедшим `checkOut` переводится в `CHECKED_OUT`;
+  `PENDING`/`CONFIRMED` с прошедшим `checkOut` переводятся в `NO_SHOW`.
 - `booking-engine.ts` создает default rooms, если они еще отсутствуют, но не
   перезаписывает существующие комнаты через `ensureDefaultRooms`, чтобы
   admin-тарифы и вместимость не сбрасывались при открытии booking-страниц.
@@ -147,6 +163,10 @@
 - `src/proxy.ts` пропускает `/admin/login`, а остальные `/admin` маршруты
   требует открыть с валидной session.
 - Admin mutations в основном реализованы server actions в `src/app/admin`.
+- `/api/admin/cron` требует `CRON_SECRET` и заголовок
+  `Authorization: Bearer <CRON_SECRET>` или query `?secret=...`; без секрета
+  route закрыт fail-closed. Даже без внешнего cron admin-страницы запускают
+  lazy auto-sweep не чаще одного раза в 5 минут.
 - Никогда не переносить секреты из `.env` или других env-файлов в docs,
   ответы, commits или логи.
 
@@ -174,6 +194,8 @@
 - `ADMIN_USERNAME`
 - `ADMIN_PASSWORD`
 - `ADMIN_SESSION_SECRET`
+- `CRON_SECRET` - опционально для внешнего планировщика auto-sweep
+  `/api/admin/cron`; без него cron route отключен.
 - `FFMPEG_PATH` - опционально, если bundled ffmpeg не подходит.
 
 Записывать только имена переменных и назначение. Значения не сохранять в этом
@@ -224,6 +246,7 @@
 
 | Дата | Изменение | Контекст |
 | --- | --- | --- |
+| 2026-06-01 | Установлен пакет профессиональной админки бронирований. | Добавлены `src/lib/booking-lifecycle.ts`, `src/lib/admin-booking-views.ts`, страницы `/admin/bookings/calendar`, `/admin/bookings/new`, `/admin/analytics`, cron route `/api/admin/cron`, компоненты `AdminBookingCalendar`, `AdminBookingCreateForm`, `AdminAnalyticsPanel`. Миграция `20260601150000_booking_lifecycle_admin` добавляет `BookingSource`, `source`, `adminNotes`, `cancellationReason`, lifecycle timestamps и индексы `Booking_status_checkOut_idx`, `Booking_source_createdAt_idx`. `AdminShell` получил навигацию календаря и статистики, admin bookings получили ручное создание, lifecycle-переходы, отмену с причиной и внутренние заметки. Выполнены `prisma format`, `npx prisma migrate dev`, `npm run db:generate`, `npx prisma migrate status`, `npm run lint`, `npm run build`; новых npm-пакетов не потребовалось. Для production добавить `CRON_SECRET` и настроить внешний cron на `/api/admin/cron` раз в 10-15 минут. |
 | 2026-06-01 | Добавлена тарифная модель комнат и питания для booking flow. | Миграция `20260601113000_room_booking_rate_plans` добавляет `BookingMealPlan`, цены комнаты для 1-4 гостей, стоимость завтрака/полупансиона за гостя, тариф по умолчанию, лимит/цену доп. кроватей и snapshot-поля в `Booking`. `booking-engine.ts` считает итог как проживание + питание + доп. кровати + доплаты, а checkout предлагает завтрак по умолчанию с выбором `ROOM_ONLY`/`BREAKFAST`/`HALF_BOARD`. `/admin/rooms` получил редактирование этих тарифов. После schema changes выполнены `prisma format`, `npm run db:generate`, `npm run lint`, `npm run build`. Для работающей БД нужно применить миграции. |
 | 2026-06-01 | Обновлен общий визуальный стиль admin-панели. | `AdminShell`, `AdminUi`, `AdminLocaleSwitcher` и `/admin/rooms` приведены к более компактному, продуктово-операционному стилю: меньшие радиусы, плотнее метрики, более строгие панели, аккуратные кнопки и карточки комнат. На mobile admin-навигация в `AdminShell` реализована как hamburger/details-меню, не горизонтальная полоса. Desktop sidebar должен быть скроллируемым через `max-height`/`overflow-y-auto`, а не обрезаться `overflow-hidden`. Для React server-action forms не задавать `method`/`encType`, иначе React пишет warning. Проверено через `npm run lint` и `npm run build`; `/admin/login` отвечает `200` на локальном dev server. |
 | 2026-06-01 | Переработана `/admin/rooms` и расширена модель `Room`. | Добавлена миграция `20260601100000_room_admin_gallery`: `roomNumber`, `imageUrls`, `recommendationDe/En/Ru`. Admin rooms теперь поддерживает создание, редактирование, удаление комнаты без бронирований, WebP-галерею до 5 фото, удаление фото, чеклист гостиничных удобств и компактный адаптивный UI. После schema changes выполнен `npm run db:generate`; проверено через `npm run lint` и `npm run build`. Для работающей БД нужно применить миграцию/`db:push` в целевом окружении. |
