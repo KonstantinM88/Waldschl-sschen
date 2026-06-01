@@ -5,6 +5,7 @@ export type AdminNoticeCode =
   | "created"
   | "saved"
   | "deleted"
+  | "delete-blocked"
   | "status-updated"
   | "bulk-updated"
   | "selection-required";
@@ -90,6 +91,13 @@ export function getAdminFeedbackFromSearchParams(
         description: t.dashboard.feedback.deleted.description,
         title: t.dashboard.feedback.deleted.title,
         tone: normalizedTone,
+      };
+    case "delete-blocked":
+      return {
+        code: "delete-blocked",
+        description: t.dashboard.feedback.deleteBlocked.description,
+        title: t.dashboard.feedback.deleteBlocked.title,
+        tone: "warning",
       };
     case "status-updated":
       return {

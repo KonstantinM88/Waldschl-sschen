@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
+import type { BookingMealPlan } from "@prisma/client";
 import {
   Bike,
   CalendarDays,
@@ -50,6 +51,8 @@ const copy = {
       "Nach dem Absenden erscheint die Reservierung in der Verwaltung als neue Buchung.",
     dogLabel: `Hund willkommen (+ ${DOG_FEE_PER_NIGHT.toFixed(0)} € / Nacht)`,
     bikeLabel: "Kostenlosen Fahrradverleih reservieren",
+    mealPlanTitle: "Verpflegung",
+    perNight: "/ Nacht",
     restaurantLabel: "Tisch im Restaurant am Anreiseabend reservieren",
     restaurantPlaceholder: "Bitte Zeit wählen",
     firstName: "Vorname",
@@ -60,6 +63,9 @@ const copy = {
     notesPlaceholder: "Besondere Wünsche, späte Anreise oder Hinweise für unser Team",
     summaryTitle: "Preisübersicht",
     summaryRoom: "Zimmer",
+    summaryAccommodation: "Übernachtung",
+    summaryMeals: "Verpflegung",
+    summaryExtraBeds: "Zusatzbetten",
     summaryDog: "Hund",
     summaryBike: "Fahrrad",
     summaryRestaurant: "Restaurant",
@@ -87,6 +93,8 @@ const copy = {
       "After submitting, the reservation appears in the admin area as a new booking.",
     dogLabel: `Dog welcome (+ €${DOG_FEE_PER_NIGHT.toFixed(0)} / night)`,
     bikeLabel: "Reserve a complimentary bicycle",
+    mealPlanTitle: "Meal plan",
+    perNight: "/ night",
     restaurantLabel: "Reserve a restaurant table for your arrival evening",
     restaurantPlaceholder: "Please select a time",
     firstName: "First name",
@@ -98,6 +106,9 @@ const copy = {
       "Special requests, late arrival or any details for our team",
     summaryTitle: "Price summary",
     summaryRoom: "Room",
+    summaryAccommodation: "Accommodation",
+    summaryMeals: "Meal plan",
+    summaryExtraBeds: "Extra beds",
     summaryDog: "Dog",
     summaryBike: "Bicycle",
     summaryRestaurant: "Restaurant",
@@ -125,6 +136,8 @@ const copy = {
       "После отправки бронь сразу появится в административной панели как новая заявка.",
     dogLabel: `Собака (+ ${DOG_FEE_PER_NIGHT.toFixed(0)} € / ночь)`,
     bikeLabel: "Забронировать бесплатный велосипед",
+    mealPlanTitle: "Питание",
+    perNight: "/ ночь",
     restaurantLabel: "Забронировать столик в ресторане на вечер заезда",
     restaurantPlaceholder: "Выберите время",
     firstName: "Имя",
@@ -136,6 +149,9 @@ const copy = {
       "Особые пожелания, поздний заезд или важные детали для нашей команды",
     summaryTitle: "Расчёт стоимости",
     summaryRoom: "Номер",
+    summaryAccommodation: "Проживание",
+    summaryMeals: "Питание",
+    summaryExtraBeds: "Доп. кровати",
     summaryDog: "Собака",
     summaryBike: "Велосипед",
     summaryRestaurant: "Ресторан",
@@ -206,12 +222,27 @@ export default function BookingCheckoutForm({
   const [dogSelected, setDogSelected] = useState(false);
   const [bikeSelected, setBikeSelected] = useState(false);
   const [restaurantTime, setRestaurantTime] = useState("");
+  const [selectedMealPlan, setSelectedMealPlan] = useState<BookingMealPlan>(
+    room.defaultMealPlan
+  );
+
+  const selectedMealOption = useMemo(
+    () =>
+      room.mealOptions.find((option) => option.value === selectedMealPlan) ??
+      room.mealOptions.find((option) => option.value === "BREAKFAST") ??
+      room.mealOptions[0],
+    [room.mealOptions, selectedMealPlan]
+  );
 
   const dogFeeTotal = useMemo(
     () => (dogSelected ? DOG_FEE_PER_NIGHT * room.nights : 0),
     [dogSelected, room.nights]
   );
-  const totalAmount = room.totalBasePrice + dogFeeTotal;
+  const accommodationTotal = room.occupancyBasePrice * room.nights;
+  const mealPlanTotal = selectedMealOption?.totalPrice ?? 0;
+  const extraBedTotal = room.extraBedTotalPerNight * room.nights;
+  const totalAmount =
+    accommodationTotal + mealPlanTotal + extraBedTotal + dogFeeTotal;
 
   if (state.status === "success") {
     return (
@@ -292,6 +323,47 @@ export default function BookingCheckoutForm({
       <input type="hidden" name="guests" value={guests} />
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="dogCount" value={dogSelected ? 1 : 0} />
+
+      <section className="mt-6">
+        <div className="text-[0.66rem] font-medium uppercase tracking-[0.18em] text-[#9c7b4b]">
+          {t.mealPlanTitle}
+        </div>
+        <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-3">
+          {room.mealOptions.map((option) => (
+            <label
+              key={option.value}
+              className={[
+                "flex cursor-pointer flex-col gap-3 rounded-[1.25rem] border px-4 py-4 transition-colors duration-200",
+                selectedMealPlan === option.value
+                  ? "border-[#c9a96e] bg-[#fff8ec]"
+                  : "border-[#eadfcf] bg-[#fcfaf6] hover:bg-white",
+              ].join(" ")}
+            >
+              <span className="flex items-start gap-3">
+                <input
+                  type="radio"
+                  name="mealPlan"
+                  value={option.value}
+                  checked={selectedMealPlan === option.value}
+                  onChange={() => setSelectedMealPlan(option.value)}
+                  className="mt-1 h-4 w-4 border-[#ccb28b] text-[#b4884c] focus:ring-[#d8bd84]"
+                />
+                <span className="min-w-0">
+                  <span className="block text-sm font-medium text-[#201b17]">
+                    {option.label}
+                  </span>
+                  <span className="mt-1 block text-xs font-light leading-relaxed text-[#6c6459]">
+                    {option.description}
+                  </span>
+                </span>
+              </span>
+              <span className="text-sm font-medium text-[#201b17]">
+                {formatCurrency(option.pricePerNight, locale)} {t.perNight}
+              </span>
+            </label>
+          ))}
+        </div>
+      </section>
 
       <section className="mt-6">
         <div className="text-[0.66rem] font-medium uppercase tracking-[0.18em] text-[#9c7b4b]">
@@ -433,12 +505,34 @@ export default function BookingCheckoutForm({
         <div className="mt-4 space-y-3 text-sm font-light text-[#4f483f]">
           <div className="flex items-center justify-between gap-4">
             <span>
-              {t.summaryRoom} · {room.nights} x {formatCurrency(room.basePrice, locale)}
+              {t.summaryAccommodation} · {room.nights} x {formatCurrency(room.occupancyBasePrice, locale)}
             </span>
             <span className="font-medium text-[#201b17]">
-              {formatCurrency(room.totalBasePrice, locale)}
+              {formatCurrency(accommodationTotal, locale)}
             </span>
           </div>
+
+          {selectedMealOption ? (
+            <div className="flex items-center justify-between gap-4">
+              <span>
+                {t.summaryMeals} · {selectedMealOption.label}
+              </span>
+              <span className="font-medium text-[#201b17]">
+                {formatCurrency(mealPlanTotal, locale)}
+              </span>
+            </div>
+          ) : null}
+
+          {room.extraBeds > 0 ? (
+            <div className="flex items-center justify-between gap-4">
+              <span>
+                {t.summaryExtraBeds} · {room.extraBeds}
+              </span>
+              <span className="font-medium text-[#201b17]">
+                {formatCurrency(extraBedTotal, locale)}
+              </span>
+            </div>
+          ) : null}
 
           {dogSelected ? (
             <div className="flex items-center justify-between gap-4">
@@ -464,11 +558,6 @@ export default function BookingCheckoutForm({
               </span>
             </div>
           ) : null}
-
-          <div className="flex items-center justify-between gap-4">
-            <span>{t.summaryBreakfast}</span>
-            <span className="font-medium text-[#201b17]">{t.breakfastIncluded}</span>
-          </div>
 
           <div className="h-px bg-[#eadfcf]" />
 

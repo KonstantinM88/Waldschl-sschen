@@ -1,0 +1,25 @@
+CREATE TYPE "BookingMealPlan" AS ENUM ('ROOM_ONLY', 'BREAKFAST', 'HALF_BOARD');
+
+ALTER TABLE "Room"
+ADD COLUMN "priceOneGuest" DECIMAL(10,2),
+ADD COLUMN "priceTwoGuests" DECIMAL(10,2),
+ADD COLUMN "priceThreeGuests" DECIMAL(10,2),
+ADD COLUMN "priceFourGuests" DECIMAL(10,2),
+ADD COLUMN "breakfastPricePerGuest" DECIMAL(10,2) NOT NULL DEFAULT 0,
+ADD COLUMN "halfBoardPricePerGuest" DECIMAL(10,2) NOT NULL DEFAULT 0,
+ADD COLUMN "defaultMealPlan" "BookingMealPlan" NOT NULL DEFAULT 'BREAKFAST',
+ADD COLUMN "extraBedMax" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN "extraBedPrice" DECIMAL(10,2) NOT NULL DEFAULT 0;
+
+UPDATE "Room"
+SET
+  "priceOneGuest" = COALESCE("priceOneGuest", "basePrice"),
+  "priceTwoGuests" = COALESCE("priceTwoGuests", "basePrice");
+
+ALTER TABLE "Booking"
+ADD COLUMN "mealPlan" "BookingMealPlan" NOT NULL DEFAULT 'BREAKFAST',
+ADD COLUMN "mealPlanPricePerGuest" DECIMAL(10,2) NOT NULL DEFAULT 0,
+ADD COLUMN "mealPlanTotal" DECIMAL(10,2) NOT NULL DEFAULT 0,
+ADD COLUMN "extraBeds" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN "extraBedPricePerNight" DECIMAL(10,2) NOT NULL DEFAULT 0,
+ADD COLUMN "extraBedTotal" DECIMAL(10,2) NOT NULL DEFAULT 0;

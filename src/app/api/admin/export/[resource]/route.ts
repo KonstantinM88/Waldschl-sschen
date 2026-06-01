@@ -20,6 +20,7 @@ import {
   getAdminLocaleFromCookieStore,
   type AdminLocale,
 } from "@/lib/admin-i18n";
+import { getMealPlanLabel } from "@/lib/booking-engine";
 
 export const dynamic = "force-dynamic";
 
@@ -115,6 +116,8 @@ function getBookingsRows(locale: AdminLocale, bookings: Awaited<ReturnType<typeo
       t.dashboard.pages.bookings.fields.stay,
       t.dashboard.pages.bookings.fields.nights,
       t.dashboard.pages.bookings.fields.guests,
+      t.dashboard.pages.bookings.fields.mealPlan,
+      t.dashboard.pages.bookings.fields.extraBeds,
       t.dashboard.pages.bookings.fields.total,
       t.dashboard.pages.bookings.fields.locale,
       t.dashboard.pages.bookings.filters.statusLabel,
@@ -128,6 +131,8 @@ function getBookingsRows(locale: AdminLocale, bookings: Awaited<ReturnType<typeo
       `${formatDateOnly(booking.checkIn)} - ${formatDateOnly(booking.checkOut)}`,
       booking.nights,
       booking.guests,
+      getMealPlanLabel(booking.mealPlan, locale),
+      booking.extraBeds,
       formatAdminCurrency(booking.totalAmount.toString(), locale),
       booking.locale,
       t.dashboard.bookingStatuses[booking.status],

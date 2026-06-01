@@ -33,7 +33,7 @@ const pageCopy = {
     badge: "Booking Engine",
     title: "Zimmer direkt und transparent buchen",
     description:
-      "Prufen Sie freie Zimmer fur Ihren Zeitraum, inklusive Fruhstuck und optionalen Zusatzleistungen fur einen komfortablen Aufenthalt im Waldschlosschen.",
+      "Prufen Sie freie Zimmer fur Ihren Zeitraum. Fruhstuck ist vorausgewahlt, kann im Checkout aber angepasst werden.",
     resultsTitle: "Verfugbare Zimmer",
     resultsSubtitle: (count: number) =>
       count === 1 ? "1 Zimmertyp verfugbar" : `${count} Zimmertypen verfugbar`,
@@ -47,7 +47,7 @@ const pageCopy = {
       dog: `Hund willkommen · + ${DOG_FEE_PER_NIGHT.toFixed(0)} € / Tag`,
       bike: `Kostenloser Fahrradverleih · ${FREE_BICYCLE_PRICE.toFixed(0)} €`,
       restaurant: "Tischreservierung am Abend der Anreise",
-      breakfast: "Reichhaltiges Fruhstucksbuffet immer inklusive",
+      breakfast: "Fruhstuck ist vorausgewahlt und im Checkout anpassbar",
     },
   },
   en: {
@@ -55,7 +55,7 @@ const pageCopy = {
     badge: "Booking engine",
     title: "Book your room directly and transparently",
     description:
-      "Check available room types for your dates, including breakfast and optional extras for a comfortable stay at Waldschlosschen.",
+      "Check available room types for your dates. Breakfast is preselected and can be adjusted at checkout.",
     resultsTitle: "Available rooms",
     resultsSubtitle: (count: number) =>
       count === 1 ? "1 room type available" : `${count} room types available`,
@@ -69,7 +69,7 @@ const pageCopy = {
       dog: `Dog welcome · + €${DOG_FEE_PER_NIGHT.toFixed(0)} / day`,
       bike: `Free bicycle reservation · €${FREE_BICYCLE_PRICE.toFixed(0)}`,
       restaurant: "Restaurant table on arrival evening",
-      breakfast: "Rich breakfast buffet always included",
+      breakfast: "Breakfast is preselected and adjustable at checkout",
     },
   },
   ru: {
@@ -77,7 +77,7 @@ const pageCopy = {
     badge: "Booking Engine",
     title: "Прямое и прозрачное бронирование номера",
     description:
-      "Проверьте доступные типы номеров на ваши даты, с включённым завтраком и дополнительными услугами для комфортного проживания в Waldschlosschen.",
+      "Проверьте доступные типы номеров на ваши даты. Завтрак выбран по умолчанию, но его можно изменить при оформлении.",
     resultsTitle: "Доступные номера",
     resultsSubtitle: (count: number) =>
       count === 1 ? "Доступен 1 тип номера" : `Доступно ${count} типов номеров`,
@@ -91,7 +91,7 @@ const pageCopy = {
       dog: `Собака · + ${DOG_FEE_PER_NIGHT.toFixed(0)} € / день`,
       bike: `Бесплатный велосипед · ${FREE_BICYCLE_PRICE.toFixed(0)} €`,
       restaurant: "Столик в ресторане в вечер заезда",
-      breakfast: "Богатый завтрак-буфет всегда включён",
+      breakfast: "Завтрак выбран по умолчанию, в checkout можно изменить",
     },
   },
 } as const;
@@ -108,7 +108,11 @@ export default async function HotelBookingPage({
   const fallbackCheckOut = format(addDays(today, 2), "yyyy-MM-dd");
   const selectedCheckIn = checkIn || fallbackCheckIn;
   const selectedCheckOut = checkOut || fallbackCheckOut;
-  const selectedGuests = guests === "1" ? 1 : 2;
+  const parsedGuests = Number.parseInt(guests ?? "", 10);
+  const selectedGuests =
+    Number.isInteger(parsedGuests) && parsedGuests >= 1 && parsedGuests <= 4
+      ? parsedGuests
+      : 2;
   const normalizedLocale = toBookingDisplayLocale(routeLocale, lang);
   const t = pageCopy[normalizedLocale];
   const languageState = {

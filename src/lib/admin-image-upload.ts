@@ -207,3 +207,24 @@ export async function saveUploadedVideoFile(file: File | null, folder: string) {
 
   return publicUrl;
 }
+
+export async function deleteUploadedPublicFile(publicUrl: string | null | undefined) {
+  if (!publicUrl?.startsWith("/uploads/")) {
+    return;
+  }
+
+  const publicRoot = path.join(
+    /*turbopackIgnore: true*/ process.cwd(),
+    "public",
+    "uploads"
+  );
+  const relativePath = publicUrl.replace(/^\/uploads\//, "");
+  const targetPath = path.resolve(publicRoot, relativePath);
+  const relativeToRoot = path.relative(publicRoot, targetPath);
+
+  if (relativeToRoot.startsWith("..") || path.isAbsolute(relativeToRoot)) {
+    return;
+  }
+
+  await rm(targetPath, { force: true });
+}

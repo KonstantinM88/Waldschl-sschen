@@ -40,8 +40,8 @@ const pageCopy = {
     arrival: "Check-in",
     departure: "Check-out",
     guests: "Gäste",
-    includedTitle: "Immer inklusive",
-    includedBreakfast: "Reichhaltiges Frühstücksbuffet",
+    includedTitle: "Im Checkout wählbar",
+    includedBreakfast: "Ohne Frühstück, mit Frühstück oder Frühstück + Abendessen",
     includedHospitality: "Persönliche Betreuung durch unser Team",
     fallbackTitle: "Bitte wählen Sie zuerst ein verfügbares Zimmer",
     fallbackText:
@@ -61,8 +61,8 @@ const pageCopy = {
     arrival: "Check-in",
     departure: "Check-out",
     guests: "Guests",
-    includedTitle: "Always included",
-    includedBreakfast: "Generous breakfast buffet",
+    includedTitle: "Selectable at checkout",
+    includedBreakfast: "Room only, breakfast or breakfast + dinner",
     includedHospitality: "Personal care from our team",
     fallbackTitle: "Please select an available room first",
     fallbackText:
@@ -82,8 +82,8 @@ const pageCopy = {
     arrival: "Заезд",
     departure: "Выезд",
     guests: "Гости",
-    includedTitle: "Всегда включено",
-    includedBreakfast: "Богатый завтрак-буфет",
+    includedTitle: "Выбор в checkout",
+    includedBreakfast: "Без завтрака, с завтраком или завтрак + ужин",
     includedHospitality: "Персональное сопровождение нашей команды",
     fallbackTitle: "Сначала выберите доступный номер",
     fallbackText:
@@ -118,7 +118,11 @@ export default async function HotelBookingCheckoutPage({
   const fallbackCheckOut = format(addDays(today, 2), "yyyy-MM-dd");
   const selectedCheckIn = checkIn || fallbackCheckIn;
   const selectedCheckOut = checkOut || fallbackCheckOut;
-  const selectedGuests = guests === "1" ? 1 : 2;
+  const parsedGuests = Number.parseInt(guests ?? "", 10);
+  const selectedGuests =
+    Number.isInteger(parsedGuests) && parsedGuests >= 1 && parsedGuests <= 4
+      ? parsedGuests
+      : 2;
   const normalizedLocale = toBookingDisplayLocale(routeLocale, lang);
   const t = pageCopy[normalizedLocale];
   const flowState = {

@@ -134,6 +134,11 @@ const adminDictionaries = {
           title: "Eintrag geloscht",
           description: "Der Datensatz wurde entfernt und die Liste aktualisiert.",
         },
+        deleteBlocked: {
+          title: "Loschen nicht moglich",
+          description:
+            "Dieser Datensatz ist noch mit Buchungen verbunden. Deaktivieren Sie ihn stattdessen oder prufen Sie die Buchungen.",
+        },
         statusUpdated: {
           title: "Status aktualisiert",
           description: "Der Status wurde gespeichert und die Ubersicht aktualisiert.",
@@ -250,6 +255,10 @@ const adminDictionaries = {
             total: "Gesamt",
             roomRate: "Preis pro Nacht",
             baseTotal: "Basisbetrag",
+            mealPlan: "Verpflegung",
+            mealPlanTotal: "Verpflegung gesamt",
+            extraBeds: "Zusatzbetten",
+            extraBedTotal: "Zusatzbetten gesamt",
             dogFeeTotal: "Hundezuschlag",
             dogs: "Hunde",
             bicycle: "Fahrrader",
@@ -607,6 +616,11 @@ const adminDictionaries = {
           title: "Запись удалена",
           description: "Данные удалены, список уже обновлен.",
         },
+        deleteBlocked: {
+          title: "Удаление невозможно",
+          description:
+            "Эта запись связана с бронированиями. Вместо удаления отключите её или проверьте бронирования.",
+        },
         statusUpdated: {
           title: "Статус обновлен",
           description: "Новый статус сохранен и отражен в панели.",
@@ -723,6 +737,10 @@ const adminDictionaries = {
             total: "Сумма",
             roomRate: "Цена за ночь",
             baseTotal: "Базовая сумма",
+            mealPlan: "Питание",
+            mealPlanTotal: "Питание всего",
+            extraBeds: "Доп. кровати",
+            extraBedTotal: "Доп. кровати всего",
             dogFeeTotal: "Доплата за собак",
             dogs: "Собаки",
             bicycle: "Велосипеды",

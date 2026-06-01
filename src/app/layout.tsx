@@ -102,6 +102,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
+      data-scroll-behavior="smooth"
       className={`scroll-smooth ${fontBody.variable} ${fontDisplay.variable} ${fontScript.variable}`}
     >
       <body className="font-[var(--font-body)] bg-cream text-text-primary antialiased">

@@ -30,8 +30,10 @@ const copy = {
     guests: "Gäste",
     guestsOne: "1 Gast",
     guestsTwo: "2 Gäste",
+    guestsThree: "3 Gäste",
+    guestsFour: "4 Gäste",
     submit: "Verfügbarkeit prüfen",
-    summary: (nights: number) => `${nights} Nacht${nights === 1 ? "" : "e"} · Frühstück inklusive`,
+    summary: (nights: number) => `${nights} Nacht${nights === 1 ? "" : "e"} · Frühstück vorausgewählt`,
   },
   en: {
     badge: "Book direct",
@@ -40,8 +42,10 @@ const copy = {
     guests: "Guests",
     guestsOne: "1 guest",
     guestsTwo: "2 guests",
+    guestsThree: "3 guests",
+    guestsFour: "4 guests",
     submit: "Check availability",
-    summary: (nights: number) => `${nights} night${nights === 1 ? "" : "s"} · Breakfast included`,
+    summary: (nights: number) => `${nights} night${nights === 1 ? "" : "s"} · Breakfast preselected`,
   },
   ru: {
     badge: "Прямое бронирование",
@@ -50,8 +54,10 @@ const copy = {
     guests: "Гости",
     guestsOne: "1 гость",
     guestsTwo: "2 гостя",
+    guestsThree: "3 гостя",
+    guestsFour: "4 гостя",
     submit: "Проверить наличие",
-    summary: (nights: number) => `${nights} ноч. · Завтрак включён`,
+    summary: (nights: number) => `${nights} ноч. · завтрак выбран по умолчанию`,
   },
 } as const;
 
@@ -172,6 +178,8 @@ export default function BookingWidget({
           >
             <option value={1}>{t.guestsOne}</option>
             <option value={2}>{t.guestsTwo}</option>
+            <option value={3}>{t.guestsThree}</option>
+            <option value={4}>{t.guestsFour}</option>
           </select>
         </label>
 

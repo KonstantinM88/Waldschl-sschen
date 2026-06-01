@@ -116,9 +116,25 @@
 Важные детали:
 
 - `RoomType`: `SINGLE`, `DOUBLE`.
+- `Room` поддерживает опциональный `roomNumber` в формате трех цифр,
+  `imageUrls` как JSON-галерею до 5 фото, `imageUrl` как основное/первое фото
+  для существующего booking UI, а также `recommendationDe/En/Ru`.
+- `Room` хранит редактируемые тарифы бронирования: `priceOneGuest` -
+  `priceFourGuests`, `breakfastPricePerGuest`, `halfBoardPricePerGuest`,
+  `defaultMealPlan`, `extraBedMax`, `extraBedPrice`. `basePrice` оставлен как
+  fallback для старого кода и если цена по числу гостей не заполнена.
+- `BookingMealPlan`: `ROOM_ONLY`, `BREAKFAST`, `HALF_BOARD`. Публичный checkout
+  предлагает `BREAKFAST` по умолчанию, но клиент может выбрать без завтрака или
+  завтрак+ужин.
+- `Booking` сохраняет снимок тарифа на момент заявки: `mealPlan`,
+  `mealPlanPricePerGuest`, `mealPlanTotal`, `extraBeds`,
+  `extraBedPricePerNight`, `extraBedTotal`. Исторические брони не должны
+  пересчитываться от новых тарифов комнаты.
 - `BookingStatus`: `PENDING`, `CONFIRMED`, `CANCELLED`, `CHECKED_IN`,
   `CHECKED_OUT`, `NO_SHOW`.
-- `booking-engine.ts` создает default rooms, если они еще отсутствуют.
+- `booking-engine.ts` создает default rooms, если они еще отсутствуют, но не
+  перезаписывает существующие комнаты через `ensureDefaultRooms`, чтобы
+  admin-тарифы и вместимость не сбрасывались при открытии booking-страниц.
 - `restaurant-menu.ts` наполняет default menu, если таблицы меню пустые.
 - Проверку доступности номеров и создание booking держать на server side;
   client-компоненты не должны тянуть Prisma/Node зависимости.
@@ -141,7 +157,10 @@
 - Admin menu upload конвертирует видео в WebM через `ffmpeg-static` или
   путь из `FFMPEG_PATH`.
 - Uploaded files сохраняются под `public/uploads`, сейчас для меню в
-  `public/uploads/restaurant-menu`.
+  `public/uploads/restaurant-menu`, для комнат в `public/uploads/rooms`.
+- Admin room upload сохраняет изображения как WebP через общий helper
+  `src/lib/admin-image-upload.ts`; удаление файлов разрешено только внутри
+  `/uploads/...`.
 - Для production на обычном Node.js сервере `public/uploads` должен жить на
   постоянном диске. Для serverless/Vercel такой local uploads flow нельзя
   считать надежным без отдельного storage/worker решения.
@@ -205,6 +224,9 @@
 
 | Дата | Изменение | Контекст |
 | --- | --- | --- |
+| 2026-06-01 | Добавлена тарифная модель комнат и питания для booking flow. | Миграция `20260601113000_room_booking_rate_plans` добавляет `BookingMealPlan`, цены комнаты для 1-4 гостей, стоимость завтрака/полупансиона за гостя, тариф по умолчанию, лимит/цену доп. кроватей и snapshot-поля в `Booking`. `booking-engine.ts` считает итог как проживание + питание + доп. кровати + доплаты, а checkout предлагает завтрак по умолчанию с выбором `ROOM_ONLY`/`BREAKFAST`/`HALF_BOARD`. `/admin/rooms` получил редактирование этих тарифов. После schema changes выполнены `prisma format`, `npm run db:generate`, `npm run lint`, `npm run build`. Для работающей БД нужно применить миграции. |
+| 2026-06-01 | Обновлен общий визуальный стиль admin-панели. | `AdminShell`, `AdminUi`, `AdminLocaleSwitcher` и `/admin/rooms` приведены к более компактному, продуктово-операционному стилю: меньшие радиусы, плотнее метрики, более строгие панели, аккуратные кнопки и карточки комнат. На mobile admin-навигация в `AdminShell` реализована как hamburger/details-меню, не горизонтальная полоса. Desktop sidebar должен быть скроллируемым через `max-height`/`overflow-y-auto`, а не обрезаться `overflow-hidden`. Для React server-action forms не задавать `method`/`encType`, иначе React пишет warning. Проверено через `npm run lint` и `npm run build`; `/admin/login` отвечает `200` на локальном dev server. |
+| 2026-06-01 | Переработана `/admin/rooms` и расширена модель `Room`. | Добавлена миграция `20260601100000_room_admin_gallery`: `roomNumber`, `imageUrls`, `recommendationDe/En/Ru`. Admin rooms теперь поддерживает создание, редактирование, удаление комнаты без бронирований, WebP-галерею до 5 фото, удаление фото, чеклист гостиничных удобств и компактный адаптивный UI. После schema changes выполнен `npm run db:generate`; проверено через `npm run lint` и `npm run build`. Для работающей БД нужно применить миграцию/`db:push` в целевом окружении. |
 | 2026-05-31 | Доработана desktop-версия первой карточки ресторанного меню. | В `RestaurantMenuMedia` добавлен режим `playInlineOnDesktopHover={false}`: для featured-карточки слева остается статичное фото/постер, а desktop hover-preview справа продолжает показывать видео. Заголовок featured-блюда уменьшен и настроен через `text-wrap: balance`, `hyphens:auto` и `overflow-wrap:normal`, чтобы немецкие названия не ломались некрасиво внутри слова. Проверено через `npm run lint` и smoke-запрос `/de/restaurant` со статусом `200`. |
 | 2026-05-31 | Унифицированы мобильные карточки блюд в ресторанном меню. | В `src/components/sections/RestaurantPageContent.tsx` мобильный блок `lg:hidden` теперь рендерит `activeCategory.items` одним шаблоном карточки; отдельная большая первая карточка убрана. Десктопный блок оставлен без изменений. Проверено через `npm run lint` и smoke-запрос `/de/restaurant` со статусом `200`. |
 | 2026-05-21 | Создан `AGENTS.md`. | Зафиксированы текущая структура Next.js приложения, Prisma-домены, booking/menu/admin контуры, env contract и правило поддерживать этот файл после значимых изменений. |

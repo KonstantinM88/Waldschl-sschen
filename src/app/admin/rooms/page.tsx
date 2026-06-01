@@ -41,7 +41,7 @@ export default async function AdminRoomsPage({
       summary={summary}
       title={t.dashboard.pages.rooms.title}
     >
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-4">
+      <section className="grid grid-cols-1 gap-3 md:grid-cols-2 2xl:grid-cols-4">
         <AdminMetricCard
           detail={`${summary.activeRooms}/${summary.totalRooms}`}
           Icon={BedDouble}

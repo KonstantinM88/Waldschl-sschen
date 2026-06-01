@@ -104,57 +104,77 @@ model Guest {
 }
 
 model Room {
-  id                 String    @id @default(cuid())
-  slug               String    @unique
-  type               RoomType
-  inventory          Int
-  maxGuests          Int
-  basePrice          Decimal   @db.Decimal(10, 2)
-  breakfastIncluded  Boolean   @default(true)
-  isActive           Boolean   @default(true)
-  sortOrder          Int       @default(0)
-  titleDe            String
-  titleEn            String
-  titleRu            String
-  descriptionDe      String
-  descriptionEn      String
-  descriptionRu      String
-  shortDescriptionDe String?
-  shortDescriptionEn String?
-  shortDescriptionRu String?
-  imageUrl           String?
-  amenities          Json?
-  bookings           Booking[]
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  id                     String          @id @default(cuid())
+  slug                   String          @unique
+  roomNumber             String?         @unique
+  type                   RoomType
+  inventory              Int
+  maxGuests              Int
+  basePrice              Decimal         @db.Decimal(10, 2)
+  priceOneGuest          Decimal?        @db.Decimal(10, 2)
+  priceTwoGuests         Decimal?        @db.Decimal(10, 2)
+  priceThreeGuests       Decimal?        @db.Decimal(10, 2)
+  priceFourGuests        Decimal?        @db.Decimal(10, 2)
+  breakfastPricePerGuest Decimal         @default(0) @db.Decimal(10, 2)
+  halfBoardPricePerGuest Decimal         @default(0) @db.Decimal(10, 2)
+  defaultMealPlan        BookingMealPlan @default(BREAKFAST)
+  extraBedMax            Int             @default(0)
+  extraBedPrice          Decimal         @default(0) @db.Decimal(10, 2)
+  breakfastIncluded      Boolean         @default(true)
+  isActive               Boolean         @default(true)
+  sortOrder              Int             @default(0)
+  titleDe                String
+  titleEn                String
+  titleRu                String
+  descriptionDe          String
+  descriptionEn          String
+  descriptionRu          String
+  shortDescriptionDe     String?
+  shortDescriptionEn     String?
+  shortDescriptionRu     String?
+  recommendationDe       String?
+  recommendationEn       String?
+  recommendationRu       String?
+  imageUrl               String?
+  imageUrls              Json?
+  amenities              Json?
+  bookings               Booking[]
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
 
   @@index([isActive, sortOrder])
 }
 
 model Booking {
-  id                        String        @id @default(cuid())
+  id                        String          @id @default(cuid())
   guestId                   String
   roomId                    String
-  guest                     Guest         @relation(fields: [guestId], references: [id], onDelete: Cascade)
-  room                      Room          @relation(fields: [roomId], references: [id], onDelete: Restrict)
+  guest                     Guest           @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  room                      Room            @relation(fields: [roomId], references: [id], onDelete: Restrict)
   checkIn                   DateTime
   checkOut                  DateTime
-  guests                    Int           @default(1)
+  guests                    Int             @default(1)
   nights                    Int
-  basePricePerNight         Decimal       @db.Decimal(10, 2)
-  baseTotal                 Decimal       @db.Decimal(10, 2)
-  dogCount                  Int           @default(0)
-  dogFeePerNight            Decimal       @default(15) @db.Decimal(10, 2)
-  dogFeeTotal               Decimal       @default(0) @db.Decimal(10, 2)
-  bicycleReserved           Boolean       @default(false)
+  basePricePerNight         Decimal         @db.Decimal(10, 2)
+  baseTotal                 Decimal         @db.Decimal(10, 2)
+  mealPlan                  BookingMealPlan @default(BREAKFAST)
+  mealPlanPricePerGuest     Decimal         @default(0) @db.Decimal(10, 2)
+  mealPlanTotal             Decimal         @default(0) @db.Decimal(10, 2)
+  extraBeds                 Int             @default(0)
+  extraBedPricePerNight     Decimal         @default(0) @db.Decimal(10, 2)
+  extraBedTotal             Decimal         @default(0) @db.Decimal(10, 2)
+  dogCount                  Int             @default(0)
+  dogFeePerNight            Decimal         @default(15) @db.Decimal(10, 2)
+  dogFeeTotal               Decimal         @default(0) @db.Decimal(10, 2)
+  bicycleReserved           Boolean         @default(false)
   restaurantReservationTime String?
-  totalAmount               Decimal       @db.Decimal(10, 2)
-  breakfastIncluded         Boolean       @default(true)
+  totalAmount               Decimal         @db.Decimal(10, 2)
+  breakfastIncluded         Boolean         @default(true)
   notes                     String?
-  status                    BookingStatus @default(PENDING)
-  locale                    String        @default("de")
-  createdAt                 DateTime      @default(now())
-  updatedAt                 DateTime      @updatedAt
+  status                    BookingStatus   @default(PENDING)
+  locale                    String          @default("de")
+  createdAt                 DateTime        @default(now())
+  updatedAt                 DateTime        @updatedAt
 
   @@index([roomId, checkIn, checkOut])
   @@index([guestId, createdAt])
@@ -164,6 +184,12 @@ model Booking {
 enum RoomType {
   SINGLE
   DOUBLE
+}
+
+enum BookingMealPlan {
+  ROOM_ONLY
+  BREAKFAST
+  HALF_BOARD
 }
 
 enum BookingStatus {

@@ -23,7 +23,7 @@ import {
   resolveAdminReturnTo,
 } from "@/lib/admin-feedback";
 import { formatHotelDate } from "@/lib/booking-dates";
-import { getRoomTypeLabel } from "@/lib/booking-engine";
+import { getMealPlanLabel, getRoomTypeLabel } from "@/lib/booking-engine";
 
 export const dynamic = "force-dynamic";
 
@@ -223,6 +223,24 @@ export default async function AdminBookingDetailPage({
               </div>
               <div className="rounded-[1.15rem] border border-[#eadfcf] bg-[#fcfaf6] px-4 py-4">
                 <div className="text-[0.58rem] font-medium uppercase tracking-[0.14em] text-[#9e927f]">
+                  {t.dashboard.pages.bookings.fields.mealPlanTotal}
+                </div>
+                <div className="mt-2 text-[#201b17]">
+                  {formatAdminCurrency(booking.mealPlanTotal.toString(), locale)}
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="rounded-[1.15rem] border border-[#eadfcf] bg-[#fcfaf6] px-4 py-4">
+                <div className="text-[0.58rem] font-medium uppercase tracking-[0.14em] text-[#9e927f]">
+                  {t.dashboard.pages.bookings.fields.extraBedTotal}
+                </div>
+                <div className="mt-2 text-[#201b17]">
+                  {formatAdminCurrency(booking.extraBedTotal.toString(), locale)}
+                </div>
+              </div>
+              <div className="rounded-[1.15rem] border border-[#eadfcf] bg-[#fcfaf6] px-4 py-4">
+                <div className="text-[0.58rem] font-medium uppercase tracking-[0.14em] text-[#9e927f]">
                   {t.dashboard.pages.bookings.fields.dogFeeTotal}
                 </div>
                 <div className="mt-2 text-[#201b17]">
@@ -268,6 +286,25 @@ export default async function AdminBookingDetailPage({
                 </div>
                 <div className="mt-2 text-[#201b17]">
                   {booking.restaurantReservationTime ?? "-"}
+                </div>
+              </div>
+              <div className="rounded-[1.15rem] border border-[#eadfcf] bg-[#fcfaf6] px-4 py-4">
+                <div className="text-[0.58rem] font-medium uppercase tracking-[0.14em] text-[#9e927f]">
+                  {t.dashboard.pages.bookings.fields.mealPlan}
+                </div>
+                <div className="mt-2 text-[#201b17]">
+                  {getMealPlanLabel(booking.mealPlan, locale)}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="rounded-[1.15rem] border border-[#eadfcf] bg-[#fcfaf6] px-4 py-4">
+                <div className="text-[0.58rem] font-medium uppercase tracking-[0.14em] text-[#9e927f]">
+                  {t.dashboard.pages.bookings.fields.extraBeds}
+                </div>
+                <div className="mt-2 text-[#201b17]">
+                  {booking.extraBeds}
                 </div>
               </div>
               <div className="rounded-[1.15rem] border border-[#eadfcf] bg-[#fcfaf6] px-4 py-4">

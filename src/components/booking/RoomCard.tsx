@@ -13,7 +13,7 @@ interface RoomCardProps {
 const copy = {
   de: {
     available: (count: number) => `${count} verfugbar`,
-    breakfast: "Frühstück inklusive",
+    breakfast: "Frühstück vorausgewählt",
     cta: "Zimmer wählen",
     from: "ab",
     guests: (count: number) => `bis ${count} Gast${count === 1 ? "" : "e"}`,
@@ -21,7 +21,7 @@ const copy = {
   },
   en: {
     available: (count: number) => `${count} available`,
-    breakfast: "Breakfast included",
+    breakfast: "Breakfast preselected",
     cta: "Select room",
     from: "from",
     guests: (count: number) => `up to ${count} guest${count === 1 ? "" : "s"}`,
@@ -29,7 +29,7 @@ const copy = {
   },
   ru: {
     available: (count: number) => `${count} доступно`,
-    breakfast: "Завтрак включён",
+    breakfast: "Завтрак выбран",
     cta: "Выбрать номер",
     from: "от",
     guests: (count: number) => `до ${count} гост.`,

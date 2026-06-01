@@ -1,6 +1,7 @@
 "use server";
 
 import { ZodError } from "zod";
+import { BookingMealPlan } from "@prisma/client";
 import { createBooking } from "@/lib/booking-engine";
 import type { BookingLocale } from "@/lib/booking-shared";
 
@@ -55,6 +56,13 @@ function normalizeBookingLocale(value: FormDataEntryValue | null): BookingLocale
   return value === "en" || value === "ru" ? value : "de";
 }
 
+function normalizeMealPlan(value: FormDataEntryValue | null) {
+  return value === BookingMealPlan.ROOM_ONLY ||
+    value === BookingMealPlan.HALF_BOARD
+    ? value
+    : BookingMealPlan.BREAKFAST;
+}
+
 function localizeBookingError(error: unknown, locale: BookingLocale) {
   const t = actionCopy[locale];
 
@@ -98,6 +106,7 @@ export async function submitHotelBookingAction(
       checkIn: String(formData.get("checkIn") ?? ""),
       checkOut: String(formData.get("checkOut") ?? ""),
       guests: Number(formData.get("guests") ?? 1),
+      mealPlan: normalizeMealPlan(formData.get("mealPlan")),
       dogCount: Number(formData.get("dogCount") ?? 0),
       bicycleReserved: formData.get("bicycleReserved") === "on",
       restaurantReservationTime:

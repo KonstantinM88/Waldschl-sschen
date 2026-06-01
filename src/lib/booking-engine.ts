@@ -1,9 +1,16 @@
 import { differenceInCalendarDays } from "date-fns";
 import { z } from "zod";
-import { BookingStatus, Prisma, RoomType, type Room } from "@prisma/client";
+import {
+  BookingMealPlan,
+  BookingStatus,
+  Prisma,
+  RoomType,
+  type Room,
+} from "@prisma/client";
 import { parseHotelDateInput } from "@/lib/booking-dates";
 import {
   type AvailableRoom,
+  type AvailableMealPlanOption,
   type BookingLocale,
   DOG_FEE_PER_NIGHT,
 } from "@/lib/booking-shared";
@@ -24,7 +31,8 @@ const createBookingSchema = z.object({
   roomId: z.string().min(1),
   checkIn: z.string().min(1),
   checkOut: z.string().min(1),
-  guests: z.number().int().min(1).max(2),
+  guests: z.number().int().min(1).max(4),
+  mealPlan: z.nativeEnum(BookingMealPlan).default(BookingMealPlan.BREAKFAST),
   dogCount: z.number().int().min(0).max(4).default(0),
   bicycleReserved: z.boolean().default(false),
   restaurantReservationTime: z.string().trim().max(20).optional(),
@@ -56,6 +64,15 @@ const DEFAULT_ROOMS = [
     inventory: 2,
     maxGuests: 1,
     basePrice: new Prisma.Decimal(79),
+    priceOneGuest: new Prisma.Decimal(79),
+    priceTwoGuests: null,
+    priceThreeGuests: null,
+    priceFourGuests: null,
+    breakfastPricePerGuest: new Prisma.Decimal(0),
+    halfBoardPricePerGuest: new Prisma.Decimal(35),
+    defaultMealPlan: BookingMealPlan.BREAKFAST,
+    extraBedMax: 0,
+    extraBedPrice: new Prisma.Decimal(0),
     imageUrl: "/Hotel/arched_window_bedroom_1600.webp",
     titleDe: "Einzelzimmer",
     titleEn: "Single room",
@@ -64,20 +81,29 @@ const DEFAULT_ROOMS = [
     shortDescriptionEn: "Quiet room for solo travellers with a boutique atmosphere.",
     shortDescriptionRu: "Тихий номер для одного гостя с бутик-атмосферой.",
     descriptionDe:
-      "Ein ruhiger Ruckzugsort fur Alleinreisende mit hochwertigem Bett, naturlichen Materialien und reichhaltigem Fruhstucksbuffet inklusive.",
+      "Ein ruhiger Ruckzugsort fur Alleinreisende mit hochwertigem Bett, naturlichen Materialien und wahlbarer Verpflegung.",
     descriptionEn:
-      "A calm retreat for solo travellers with a high-quality bed, natural materials and a rich breakfast buffet included.",
+      "A calm retreat for solo travellers with a high-quality bed, natural materials and selectable meal options.",
     descriptionRu:
-      "Спокойный номер для одного гостя с качественной кроватью, натуральными материалами и включённым завтраком-буфетом.",
-    amenities: ["WiFi", "Dusche / Bad", "TV", "Frühstück inklusive"],
+      "Спокойный номер для одного гостя с качественной кроватью, натуральными материалами и выбором питания.",
+    amenities: ["WiFi", "Dusche / Bad", "TV", "Fruhstuck wahlbar"],
     sortOrder: 1,
   },
   {
     slug: "double",
     type: RoomType.DOUBLE,
     inventory: 22,
-    maxGuests: 2,
+    maxGuests: 4,
     basePrice: new Prisma.Decimal(125),
+    priceOneGuest: new Prisma.Decimal(105),
+    priceTwoGuests: new Prisma.Decimal(125),
+    priceThreeGuests: new Prisma.Decimal(150),
+    priceFourGuests: new Prisma.Decimal(175),
+    breakfastPricePerGuest: new Prisma.Decimal(0),
+    halfBoardPricePerGuest: new Prisma.Decimal(35),
+    defaultMealPlan: BookingMealPlan.BREAKFAST,
+    extraBedMax: 2,
+    extraBedPrice: new Prisma.Decimal(25),
     imageUrl: "/Hotel/bedroom_balcony_1600.webp",
     titleDe: "Doppelzimmer",
     titleEn: "Double room",
@@ -86,12 +112,12 @@ const DEFAULT_ROOMS = [
     shortDescriptionEn: "Spacious room for two guests with views of the landscape.",
     shortDescriptionRu: "Просторный номер для двух гостей с видом на природу.",
     descriptionDe:
-      "Grosszugig, hell und stilvoll komponiert mit komfortablem Doppelbett, Sitzbereich und reichhaltigem Fruhstucksbuffet inklusive.",
+      "Grosszugig, hell und stilvoll komponiert mit komfortablem Doppelbett, Sitzbereich und wahlbarer Verpflegung.",
     descriptionEn:
-      "Spacious, bright and elegantly composed with a comfortable double bed, seating area and a rich breakfast buffet included.",
+      "Spacious, bright and elegantly composed with a comfortable double bed, seating area and selectable meal options.",
     descriptionRu:
-      "Просторный, светлый и элегантный номер с большой кроватью, зоной отдыха и включённым завтраком-буфетом.",
-    amenities: ["WiFi", "Sitzbereich", "TV", "Frühstück inklusive"],
+      "Просторный, светлый и элегантный номер с большой кроватью, зоной отдыха и выбором питания.",
+    amenities: ["WiFi", "Sitzbereich", "TV", "Fruhstuck wahlbar"],
     sortOrder: 2,
   },
 ] as const;
@@ -173,24 +199,170 @@ export function normalizeAmenities(amenities: unknown) {
   return [];
 }
 
+const MEAL_PLAN_COPY: Record<
+  BookingMealPlan,
+  Record<BookingLocale, { description: string; label: string }>
+> = {
+  [BookingMealPlan.ROOM_ONLY]: {
+    de: {
+      label: "Ohne Fruhstuck",
+      description: "Nur Ubernachtung, keine Verpflegung.",
+    },
+    en: {
+      label: "Room only",
+      description: "Accommodation without breakfast or dinner.",
+    },
+    ru: {
+      label: "Без завтрака",
+      description: "Только проживание, без питания.",
+    },
+  },
+  [BookingMealPlan.BREAKFAST]: {
+    de: {
+      label: "Mit Fruhstuck",
+      description: "Fruhstuck ist fur diese Anfrage vorausgewahlt.",
+    },
+    en: {
+      label: "With breakfast",
+      description: "Breakfast is preselected for this request.",
+    },
+    ru: {
+      label: "С завтраком",
+      description: "Этот вариант выбран по умолчанию.",
+    },
+  },
+  [BookingMealPlan.HALF_BOARD]: {
+    de: {
+      label: "Fruhstuck + Abendessen",
+      description: "Fruhstuck und Abendessen fur jeden Gast.",
+    },
+    en: {
+      label: "Breakfast + dinner",
+      description: "Breakfast and dinner for each guest.",
+    },
+    ru: {
+      label: "Завтрак + ужин",
+      description: "Завтрак и ужин для каждого гостя.",
+    },
+  },
+};
+
+function toDecimal(value: Prisma.Decimal | number | string | null | undefined) {
+  return new Prisma.Decimal(value ?? 0);
+}
+
+function getOccupancyPrice(room: Room, guests: number) {
+  const priceByGuests = {
+    1: room.priceOneGuest,
+    2: room.priceTwoGuests,
+    3: room.priceThreeGuests,
+    4: room.priceFourGuests,
+  } as const;
+
+  return toDecimal(priceByGuests[guests as 1 | 2 | 3 | 4] ?? room.basePrice);
+}
+
+function getMealPlanPricePerGuest(room: Room, mealPlan: BookingMealPlan) {
+  if (mealPlan === BookingMealPlan.BREAKFAST) {
+    return toDecimal(room.breakfastPricePerGuest);
+  }
+
+  if (mealPlan === BookingMealPlan.HALF_BOARD) {
+    return toDecimal(room.halfBoardPricePerGuest);
+  }
+
+  return new Prisma.Decimal(0);
+}
+
+function getStandardGuestCapacity(room: Pick<Room, "type">) {
+  return room.type === RoomType.SINGLE ? 1 : 2;
+}
+
+function getExtraBedCount(room: Pick<Room, "type" | "extraBedMax">, guests: number) {
+  return Math.max(guests - getStandardGuestCapacity(room), 0);
+}
+
+function canHostGuestCount(room: Room, guests: number) {
+  if (guests > room.maxGuests) {
+    return false;
+  }
+
+  return getExtraBedCount(room, guests) <= room.extraBedMax;
+}
+
+function calculateRoomRate(room: Room, guests: number, mealPlan: BookingMealPlan) {
+  if (!canHostGuestCount(room, guests)) {
+    throw new Error("Guest count exceeds room capacity.");
+  }
+
+  const occupancyBasePrice = getOccupancyPrice(room, guests);
+  const mealPlanPricePerGuest = getMealPlanPricePerGuest(room, mealPlan);
+  const mealPlanTotalPerNight = mealPlanPricePerGuest.mul(guests);
+  const extraBeds = getExtraBedCount(room, guests);
+  const extraBedPricePerNight = toDecimal(room.extraBedPrice);
+  const extraBedTotalPerNight = extraBedPricePerNight.mul(extraBeds);
+  const totalPricePerNight = occupancyBasePrice
+    .add(mealPlanTotalPerNight)
+    .add(extraBedTotalPerNight);
+
+  return {
+    extraBeds,
+    extraBedPricePerNight,
+    extraBedTotalPerNight,
+    mealPlanPricePerGuest,
+    mealPlanTotalPerNight,
+    occupancyBasePrice,
+    totalPricePerNight,
+  };
+}
+
+function getMealPlanOptions(
+  room: Room,
+  guests: number,
+  nights: number,
+  locale: BookingLocale
+): AvailableMealPlanOption[] {
+  return [
+    BookingMealPlan.ROOM_ONLY,
+    BookingMealPlan.BREAKFAST,
+    BookingMealPlan.HALF_BOARD,
+  ].map((mealPlan) => {
+    const copy = MEAL_PLAN_COPY[mealPlan][locale];
+    const pricePerGuest = Number(getMealPlanPricePerGuest(room, mealPlan));
+    const pricePerNight = pricePerGuest * guests;
+
+    return {
+      description: copy.description,
+      label: copy.label,
+      pricePerGuest,
+      pricePerNight,
+      totalPrice: pricePerNight * nights,
+      value: mealPlan,
+    };
+  });
+}
+
 export async function ensureDefaultRooms(client: PrismaRoomClient = prisma) {
   await Promise.all(
     DEFAULT_ROOMS.map((room) =>
       client.room.upsert({
         where: { slug: room.slug },
-        update: {
-          inventory: room.inventory,
-          maxGuests: room.maxGuests,
-          breakfastIncluded: true,
-          sortOrder: room.sortOrder,
-          type: room.type,
-        },
+        update: {},
         create: {
           slug: room.slug,
           type: room.type,
           inventory: room.inventory,
           maxGuests: room.maxGuests,
           basePrice: room.basePrice,
+          priceOneGuest: room.priceOneGuest,
+          priceTwoGuests: room.priceTwoGuests,
+          priceThreeGuests: room.priceThreeGuests,
+          priceFourGuests: room.priceFourGuests,
+          breakfastPricePerGuest: room.breakfastPricePerGuest,
+          halfBoardPricePerGuest: room.halfBoardPricePerGuest,
+          defaultMealPlan: room.defaultMealPlan,
+          extraBedMax: room.extraBedMax,
+          extraBedPrice: room.extraBedPrice,
           breakfastIncluded: true,
           isActive: true,
           sortOrder: room.sortOrder,
@@ -280,7 +452,13 @@ export async function getAvailableRooms(
       const reserved = reservedByRoom.get(room.id) ?? 0;
       const available = Math.max(room.inventory - reserved, 0);
       const localized = getLocalizedRoomField(room, normalizedLocale);
-      const basePrice = Number(room.basePrice);
+      if (!canHostGuestCount(room, guests)) {
+        return null;
+      }
+
+      const defaultMealPlan = room.defaultMealPlan ?? BookingMealPlan.BREAKFAST;
+      const rate = calculateRoomRate(room, guests, defaultMealPlan);
+      const basePrice = Number(rate.totalPricePerNight);
 
       return {
         id: room.id,
@@ -292,18 +470,25 @@ export async function getAvailableRooms(
         imageUrl: room.imageUrl,
         amenities: normalizeAmenities(room.amenities),
         basePrice,
-        breakfastIncluded: room.breakfastIncluded,
+        breakfastIncluded: defaultMealPlan !== BookingMealPlan.ROOM_ONLY,
+        defaultMealPlan,
+        extraBedMax: room.extraBedMax,
+        extraBedPrice: Number(rate.extraBedPricePerNight),
+        extraBedTotalPerNight: Number(rate.extraBedTotalPerNight),
+        extraBeds: rate.extraBeds,
         inventory: room.inventory,
         bookedCount: reserved,
         availableCount: available,
         maxGuests: room.maxGuests,
+        mealOptions: getMealPlanOptions(room, guests, nights, normalizedLocale),
         guests,
         nights,
+        occupancyBasePrice: Number(rate.occupancyBasePrice),
         totalBasePrice: basePrice * nights,
         locale: normalizedLocale,
       } satisfies AvailableRoom;
     })
-    .filter((room) => room.availableCount > 0);
+    .filter((room): room is AvailableRoom => Boolean(room && room.availableCount > 0));
 }
 
 export async function createBooking(input: z.infer<typeof createBookingSchema>) {
@@ -327,7 +512,7 @@ export async function createBooking(input: z.infer<typeof createBookingSchema>) 
       throw new Error("Selected room is not available.");
     }
 
-    if (validated.guests > room.maxGuests) {
+    if (!canHostGuestCount(room, validated.guests)) {
       throw new Error("Guest count exceeds room capacity.");
     }
 
@@ -350,11 +535,17 @@ export async function createBooking(input: z.infer<typeof createBookingSchema>) 
       throw new Error("Room inventory is sold out for the selected dates.");
     }
 
-    const basePricePerNight = room.basePrice;
+    const rate = calculateRoomRate(room, validated.guests, validated.mealPlan);
+    const basePricePerNight = rate.occupancyBasePrice;
     const baseTotal = basePricePerNight.mul(nights);
+    const mealPlanTotal = rate.mealPlanTotalPerNight.mul(nights);
+    const extraBedTotal = rate.extraBedTotalPerNight.mul(nights);
     const dogFeePerNight = new Prisma.Decimal(DOG_FEE_PER_NIGHT);
     const dogFeeTotal = dogFeePerNight.mul(validated.dogCount).mul(nights);
-    const totalAmount = baseTotal.add(dogFeeTotal);
+    const totalAmount = baseTotal
+      .add(mealPlanTotal)
+      .add(extraBedTotal)
+      .add(dogFeeTotal);
 
     const guest = await transactionClient.guest.create({
       data: {
@@ -377,6 +568,12 @@ export async function createBooking(input: z.infer<typeof createBookingSchema>) 
         nights,
         basePricePerNight,
         baseTotal,
+        mealPlan: validated.mealPlan,
+        mealPlanPricePerGuest: rate.mealPlanPricePerGuest,
+        mealPlanTotal,
+        extraBeds: rate.extraBeds,
+        extraBedPricePerNight: rate.extraBedPricePerNight,
+        extraBedTotal,
         dogCount: validated.dogCount,
         dogFeePerNight,
         dogFeeTotal,
@@ -384,7 +581,7 @@ export async function createBooking(input: z.infer<typeof createBookingSchema>) 
         restaurantReservationTime:
           validated.restaurantReservationTime?.trim() || null,
         totalAmount,
-        breakfastIncluded: room.breakfastIncluded,
+        breakfastIncluded: validated.mealPlan !== BookingMealPlan.ROOM_ONLY,
         notes: validated.notes || null,
         locale: validated.locale,
       },
@@ -407,6 +604,13 @@ export async function createBooking(input: z.infer<typeof createBookingSchema>) 
 
 export function getRoomTypeLabel(type: RoomType, locale: BookingLocale) {
   return ROOM_TYPE_LABELS[type][toBookingLocale(locale)];
+}
+
+export function getMealPlanLabel(
+  mealPlan: BookingMealPlan,
+  locale: BookingLocale
+) {
+  return MEAL_PLAN_COPY[mealPlan][toBookingLocale(locale)].label;
 }
 
 export function getDefaultRestaurantTimeOptions(locale: BookingLocale) {
