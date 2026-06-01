@@ -7,7 +7,10 @@ import {
   RoomType,
   type Room,
 } from "@prisma/client";
-import { parseHotelDateInput } from "@/lib/booking-dates";
+import {
+  assertBookableCheckInDateInput,
+  parseHotelDateInput,
+} from "@/lib/booking-dates";
 import {
   type AvailableRoom,
   type AvailableMealPlanOption,
@@ -41,6 +44,10 @@ const createBookingSchema = z.object({
   lastName: z.string().trim().min(1).max(120),
   email: z.string().trim().email(),
   phone: z.string().trim().max(50).optional(),
+  street: z.string().trim().min(1).max(180),
+  postalCode: z.string().trim().min(1).max(20),
+  city: z.string().trim().min(1).max(120),
+  country: z.string().trim().min(1).max(120),
   notes: z.string().trim().max(2000).optional(),
 });
 
@@ -403,6 +410,7 @@ export async function getAvailableRooms(
   const checkIn = parseBookingDate(checkInInput);
   const checkOut = parseBookingDate(checkOutInput);
   const nights = assertDateRange(checkIn, checkOut);
+  assertBookableCheckInDateInput(checkInInput);
   const normalizedLocale = toBookingLocale(locale);
 
   const roomResultsPromise: Promise<AvailableRoomsQueryResult> = prisma.room.findMany({
@@ -468,6 +476,7 @@ export async function getAvailableRooms(
         description: localized.description,
         shortDescription: localized.shortDescription,
         imageUrl: room.imageUrl,
+        gallery: normalizeAmenities(room.imageUrls),
         amenities: normalizeAmenities(room.amenities),
         basePrice,
         breakfastIncluded: defaultMealPlan !== BookingMealPlan.ROOM_ONLY,
@@ -496,6 +505,7 @@ export async function createBooking(input: z.infer<typeof createBookingSchema>) 
   const checkIn = parseBookingDate(validated.checkIn);
   const checkOut = parseBookingDate(validated.checkOut);
   const nights = assertDateRange(checkIn, checkOut);
+  assertBookableCheckInDateInput(validated.checkIn);
 
   return prisma.$transaction(async (tx) => {
     const transactionClient = tx as unknown as typeof prisma;
@@ -553,6 +563,10 @@ export async function createBooking(input: z.infer<typeof createBookingSchema>) 
         lastName: validated.lastName,
         email: validated.email,
         phone: validated.phone || null,
+        street: validated.street,
+        postalCode: validated.postalCode,
+        city: validated.city,
+        country: validated.country,
         notes: validated.notes || null,
         locale: validated.locale,
       },
@@ -598,6 +612,21 @@ export async function createBooking(input: z.infer<typeof createBookingSchema>) 
           toBookingLocale(validated.locale)
         ],
       totalAmount: Number(totalAmount),
+      checkIn: validated.checkIn,
+      checkOut: validated.checkOut,
+      nights,
+      guests: validated.guests,
+      mealPlanLabel: MEAL_PLAN_COPY[validated.mealPlan][
+        toBookingLocale(validated.locale)
+      ].label,
+      firstName: validated.firstName,
+      lastName: validated.lastName,
+      email: validated.email,
+      phone: validated.phone ?? null,
+      street: validated.street,
+      postalCode: validated.postalCode,
+      city: validated.city,
+      country: validated.country,
     };
   });
 }

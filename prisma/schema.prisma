@@ -89,16 +89,20 @@ model RestaurantMenuItem {
 }
 
 model Guest {
-  id        String    @id @default(cuid())
-  firstName String
-  lastName  String
-  email     String
-  phone     String?
-  notes     String?
-  locale    String    @default("de")
-  bookings  Booking[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id         String    @id @default(cuid())
+  firstName  String
+  lastName   String
+  email      String
+  phone      String?
+  notes      String?
+  street     String?
+  postalCode String?
+  city       String?
+  country    String?
+  locale     String    @default("de")
+  bookings   Booking[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@index([email])
 }

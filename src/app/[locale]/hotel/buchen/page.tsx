@@ -1,4 +1,3 @@
-import { addDays, format } from "date-fns";
 import { Coffee, Dog, Sparkles, UtensilsCrossed } from "lucide-react";
 import BookingLanguageSwitcher from "@/components/booking/BookingLanguageSwitcher";
 import BookingWidget from "@/components/booking/BookingWidget";
@@ -12,7 +11,14 @@ import {
   toBookingDisplayLocale,
   toBookingRouteLocale,
 } from "@/lib/booking-navigation";
-import { DOG_FEE_PER_NIGHT, FREE_BICYCLE_PRICE } from "@/lib/booking-shared";
+import { resolveBookableDateRange } from "@/lib/booking-dates";
+import {
+  DOG_FEE_PER_NIGHT,
+  FREE_BICYCLE_PRICE,
+  HOTEL_CHECK_IN_TIME,
+  HOTEL_CHECK_OUT_TIME,
+  HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME,
+} from "@/lib/booking-shared";
 import { siteConfig } from "@/data/site";
 
 export const dynamic = "force-dynamic";
@@ -34,6 +40,7 @@ const pageCopy = {
     title: "Zimmer direkt und transparent buchen",
     description:
       "Prufen Sie freie Zimmer fur Ihren Zeitraum. Fruhstuck ist vorausgewahlt, kann im Checkout aber angepasst werden.",
+    timeRule: `Check-in ab ${HOTEL_CHECK_IN_TIME} Uhr · Check-out bis ${HOTEL_CHECK_OUT_TIME} Uhr · Anreise heute online bis ${HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME} Uhr Berliner Zeit`,
     resultsTitle: "Verfugbare Zimmer",
     resultsSubtitle: (count: number) =>
       count === 1 ? "1 Zimmertyp verfugbar" : `${count} Zimmertypen verfugbar`,
@@ -56,6 +63,7 @@ const pageCopy = {
     title: "Book your room directly and transparently",
     description:
       "Check available room types for your dates. Breakfast is preselected and can be adjusted at checkout.",
+    timeRule: `Check-in from ${HOTEL_CHECK_IN_TIME} · Check-out until ${HOTEL_CHECK_OUT_TIME} · Same-day arrival online until ${HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME} Berlin time`,
     resultsTitle: "Available rooms",
     resultsSubtitle: (count: number) =>
       count === 1 ? "1 room type available" : `${count} room types available`,
@@ -78,6 +86,7 @@ const pageCopy = {
     title: "Прямое и прозрачное бронирование номера",
     description:
       "Проверьте доступные типы номеров на ваши даты. Завтрак выбран по умолчанию, но его можно изменить при оформлении.",
+    timeRule: `Заезд с ${HOTEL_CHECK_IN_TIME} · выезд до ${HOTEL_CHECK_OUT_TIME} · заезд сегодня онлайн до ${HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME} по Берлину`,
     resultsTitle: "Доступные номера",
     resultsSubtitle: (count: number) =>
       count === 1 ? "Доступен 1 тип номера" : `Доступно ${count} типов номеров`,
@@ -103,11 +112,9 @@ export default async function HotelBookingPage({
   const { locale } = await params;
   const { checkIn, checkOut, guests, lang } = await searchParams;
   const routeLocale = toBookingRouteLocale(locale);
-  const today = new Date();
-  const fallbackCheckIn = format(addDays(today, 1), "yyyy-MM-dd");
-  const fallbackCheckOut = format(addDays(today, 2), "yyyy-MM-dd");
-  const selectedCheckIn = checkIn || fallbackCheckIn;
-  const selectedCheckOut = checkOut || fallbackCheckOut;
+  const bookingRange = resolveBookableDateRange({ checkIn, checkOut });
+  const selectedCheckIn = bookingRange.checkIn;
+  const selectedCheckOut = bookingRange.checkOut;
   const parsedGuests = Number.parseInt(guests ?? "", 10);
   const selectedGuests =
     Number.isInteger(parsedGuests) && parsedGuests >= 1 && parsedGuests <= 4
@@ -151,6 +158,9 @@ export default async function HotelBookingPage({
               <p className="mt-5 max-w-[42rem] text-[0.98rem] font-light leading-relaxed text-[#5d564c] sm:text-[1.05rem]">
                 {t.description}
               </p>
+              <p className="mt-3 max-w-[42rem] rounded-[1.1rem] border border-[#eadfcf] bg-white/70 px-4 py-3 text-xs font-light leading-relaxed text-[#6c6459]">
+                {t.timeRule}
+              </p>
 
               <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {[
@@ -178,6 +188,7 @@ export default async function HotelBookingPage({
               initialCheckIn={selectedCheckIn}
               initialCheckOut={selectedCheckOut}
               initialGuests={selectedGuests}
+              minCheckIn={bookingRange.minCheckIn}
               className="self-start"
             />
           </div>

@@ -15,7 +15,67 @@ import {
   getStatusTimestampPatch,
   type CreateAdminBookingInput,
 } from "@/lib/booking-lifecycle";
+import { getMealPlanLabel, getRoomTypeLabel } from "@/lib/booking-engine";
+import type { BookingLocale } from "@/lib/booking-shared";
+import { sendEmail } from "@/lib/email";
+import {
+  buildGuestCancelledEmail,
+  buildGuestConfirmedEmail,
+  type BookingEmailData,
+} from "@/lib/email-templates";
 import { prisma } from "@/lib/prisma";
+
+const BOOKING_EMAIL_INCLUDE = { guest: true, room: true } as const;
+
+interface BookingEmailSource {
+  id: string;
+  checkIn: Date;
+  checkOut: Date;
+  nights: number;
+  guests: number;
+  totalAmount: { toString(): string };
+  mealPlan: Parameters<typeof getMealPlanLabel>[0];
+  locale: string;
+  cancellationReason: string | null;
+  guest: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string | null;
+    street: string | null;
+    postalCode: string | null;
+    city: string | null;
+    country: string | null;
+  };
+  room: { type: Parameters<typeof getRoomTypeLabel>[0] };
+}
+
+function toBookingLocale(value: string | null | undefined): BookingLocale {
+  return value === "en" || value === "ru" ? value : "de";
+}
+
+function toBookingEmailData(booking: BookingEmailSource): BookingEmailData {
+  const locale = toBookingLocale(booking.locale);
+  return {
+    bookingId: booking.id,
+    firstName: booking.guest.firstName,
+    lastName: booking.guest.lastName,
+    email: booking.guest.email,
+    phone: booking.guest.phone,
+    roomTitle: getRoomTypeLabel(booking.room.type, locale),
+    checkIn: booking.checkIn.toISOString().slice(0, 10),
+    checkOut: booking.checkOut.toISOString().slice(0, 10),
+    nights: booking.nights,
+    guests: booking.guests,
+    totalAmount: Number(booking.totalAmount.toString()),
+    mealPlanLabel: getMealPlanLabel(booking.mealPlan, locale),
+    street: booking.guest.street,
+    postalCode: booking.guest.postalCode,
+    city: booking.guest.city,
+    country: booking.guest.country,
+    cancellationReason: booking.cancellationReason,
+  };
+}
 
 const bookingStatusSchema = z.object({
   id: z.string().min(1),
@@ -74,13 +134,25 @@ export async function updateBookingStatusAction(formData: FormData) {
     redirect(withAdminNotice(returnTo, "invalid-transition", "warning"));
   }
 
-  await prisma.booking.update({
+  const updated = await prisma.booking.update({
     where: { id: parsed.id },
     data: {
       status: parsed.status,
       ...getStatusTimestampPatch(parsed.status),
     },
+    include: BOOKING_EMAIL_INCLUDE,
   });
+
+  // Notify the guest when their booking gets confirmed.
+  if (parsed.status === BookingStatus.CONFIRMED) {
+    try {
+      const data = toBookingEmailData(updated as unknown as BookingEmailSource);
+      const mail = buildGuestConfirmedEmail(data, toBookingLocale(updated.locale));
+      await sendEmail({ to: data.email, subject: mail.subject, html: mail.html });
+    } catch {
+      // email failure must not block the status update
+    }
+  }
 
   revalidateBookingViews(parsed.id);
   redirect(withAdminNotice(returnTo, "status-updated"));
@@ -111,14 +183,23 @@ export async function cancelBookingAction(formData: FormData) {
     redirect(withAdminNotice(returnTo, "invalid-transition", "warning"));
   }
 
-  await prisma.booking.update({
+  const cancelled = await prisma.booking.update({
     where: { id: parsed.id },
     data: {
       status: BookingStatus.CANCELLED,
       cancelledAt: new Date(),
       cancellationReason: parsed.reason || null,
     },
+    include: BOOKING_EMAIL_INCLUDE,
   });
+
+  try {
+    const data = toBookingEmailData(cancelled as unknown as BookingEmailSource);
+    const mail = buildGuestCancelledEmail(data, toBookingLocale(cancelled.locale));
+    await sendEmail({ to: data.email, subject: mail.subject, html: mail.html });
+  } catch {
+    // email failure must not block the cancellation
+  }
 
   revalidateBookingViews(parsed.id);
   redirect(withAdminNotice(returnTo, "status-updated"));

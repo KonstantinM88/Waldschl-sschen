@@ -88,6 +88,9 @@
   аналитика.
 - `admin-booking-views.ts` - server-side helpers для admin calendar/new
   booking/analytics страниц и lazy auto-sweep.
+- `email.ts` и `email-templates.ts` - dependency-free Resend REST email flow
+  для booking уведомлений; отсутствие `RESEND_API_KEY` не должно ломать
+  сохранение брони.
 - `restaurant-menu*` - default menu data, public/admin menu queries и shared
   menu types.
 - `admin-*` - admin auth, dashboard data, feedback, i18n и media upload logic.
@@ -143,6 +146,19 @@
   `checkedOutAt`, `autoCompletedAt`.
 - `BookingStatus`: `PENDING`, `CONFIRMED`, `CANCELLED`, `CHECKED_IN`,
   `CHECKED_OUT`, `NO_SHOW`.
+- Booking time rules use Berlin time (`Europe/Berlin`): public check-in is from
+  `15:00`, check-out is until `12:00`, and same-day online booking is allowed
+  only until `13:00` Berlin time (2 hours before check-in). Keep these values in
+  `src/lib/booking-shared.ts` and enforce public booking validity through
+  `src/lib/booking-dates.ts`/`booking-engine.ts`.
+- `Guest` хранит адресные поля `street`, `postalCode`, `city`, `country` для
+  счета и booking contract. Публичный checkout требует эти поля при создании
+  брони; для иностранных гостей обязательный Meldeschein/паспорт/подпись все
+  равно остается офлайн-процессом при заезде.
+- Booking emails отправляются через `src/lib/email.ts` и
+  `src/lib/email-templates.ts`: guest received, hotel notification, guest
+  confirmed, guest cancelled. Email delivery fail-safe: ошибки Resend или
+  отсутствие `RESEND_API_KEY` не должны откатывать уже сохраненную бронь.
 - Admin lifecycle переходы держать в `BOOKING_STATUS_TRANSITIONS` внутри
   `src/lib/booking-lifecycle.ts`; UI не должен предлагать переходы, которые
   сервер запрещает.
@@ -196,6 +212,12 @@
 - `ADMIN_SESSION_SECRET`
 - `CRON_SECRET` - опционально для внешнего планировщика auto-sweep
   `/api/admin/cron`; без него cron route отключен.
+- `RESEND_API_KEY` - опционально для отправки booking email через Resend REST;
+  если отсутствует, письма пропускаются без ошибки для брони.
+- `RESEND_FROM` - отправитель booking email; домен должен быть
+  подтвержден в Resend.
+- `BOOKING_NOTIFY_EMAIL` - опциональный адрес отеля для уведомлений о новых
+  бронированиях; fallback берется из `siteConfig.email`.
 - `FFMPEG_PATH` - опционально, если bundled ffmpeg не подходит.
 
 Записывать только имена переменных и назначение. Значения не сохранять в этом
@@ -246,6 +268,8 @@
 
 | Дата | Изменение | Контекст |
 | --- | --- | --- |
+| 2026-06-02 | Добавлены правила времени для публичного бронирования. | В `src/lib/booking-shared.ts` зафиксированы `HOTEL_CHECK_IN_TIME=15:00`, `HOTEL_CHECK_OUT_TIME=12:00`, `HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME=13:00`, `HOTEL_BOOKING_MIN_LEAD_HOURS=2`. `src/lib/booking-dates.ts` теперь считает минимальную дату заезда по `Europe/Berlin`: сегодня доступно только до 13:00 Berlin, после этого earliest check-in становится завтра. `booking-engine.ts` серверно запрещает публичные брони на уже недоступную дату, `/hotel/buchen` и `/hotel/buchen/checkout` нормализуют query dates и показывают время заезда/выезда, `BookingWidget` и `BookingCheckoutForm` выводят клиенту правила времени. `processExpiredBookings` освобождает checkout-date только после 12:00 Berlin, а не в полночь. Проверено через `npm run lint`, `npm run build` и `npx tsx` smoke для 12:59/13:01 Berlin и 11:59/12:01 Berlin. |
+| 2026-06-01 | Установлен Stage 2 пакет booking email, адреса гостя и улучшенной room card. | Миграция `20260602100000_guest_address` добавляет в `Guest` поля `street`, `postalCode`, `city`, `country`. Публичный checkout теперь собирает адрес, `booking-engine.ts` сохраняет адрес и возвращает расширенный booking result, `booking-actions.ts` отправляет guest/hotel email после сохранения. Admin booking actions отправляют guest email при подтверждении и отмене. Добавлены `src/lib/email.ts`, `src/lib/email-templates.ts`; Resend работает через REST без новых npm-пакетов и fail-safe при отсутствии `RESEND_API_KEY`. `RoomCard` использует `room.gallery` из `Room.imageUrls` с миниатюрами и low-availability badge. Выполнены `prisma format`, `npx prisma migrate dev`, `npm run db:generate`, `npx prisma migrate status`, `npm run lint`, `npm run build`; новых npm-пакетов не потребовалось. Для production задать `RESEND_API_KEY`, `RESEND_FROM`, опционально `BOOKING_NOTIFY_EMAIL`, затем применить миграции через deploy-flow. |
 | 2026-06-01 | Установлен пакет профессиональной админки бронирований. | Добавлены `src/lib/booking-lifecycle.ts`, `src/lib/admin-booking-views.ts`, страницы `/admin/bookings/calendar`, `/admin/bookings/new`, `/admin/analytics`, cron route `/api/admin/cron`, компоненты `AdminBookingCalendar`, `AdminBookingCreateForm`, `AdminAnalyticsPanel`. Миграция `20260601150000_booking_lifecycle_admin` добавляет `BookingSource`, `source`, `adminNotes`, `cancellationReason`, lifecycle timestamps и индексы `Booking_status_checkOut_idx`, `Booking_source_createdAt_idx`. `AdminShell` получил навигацию календаря и статистики, admin bookings получили ручное создание, lifecycle-переходы, отмену с причиной и внутренние заметки. Выполнены `prisma format`, `npx prisma migrate dev`, `npm run db:generate`, `npx prisma migrate status`, `npm run lint`, `npm run build`; новых npm-пакетов не потребовалось. Для production добавить `CRON_SECRET` и настроить внешний cron на `/api/admin/cron` раз в 10-15 минут. |
 | 2026-06-01 | Добавлена тарифная модель комнат и питания для booking flow. | Миграция `20260601113000_room_booking_rate_plans` добавляет `BookingMealPlan`, цены комнаты для 1-4 гостей, стоимость завтрака/полупансиона за гостя, тариф по умолчанию, лимит/цену доп. кроватей и snapshot-поля в `Booking`. `booking-engine.ts` считает итог как проживание + питание + доп. кровати + доплаты, а checkout предлагает завтрак по умолчанию с выбором `ROOM_ONLY`/`BREAKFAST`/`HALF_BOARD`. `/admin/rooms` получил редактирование этих тарифов. После schema changes выполнены `prisma format`, `npm run db:generate`, `npm run lint`, `npm run build`. Для работающей БД нужно применить миграции. |
 | 2026-06-01 | Обновлен общий визуальный стиль admin-панели. | `AdminShell`, `AdminUi`, `AdminLocaleSwitcher` и `/admin/rooms` приведены к более компактному, продуктово-операционному стилю: меньшие радиусы, плотнее метрики, более строгие панели, аккуратные кнопки и карточки комнат. На mobile admin-навигация в `AdminShell` реализована как hamburger/details-меню, не горизонтальная полоса. Desktop sidebar должен быть скроллируемым через `max-height`/`overflow-y-auto`, а не обрезаться `overflow-hidden`. Для React server-action forms не задавать `method`/`encType`, иначе React пишет warning. Проверено через `npm run lint` и `npm run build`; `/admin/login` отвечает `200` на локальном dev server. |

@@ -4,7 +4,12 @@ import { useMemo, useState } from "react";
 import { addDays, differenceInCalendarDays, format, parseISO } from "date-fns";
 import { de, enUS, ru } from "date-fns/locale";
 import { CalendarDays, Search, Users } from "lucide-react";
-import type { BookingLocale } from "@/lib/booking-shared";
+import {
+  HOTEL_CHECK_IN_TIME,
+  HOTEL_CHECK_OUT_TIME,
+  HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME,
+  type BookingLocale,
+} from "@/lib/booking-shared";
 
 interface BookingWidgetProps {
   action: string;
@@ -14,6 +19,7 @@ interface BookingWidgetProps {
   initialGuests?: number;
   languageQueryValue?: BookingLocale;
   locale?: BookingLocale;
+  minCheckIn?: string;
 }
 
 const dateLocales = {
@@ -33,6 +39,9 @@ const copy = {
     guestsThree: "3 Gäste",
     guestsFour: "4 Gäste",
     submit: "Verfügbarkeit prüfen",
+    checkInTime: `ab ${HOTEL_CHECK_IN_TIME} Uhr`,
+    checkOutTime: `bis ${HOTEL_CHECK_OUT_TIME} Uhr`,
+    sameDayRule: `Heute bis ${HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME} Uhr Berliner Zeit`,
     summary: (nights: number) => `${nights} Nacht${nights === 1 ? "" : "e"} · Frühstück vorausgewählt`,
   },
   en: {
@@ -45,6 +54,9 @@ const copy = {
     guestsThree: "3 guests",
     guestsFour: "4 guests",
     submit: "Check availability",
+    checkInTime: `from ${HOTEL_CHECK_IN_TIME}`,
+    checkOutTime: `until ${HOTEL_CHECK_OUT_TIME}`,
+    sameDayRule: `Today until ${HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME} Berlin time`,
     summary: (nights: number) => `${nights} night${nights === 1 ? "" : "s"} · Breakfast preselected`,
   },
   ru: {
@@ -57,6 +69,9 @@ const copy = {
     guestsThree: "3 гостя",
     guestsFour: "4 гостя",
     submit: "Проверить наличие",
+    checkInTime: `с ${HOTEL_CHECK_IN_TIME}`,
+    checkOutTime: `до ${HOTEL_CHECK_OUT_TIME}`,
+    sameDayRule: `Сегодня до ${HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME} по Берлину`,
     summary: (nights: number) => `${nights} ноч. · завтрак выбран по умолчанию`,
   },
 } as const;
@@ -73,15 +88,15 @@ export default function BookingWidget({
   initialGuests = 2,
   languageQueryValue,
   locale = "de",
+  minCheckIn,
 }: BookingWidgetProps) {
   const normalizedLocale = toLocale(locale);
   const t = copy[normalizedLocale];
-  const today = new Date();
-  const minCheckIn = format(addDays(today, 1), "yyyy-MM-dd");
-  const minCheckOut = format(addDays(today, 2), "yyyy-MM-dd");
+  const fallbackCheckIn = minCheckIn ?? format(new Date(), "yyyy-MM-dd");
+  const fallbackCheckOut = format(addDays(parseISO(fallbackCheckIn), 1), "yyyy-MM-dd");
 
-  const [checkIn, setCheckIn] = useState(initialCheckIn ?? minCheckIn);
-  const [checkOut, setCheckOut] = useState(initialCheckOut ?? minCheckOut);
+  const [checkIn, setCheckIn] = useState(initialCheckIn ?? fallbackCheckIn);
+  const [checkOut, setCheckOut] = useState(initialCheckOut ?? fallbackCheckOut);
   const [guests, setGuests] = useState(initialGuests);
 
   const nights = useMemo(() => {
@@ -133,10 +148,13 @@ export default function BookingWidget({
             <CalendarDays className="h-4 w-4 stroke-[1.8]" />
             {t.checkIn}
           </span>
+          <span className="mt-1 block text-[0.72rem] font-light text-[#7b7368]">
+            {t.checkInTime}
+          </span>
           <input
             name="checkIn"
             type="date"
-            min={minCheckIn}
+            min={fallbackCheckIn}
             value={checkIn}
             onChange={(event) => {
               const nextCheckIn = event.target.value;
@@ -154,6 +172,9 @@ export default function BookingWidget({
           <span className="flex items-center gap-2 text-[0.64rem] font-medium uppercase tracking-[0.16em] text-[#9e927f]">
             <CalendarDays className="h-4 w-4 stroke-[1.8]" />
             {t.checkOut}
+          </span>
+          <span className="mt-1 block text-[0.72rem] font-light text-[#7b7368]">
+            {t.checkOutTime}
           </span>
           <input
             name="checkOut"
@@ -190,6 +211,9 @@ export default function BookingWidget({
           {t.submit}
         </button>
       </div>
+      <p className="mt-3 text-xs font-light leading-relaxed text-[#7b7368]">
+        {t.sameDayRule}
+      </p>
     </form>
   );
 }

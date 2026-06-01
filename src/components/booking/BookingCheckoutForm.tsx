@@ -9,7 +9,9 @@ import {
   CalendarDays,
   CheckCircle2,
   Dog,
+  Home,
   Mail,
+  MapPin,
   MessageSquare,
   Phone,
   ShieldCheck,
@@ -18,6 +20,9 @@ import {
 } from "lucide-react";
 import {
   DOG_FEE_PER_NIGHT,
+  HOTEL_CHECK_IN_TIME,
+  HOTEL_CHECK_OUT_TIME,
+  HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME,
   type AvailableRoom,
   type BookingLocale,
 } from "@/lib/booking-shared";
@@ -49,6 +54,12 @@ const copy = {
     guestTitle: "Ihre Kontaktdaten",
     secureNote:
       "Nach dem Absenden erscheint die Reservierung in der Verwaltung als neue Buchung.",
+    stayTitle: "Aufenthalt",
+    arrival: "Check-in",
+    departure: "Check-out",
+    arrivalTime: `ab ${HOTEL_CHECK_IN_TIME} Uhr`,
+    departureTime: `bis ${HOTEL_CHECK_OUT_TIME} Uhr`,
+    sameDayRule: `Heute bis ${HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME} Uhr Berliner Zeit`,
     dogLabel: `Hund willkommen (+ ${DOG_FEE_PER_NIGHT.toFixed(0)} € / Nacht)`,
     bikeLabel: "Kostenlosen Fahrradverleih reservieren",
     mealPlanTitle: "Verpflegung",
@@ -59,6 +70,13 @@ const copy = {
     lastName: "Nachname",
     email: "E-Mail",
     phone: "Telefon",
+    addressTitle: "Rechnungs- und Wohnanschrift",
+    addressHint:
+      "Für Rechnung und Buchungsvertrag benötigen wir Ihre Wohnanschrift. Ausländische Gäste füllen den gesetzlichen Meldeschein bei der Anreise vor Ort aus.",
+    street: "Straße und Hausnummer",
+    postalCode: "PLZ",
+    city: "Ort",
+    country: "Land",
     notes: "Anmerkungen",
     notesPlaceholder: "Besondere Wünsche, späte Anreise oder Hinweise für unser Team",
     summaryTitle: "Preisübersicht",
@@ -91,6 +109,12 @@ const copy = {
     guestTitle: "Your contact details",
     secureNote:
       "After submitting, the reservation appears in the admin area as a new booking.",
+    stayTitle: "Stay",
+    arrival: "Check-in",
+    departure: "Check-out",
+    arrivalTime: `from ${HOTEL_CHECK_IN_TIME}`,
+    departureTime: `until ${HOTEL_CHECK_OUT_TIME}`,
+    sameDayRule: `Today until ${HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME} Berlin time`,
     dogLabel: `Dog welcome (+ €${DOG_FEE_PER_NIGHT.toFixed(0)} / night)`,
     bikeLabel: "Reserve a complimentary bicycle",
     mealPlanTitle: "Meal plan",
@@ -101,6 +125,13 @@ const copy = {
     lastName: "Last name",
     email: "Email",
     phone: "Phone",
+    addressTitle: "Billing and home address",
+    addressHint:
+      "We need your home address for the invoice and booking contract. Foreign guests complete the statutory registration form on site at check-in.",
+    street: "Street and house number",
+    postalCode: "Postal code",
+    city: "City",
+    country: "Country",
     notes: "Notes",
     notesPlaceholder:
       "Special requests, late arrival or any details for our team",
@@ -134,6 +165,12 @@ const copy = {
     guestTitle: "Ваши контактные данные",
     secureNote:
       "После отправки бронь сразу появится в административной панели как новая заявка.",
+    stayTitle: "Проживание",
+    arrival: "Заезд",
+    departure: "Выезд",
+    arrivalTime: `с ${HOTEL_CHECK_IN_TIME}`,
+    departureTime: `до ${HOTEL_CHECK_OUT_TIME}`,
+    sameDayRule: `Сегодня до ${HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME} по Берлину`,
     dogLabel: `Собака (+ ${DOG_FEE_PER_NIGHT.toFixed(0)} € / ночь)`,
     bikeLabel: "Забронировать бесплатный велосипед",
     mealPlanTitle: "Питание",
@@ -144,6 +181,13 @@ const copy = {
     lastName: "Фамилия",
     email: "E-mail",
     phone: "Телефон",
+    addressTitle: "Адрес для счёта и проживания",
+    addressHint:
+      "Для счёта и договора бронирования нужен ваш адрес проживания. Иностранные гости заполняют обязательный регистрационный лист на месте при заезде.",
+    street: "Улица и номер дома",
+    postalCode: "Индекс",
+    city: "Город",
+    country: "Страна",
     notes: "Комментарий",
     notesPlaceholder:
       "Особые пожелания, поздний заезд или важные детали для нашей команды",
@@ -324,6 +368,39 @@ export default function BookingCheckoutForm({
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="dogCount" value={dogSelected ? 1 : 0} />
 
+      <section className="mt-6 rounded-[1.35rem] border border-[#eadfcf] bg-[#fcfaf6] px-4 py-4">
+        <div className="text-[0.66rem] font-medium uppercase tracking-[0.18em] text-[#9c7b4b]">
+          {t.stayTitle}
+        </div>
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="rounded-[1.15rem] border border-[#eadfcf] bg-white px-4 py-3">
+            <div className="text-[0.64rem] font-medium uppercase tracking-[0.16em] text-[#9e927f]">
+              {t.arrival}
+            </div>
+            <div className="mt-2 text-sm font-medium text-[#201b17]">
+              {checkIn}
+            </div>
+            <div className="mt-1 text-xs font-light text-[#7b7368]">
+              {t.arrivalTime}
+            </div>
+          </div>
+          <div className="rounded-[1.15rem] border border-[#eadfcf] bg-white px-4 py-3">
+            <div className="text-[0.64rem] font-medium uppercase tracking-[0.16em] text-[#9e927f]">
+              {t.departure}
+            </div>
+            <div className="mt-2 text-sm font-medium text-[#201b17]">
+              {checkOut}
+            </div>
+            <div className="mt-1 text-xs font-light text-[#7b7368]">
+              {t.departureTime}
+            </div>
+          </div>
+        </div>
+        <p className="mt-3 text-xs font-light leading-relaxed text-[#7b7368]">
+          {t.sameDayRule}
+        </p>
+      </section>
+
       <section className="mt-6">
         <div className="text-[0.66rem] font-medium uppercase tracking-[0.18em] text-[#9c7b4b]">
           {t.mealPlanTitle}
@@ -477,6 +554,68 @@ export default function BookingCheckoutForm({
             <input
               name="phone"
               autoComplete="tel"
+              className="mt-3 w-full bg-transparent text-sm text-[#201b17] outline-none"
+            />
+          </label>
+        </div>
+
+        <div className="mt-6 text-[0.66rem] font-medium uppercase tracking-[0.18em] text-[#9c7b4b]">
+          {t.addressTitle}
+        </div>
+        <p className="mt-2 max-w-[44rem] text-xs font-light leading-relaxed text-[#7b7368]">
+          {t.addressHint}
+        </p>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+          <label className="rounded-[1.25rem] border border-[#eadfcf] bg-[#fcfaf6] px-4 py-3 md:col-span-2">
+            <span className="flex items-center gap-2 text-[0.64rem] font-medium uppercase tracking-[0.16em] text-[#9e927f]">
+              <Home className="h-4 w-4 stroke-[1.8]" />
+              {t.street}
+            </span>
+            <input
+              name="street"
+              required
+              autoComplete="street-address"
+              className="mt-3 w-full bg-transparent text-sm text-[#201b17] outline-none"
+            />
+          </label>
+
+          <label className="rounded-[1.25rem] border border-[#eadfcf] bg-[#fcfaf6] px-4 py-3">
+            <span className="flex items-center gap-2 text-[0.64rem] font-medium uppercase tracking-[0.16em] text-[#9e927f]">
+              <MapPin className="h-4 w-4 stroke-[1.8]" />
+              {t.postalCode}
+            </span>
+            <input
+              name="postalCode"
+              required
+              autoComplete="postal-code"
+              className="mt-3 w-full bg-transparent text-sm text-[#201b17] outline-none"
+            />
+          </label>
+
+          <label className="rounded-[1.25rem] border border-[#eadfcf] bg-[#fcfaf6] px-4 py-3">
+            <span className="flex items-center gap-2 text-[0.64rem] font-medium uppercase tracking-[0.16em] text-[#9e927f]">
+              <MapPin className="h-4 w-4 stroke-[1.8]" />
+              {t.city}
+            </span>
+            <input
+              name="city"
+              required
+              autoComplete="address-level2"
+              className="mt-3 w-full bg-transparent text-sm text-[#201b17] outline-none"
+            />
+          </label>
+
+          <label className="rounded-[1.25rem] border border-[#eadfcf] bg-[#fcfaf6] px-4 py-3 md:col-span-2">
+            <span className="flex items-center gap-2 text-[0.64rem] font-medium uppercase tracking-[0.16em] text-[#9e927f]">
+              <MapPin className="h-4 w-4 stroke-[1.8]" />
+              {t.country}
+            </span>
+            <input
+              name="country"
+              required
+              defaultValue={locale === "de" ? "Deutschland" : ""}
+              autoComplete="country-name"
               className="mt-3 w-full bg-transparent text-sm text-[#201b17] outline-none"
             />
           </label>

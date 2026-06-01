@@ -15,7 +15,10 @@ import {
   RoomType,
   type Room,
 } from "@prisma/client";
-import { parseHotelDateInput } from "@/lib/booking-dates";
+import {
+  getLatestReleasableCheckOutDate,
+  parseHotelDateInput,
+} from "@/lib/booking-dates";
 import {
   ACTIVE_BOOKING_STATUSES,
   ensureDefaultRooms,
@@ -102,13 +105,15 @@ export interface ExpirySweepResult {
 export async function processExpiredBookings(
   reference: Date = new Date()
 ): Promise<ExpirySweepResult> {
-  const today = startOfDay(reference);
+  const releasableCheckOut = parseHotelDateInput(
+    getLatestReleasableCheckOutDate(reference)
+  );
 
   const [checkedOut, noShow] = await prisma.$transaction([
     prisma.booking.updateMany({
       where: {
         status: BookingStatus.CHECKED_IN,
-        checkOut: { lte: today },
+        checkOut: { lte: releasableCheckOut },
       },
       data: {
         status: BookingStatus.CHECKED_OUT,
@@ -119,7 +124,7 @@ export async function processExpiredBookings(
     prisma.booking.updateMany({
       where: {
         status: { in: [BookingStatus.PENDING, BookingStatus.CONFIRMED] },
-        checkOut: { lte: today },
+        checkOut: { lte: releasableCheckOut },
       },
       data: {
         status: BookingStatus.NO_SHOW,

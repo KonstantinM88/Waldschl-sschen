@@ -1,4 +1,3 @@
-import { addDays, format } from "date-fns";
 import { CalendarDays, Coffee, Sparkles, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,7 +12,13 @@ import {
   toBookingDisplayLocale,
   toBookingRouteLocale,
 } from "@/lib/booking-navigation";
-import type { BookingLocale } from "@/lib/booking-shared";
+import { resolveBookableDateRange } from "@/lib/booking-dates";
+import {
+  HOTEL_CHECK_IN_TIME,
+  HOTEL_CHECK_OUT_TIME,
+  HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME,
+  type BookingLocale,
+} from "@/lib/booking-shared";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +44,9 @@ const pageCopy = {
     summaryTitle: "Ihr Aufenthalt im Überblick",
     arrival: "Check-in",
     departure: "Check-out",
+    arrivalTime: `ab ${HOTEL_CHECK_IN_TIME} Uhr`,
+    departureTime: `bis ${HOTEL_CHECK_OUT_TIME} Uhr`,
+    sameDayRule: `Anreise heute online bis ${HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME} Uhr Berliner Zeit`,
     guests: "Gäste",
     includedTitle: "Im Checkout wählbar",
     includedBreakfast: "Ohne Frühstück, mit Frühstück oder Frühstück + Abendessen",
@@ -60,6 +68,9 @@ const pageCopy = {
     summaryTitle: "Your stay at a glance",
     arrival: "Check-in",
     departure: "Check-out",
+    arrivalTime: `from ${HOTEL_CHECK_IN_TIME}`,
+    departureTime: `until ${HOTEL_CHECK_OUT_TIME}`,
+    sameDayRule: `Same-day arrival online until ${HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME} Berlin time`,
     guests: "Guests",
     includedTitle: "Selectable at checkout",
     includedBreakfast: "Room only, breakfast or breakfast + dinner",
@@ -81,6 +92,9 @@ const pageCopy = {
     summaryTitle: "Ваше проживание",
     arrival: "Заезд",
     departure: "Выезд",
+    arrivalTime: `с ${HOTEL_CHECK_IN_TIME}`,
+    departureTime: `до ${HOTEL_CHECK_OUT_TIME}`,
+    sameDayRule: `Заезд сегодня онлайн до ${HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME} по Берлину`,
     guests: "Гости",
     includedTitle: "Выбор в checkout",
     includedBreakfast: "Без завтрака, с завтраком или завтрак + ужин",
@@ -113,11 +127,9 @@ export default async function HotelBookingCheckoutPage({
   const { locale } = await params;
   const { room, checkIn, checkOut, guests, lang } = await searchParams;
   const routeLocale = toBookingRouteLocale(locale);
-  const today = new Date();
-  const fallbackCheckIn = format(addDays(today, 1), "yyyy-MM-dd");
-  const fallbackCheckOut = format(addDays(today, 2), "yyyy-MM-dd");
-  const selectedCheckIn = checkIn || fallbackCheckIn;
-  const selectedCheckOut = checkOut || fallbackCheckOut;
+  const bookingRange = resolveBookableDateRange({ checkIn, checkOut });
+  const selectedCheckIn = bookingRange.checkIn;
+  const selectedCheckOut = bookingRange.checkOut;
   const parsedGuests = Number.parseInt(guests ?? "", 10);
   const selectedGuests =
     Number.isInteger(parsedGuests) && parsedGuests >= 1 && parsedGuests <= 4
@@ -174,6 +186,9 @@ export default async function HotelBookingCheckoutPage({
             </h1>
             <p className="mt-4 max-w-[46rem] text-[0.98rem] font-light leading-relaxed text-[#5d564c] sm:text-[1.05rem]">
               {t.description}
+            </p>
+            <p className="mt-3 max-w-[46rem] rounded-[1.1rem] border border-[#eadfcf] bg-white/70 px-4 py-3 text-xs font-light leading-relaxed text-[#6c6459]">
+              {t.arrivalTime} · {t.departureTime} · {t.sameDayRule}
             </p>
           </div>
         </section>
@@ -249,6 +264,9 @@ export default async function HotelBookingCheckoutPage({
                       <div className="mt-2 text-sm font-light text-white/86">
                         {selectedCheckIn}
                       </div>
+                      <div className="mt-1 text-xs font-light text-white/56">
+                        {t.arrivalTime}
+                      </div>
                     </div>
                     <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.04] px-4 py-4">
                       <div className="text-[0.6rem] font-medium uppercase tracking-[0.16em] text-[#f1dfba]">
@@ -256,6 +274,9 @@ export default async function HotelBookingCheckoutPage({
                       </div>
                       <div className="mt-2 text-sm font-light text-white/86">
                         {selectedCheckOut}
+                      </div>
+                      <div className="mt-1 text-xs font-light text-white/56">
+                        {t.departureTime}
                       </div>
                     </div>
                     <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.04] px-4 py-4">
