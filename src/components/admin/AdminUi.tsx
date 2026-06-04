@@ -207,7 +207,7 @@ export function AdminField({
   label: string;
 }) {
   return (
-    <label className="min-w-0 rounded-xl border border-[#dfd2c0] bg-white px-4 py-3">
+    <label className="block w-full min-w-0 rounded-xl border border-[#dfd2c0] bg-white px-4 py-3">
       <span className="text-[0.56rem] font-semibold uppercase tracking-[0.16em] text-[#9e927f]">
         {label}
       </span>

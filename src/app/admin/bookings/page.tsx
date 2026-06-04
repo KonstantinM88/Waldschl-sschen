@@ -246,6 +246,9 @@ export default async function AdminBookingsPage({
 
                           <div className="mt-2 text-sm font-light text-[#5d564c]">
                             {getRoomTypeLabel(booking.room.type, locale)}
+                            {booking.assignedRoomNumber
+                              ? ` · ${t.dashboard.pages.bookings.fields.assignedRoomNumber}: ${booking.assignedRoomNumber}`
+                              : ""}
                           </div>
 
                           <div className="mt-4 grid grid-cols-1 gap-3 text-sm text-[#4f483f] md:grid-cols-2 xl:grid-cols-4">

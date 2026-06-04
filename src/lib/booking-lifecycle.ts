@@ -8,6 +8,8 @@ import {
 } from "date-fns";
 import { z } from "zod";
 import {
+  BookingLifecycleActorType,
+  BookingLifecycleEventType,
   BookingMealPlan,
   BookingSource,
   BookingStatus,
@@ -19,11 +21,15 @@ import {
   getLatestReleasableCheckOutDate,
   parseHotelDateInput,
 } from "@/lib/booking-dates";
+import { buildBookingLifecycleEventData } from "@/lib/booking-lifecycle-events";
 import {
   ACTIVE_BOOKING_STATUSES,
   ensureDefaultRooms,
 } from "@/lib/booking-engine";
-import { DOG_FEE_PER_NIGHT } from "@/lib/booking-shared";
+import {
+  DOG_FEE_PER_NIGHT,
+  HOTEL_ROOM_NUMBER_PATTERN,
+} from "@/lib/booking-shared";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -78,8 +84,11 @@ function lifecycleTimestampPatch(
  * Returns the lifecycle timestamp field(s) that should be written when a booking
  * moves into `status`. Exposed so the status-update action can merge it.
  */
-export function getStatusTimestampPatch(status: BookingStatus) {
-  return lifecycleTimestampPatch(status, new Date());
+export function getStatusTimestampPatch(
+  status: BookingStatus,
+  reference: Date = new Date()
+) {
+  return lifecycleTimestampPatch(status, reference);
 }
 
 // ---------------------------------------------------------------------------
@@ -109,35 +118,91 @@ export async function processExpiredBookings(
     getLatestReleasableCheckOutDate(reference)
   );
 
-  const [checkedOut, noShow] = await prisma.$transaction([
-    prisma.booking.updateMany({
+  return prisma.$transaction(async (tx) => {
+    const checkedOutCandidates = await tx.booking.findMany({
       where: {
         status: BookingStatus.CHECKED_IN,
         checkOut: { lte: releasableCheckOut },
       },
-      data: {
-        status: BookingStatus.CHECKED_OUT,
-        checkedOutAt: reference,
-        autoCompletedAt: reference,
+      select: {
+        id: true,
+        status: true,
       },
-    }),
-    prisma.booking.updateMany({
+    });
+    const noShowCandidates = await tx.booking.findMany({
       where: {
         status: { in: [BookingStatus.PENDING, BookingStatus.CONFIRMED] },
         checkOut: { lte: releasableCheckOut },
       },
-      data: {
-        status: BookingStatus.NO_SHOW,
-        autoCompletedAt: reference,
+      select: {
+        id: true,
+        status: true,
       },
-    }),
-  ]);
+    });
+    let checkedOut = 0;
+    let noShow = 0;
 
-  return {
-    checkedOut: checkedOut.count,
-    noShow: noShow.count,
-    processedAt: reference.toISOString(),
-  };
+    for (const booking of checkedOutCandidates) {
+      const updated = await tx.booking.updateMany({
+        where: {
+          id: booking.id,
+          status: booking.status,
+        },
+        data: {
+          status: BookingStatus.CHECKED_OUT,
+          checkedOutAt: reference,
+          autoCompletedAt: reference,
+        },
+      });
+
+      if (updated.count) {
+        checkedOut += updated.count;
+        await tx.bookingLifecycleEvent.create({
+          data: buildBookingLifecycleEventData({
+            bookingId: booking.id,
+            actorType: BookingLifecycleActorType.SYSTEM,
+            automatic: true,
+            fromStatus: booking.status,
+            toStatus: BookingStatus.CHECKED_OUT,
+            createdAt: reference,
+          }),
+        });
+      }
+    }
+
+    for (const booking of noShowCandidates) {
+      const updated = await tx.booking.updateMany({
+        where: {
+          id: booking.id,
+          status: booking.status,
+        },
+        data: {
+          status: BookingStatus.NO_SHOW,
+          autoCompletedAt: reference,
+        },
+      });
+
+      if (updated.count) {
+        noShow += updated.count;
+        await tx.bookingLifecycleEvent.create({
+          data: buildBookingLifecycleEventData({
+            bookingId: booking.id,
+            actorType: BookingLifecycleActorType.SYSTEM,
+            automatic: true,
+            fromStatus: booking.status,
+            toStatus: BookingStatus.NO_SHOW,
+            createdAt: reference,
+          }),
+        });
+      }
+    }
+
+    return {
+      checkedOut,
+      noShow,
+      processedAt: reference.toISOString(),
+    };
+  });
 }
 
 let lastLazySweep = 0;
@@ -176,8 +241,18 @@ const ADMIN_SOURCES = [
   BookingSource.WALK_IN,
 ] as const;
 
+const optionalAssignedRoomNumberSchema = z
+  .string()
+  .trim()
+  .optional()
+  .transform((value) => value || undefined)
+  .refine((value) => !value || HOTEL_ROOM_NUMBER_PATTERN.test(value), {
+    message: "Assigned room number must contain exactly three digits.",
+  });
+
 const createAdminBookingSchema = z.object({
   roomId: z.string().min(1),
+  assignedRoomNumber: optionalAssignedRoomNumberSchema,
   checkIn: z.string().min(1),
   checkOut: z.string().min(1),
   guests: z.coerce.number().int().min(1).max(4),
@@ -248,13 +323,40 @@ function canHostGuestCount(room: Room, guests: number) {
   return getExtraBedCount(room, guests) <= room.extraBedMax;
 }
 
+function hasAvailableRoomInventory(
+  inventory: number,
+  bookings: Array<{ checkIn: Date; checkOut: Date }>,
+  checkIn: Date,
+  checkOut: Date
+) {
+  for (
+    let nightStart = checkIn;
+    nightStart < checkOut;
+    nightStart = addDays(nightStart, 1)
+  ) {
+    const nightEnd = addDays(nightStart, 1);
+    const occupied = bookings.filter(
+      (booking) => booking.checkIn < nightEnd && booking.checkOut > nightStart
+    ).length;
+
+    if (occupied >= inventory) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 /**
  * Creates a booking on behalf of a guest (phone / walk-in / email request).
  * Unlike the public flow this lets the admin pick the initial status and the
  * source channel, but it shares the exact same pricing + inventory logic so a
  * manually-entered stay never double-books a room or mis-prices.
  */
-export async function createAdminBooking(input: CreateAdminBookingInput) {
+export async function createAdminBooking(
+  input: CreateAdminBookingInput,
+  changedBy = "admin"
+) {
   const validated = createAdminBookingSchema.parse(input);
   const checkIn = parseHotelDateInput(validated.checkIn);
   const checkOut = parseHotelDateInput(validated.checkOut);
@@ -283,17 +385,43 @@ export async function createAdminBooking(input: CreateAdminBookingInput) {
 
     // Inventory check only matters when the new booking will actually hold a room.
     if (statusHoldsInventory(validated.status)) {
-      const overlappingBookings = await transactionClient.booking.count({
+      const overlappingBookings = await transactionClient.booking.findMany({
         where: {
           roomId: room.id,
           status: { in: [...ACTIVE_BOOKING_STATUSES] },
           checkIn: { lt: checkOut },
           checkOut: { gt: checkIn },
         },
+        select: {
+          checkIn: true,
+          checkOut: true,
+        },
       });
 
-      if (overlappingBookings >= room.inventory) {
+      if (
+        !hasAvailableRoomInventory(
+          room.inventory,
+          overlappingBookings,
+          checkIn,
+          checkOut
+        )
+      ) {
         throw new Error("Room inventory is sold out for the selected dates.");
+      }
+
+      if (validated.assignedRoomNumber) {
+        const assignedRoomOverlap = await transactionClient.booking.count({
+          where: {
+            assignedRoomNumber: validated.assignedRoomNumber,
+            status: { in: [...ACTIVE_BOOKING_STATUSES] },
+            checkIn: { lt: checkOut },
+            checkOut: { gt: checkIn },
+          },
+        });
+
+        if (assignedRoomOverlap > 0) {
+          throw new Error("Assigned room is occupied for the selected dates.");
+        }
       }
     }
 
@@ -331,6 +459,7 @@ export async function createAdminBooking(input: CreateAdminBookingInput) {
       data: {
         guestId: guest.id,
         roomId: room.id,
+        assignedRoomNumber: validated.assignedRoomNumber || null,
         checkIn,
         checkOut,
         guests: validated.guests,
@@ -366,10 +495,261 @@ export async function createAdminBooking(input: CreateAdminBookingInput) {
       include: { guest: true, room: true },
     });
 
+    await transactionClient.bookingLifecycleEvent.create({
+      data: buildBookingLifecycleEventData({
+        bookingId: booking.id,
+        eventType: BookingLifecycleEventType.CREATED,
+        actorType: BookingLifecycleActorType.ADMIN,
+        actorName: changedBy,
+        toStatus: booking.status,
+        details: {
+          source: validated.source,
+        },
+      }),
+    });
+
     return {
       bookingId: booking.id,
       totalAmount: Number(totalAmount),
     };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Admin booking stay / services editing
+// ---------------------------------------------------------------------------
+
+const updateAdminBookingStayServicesSchema = z.object({
+  id: z.string().min(1),
+  checkIn: z.string().trim().min(1),
+  checkOut: z.string().trim().min(1),
+  mealPlan: z.nativeEnum(BookingMealPlan),
+  dogCount: z.coerce.number().int().min(0).max(4),
+  bicycleReserved: z.boolean().default(false),
+  restaurantReservationTime: z.string().trim().max(20).optional(),
+});
+
+export type UpdateAdminBookingStayServicesInput = z.input<
+  typeof updateAdminBookingStayServicesSchema
+>;
+
+export const BOOKING_STAY_SERVICE_AUDIT_FIELDS = [
+  "checkIn",
+  "checkOut",
+  "nights",
+  "mealPlan",
+  "mealPlanPricePerGuest",
+  "mealPlanTotal",
+  "dogCount",
+  "dogFeeTotal",
+  "bicycleReserved",
+  "restaurantReservationTime",
+  "baseTotal",
+  "extraBedTotal",
+  "totalAmount",
+] as const;
+
+export type BookingStayServiceAuditField =
+  (typeof BOOKING_STAY_SERVICE_AUDIT_FIELDS)[number];
+
+export function canEditBookingStayAndServices(status: BookingStatus) {
+  return statusHoldsInventory(status);
+}
+
+function normalizeBookingAuditValue(value: unknown) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  if (value instanceof Date) {
+    return isoDate(value);
+  }
+
+  if (typeof value === "boolean") {
+    return value ? "true" : "false";
+  }
+
+  return String(value);
+}
+
+/**
+ * Updates the operational part of a booking. Existing room and add-on snapshot
+ * rates stay stable for extra nights. When the meal plan itself changes, the
+ * newly selected plan takes the room's current configured price.
+ */
+export async function updateAdminBookingStayAndServices(
+  input: UpdateAdminBookingStayServicesInput,
+  changedBy: string
+) {
+  const validated = updateAdminBookingStayServicesSchema.parse(input);
+  const checkIn = parseHotelDateInput(validated.checkIn);
+  const checkOut = parseHotelDateInput(validated.checkOut);
+  const nights = differenceInCalendarDays(checkOut, checkIn);
+
+  if (
+    isoDate(checkIn) !== validated.checkIn ||
+    isoDate(checkOut) !== validated.checkOut ||
+    !Number.isFinite(nights) ||
+    nights < 1
+  ) {
+    throw new Error("Invalid booking date range.");
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const transactionClient = tx as unknown as typeof prisma;
+    const booking = await transactionClient.booking.findUnique({
+      where: { id: validated.id },
+      include: { room: true },
+    });
+
+    if (!booking) {
+      throw new Error("Booking not found.");
+    }
+
+    if (!canEditBookingStayAndServices(booking.status)) {
+      throw new Error("Booking cannot be edited in its current status.");
+    }
+
+    if (
+      booking.status === BookingStatus.CHECKED_IN &&
+      isoDate(booking.checkIn) !== validated.checkIn
+    ) {
+      throw new Error("Check-in date cannot be changed after check-in.");
+    }
+
+    const datesChanged =
+      isoDate(booking.checkIn) !== validated.checkIn ||
+      isoDate(booking.checkOut) !== validated.checkOut;
+
+    if (datesChanged) {
+      const overlappingBookings = await transactionClient.booking.findMany({
+        where: {
+          id: { not: booking.id },
+          roomId: booking.roomId,
+          status: { in: [...ACTIVE_BOOKING_STATUSES] },
+          checkIn: { lt: checkOut },
+          checkOut: { gt: checkIn },
+        },
+        select: {
+          checkIn: true,
+          checkOut: true,
+        },
+      });
+
+      if (
+        !hasAvailableRoomInventory(
+          booking.room.inventory,
+          overlappingBookings,
+          checkIn,
+          checkOut
+        )
+      ) {
+        throw new Error("Room inventory is sold out for the selected dates.");
+      }
+
+      if (booking.assignedRoomNumber) {
+        const assignedRoomOverlap = await transactionClient.booking.count({
+          where: {
+            id: { not: booking.id },
+            assignedRoomNumber: booking.assignedRoomNumber,
+            status: { in: [...ACTIVE_BOOKING_STATUSES] },
+            checkIn: { lt: checkOut },
+            checkOut: { gt: checkIn },
+          },
+        });
+
+        if (assignedRoomOverlap > 0) {
+          throw new Error("Assigned room is occupied for the selected dates.");
+        }
+      }
+    }
+
+    const baseTotal = toDecimal(booking.basePricePerNight).mul(nights);
+    const mealPlanPricePerGuest =
+      validated.mealPlan === booking.mealPlan
+        ? toDecimal(booking.mealPlanPricePerGuest)
+        : getMealPlanPricePerGuest(booking.room, validated.mealPlan);
+    const mealPlanTotal = mealPlanPricePerGuest
+      .mul(booking.guests)
+      .mul(nights);
+    const extraBedTotal = toDecimal(booking.extraBedPricePerNight)
+      .mul(booking.extraBeds)
+      .mul(nights);
+    const dogFeeTotal = toDecimal(booking.dogFeePerNight)
+      .mul(validated.dogCount)
+      .mul(nights);
+    const totalAmount = baseTotal
+      .add(mealPlanTotal)
+      .add(extraBedTotal)
+      .add(dogFeeTotal);
+
+    const previousValues = {
+      checkIn: booking.checkIn,
+      checkOut: booking.checkOut,
+      nights: booking.nights,
+      mealPlan: booking.mealPlan,
+      mealPlanPricePerGuest: booking.mealPlanPricePerGuest,
+      mealPlanTotal: booking.mealPlanTotal,
+      dogCount: booking.dogCount,
+      dogFeeTotal: booking.dogFeeTotal,
+      bicycleReserved: booking.bicycleReserved,
+      restaurantReservationTime: booking.restaurantReservationTime,
+      baseTotal: booking.baseTotal,
+      extraBedTotal: booking.extraBedTotal,
+      totalAmount: booking.totalAmount,
+    };
+    const nextValues = {
+      checkIn,
+      checkOut,
+      nights,
+      mealPlan: validated.mealPlan,
+      mealPlanPricePerGuest,
+      mealPlanTotal,
+      dogCount: validated.dogCount,
+      dogFeeTotal,
+      bicycleReserved: validated.bicycleReserved,
+      restaurantReservationTime:
+        validated.restaurantReservationTime?.trim() || null,
+      baseTotal,
+      extraBedTotal,
+      totalAmount,
+    };
+    const changes: Prisma.InputJsonObject[] = [];
+
+    for (const field of BOOKING_STAY_SERVICE_AUDIT_FIELDS) {
+      const previousValue = normalizeBookingAuditValue(previousValues[field]);
+      const nextValue = normalizeBookingAuditValue(nextValues[field]);
+
+      if (previousValue !== nextValue) {
+        changes.push({
+          field,
+          previousValue,
+          nextValue,
+        });
+      }
+    }
+
+    if (!changes.length) {
+      return "unchanged" as const;
+    }
+
+    await transactionClient.booking.update({
+      where: { id: booking.id },
+      data: {
+        ...nextValues,
+        breakfastIncluded: validated.mealPlan !== BookingMealPlan.ROOM_ONLY,
+      },
+    });
+
+    await transactionClient.bookingChangeLog.create({
+      data: {
+        bookingId: booking.id,
+        changedBy: changedBy.trim(),
+        changes,
+      },
+    });
+
+    return "updated" as const;
   });
 }
 

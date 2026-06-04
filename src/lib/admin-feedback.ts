@@ -8,8 +8,11 @@ export type AdminNoticeCode =
   | "delete-blocked"
   | "status-updated"
   | "bulk-updated"
+  | "receipt-sent"
+  | "receipt-email-failed"
   | "selection-required"
   | "invalid-transition"
+  | "booking-locked"
   | "invalid-input"
   | "sold-out"
   | "capacity"
@@ -118,6 +121,20 @@ export function getAdminFeedbackFromSearchParams(
         title: t.dashboard.feedback.bulkUpdated.title,
         tone: normalizedTone,
       };
+    case "receipt-sent":
+      return {
+        code: "receipt-sent",
+        description: t.dashboard.feedback.receiptSent.description,
+        title: t.dashboard.feedback.receiptSent.title,
+        tone: normalizedTone,
+      };
+    case "receipt-email-failed":
+      return {
+        code: "receipt-email-failed",
+        description: t.dashboard.feedback.receiptEmailFailed.description,
+        title: t.dashboard.feedback.receiptEmailFailed.title,
+        tone: "error",
+      };
     case "selection-required":
       return {
         code: "selection-required",
@@ -130,6 +147,13 @@ export function getAdminFeedbackFromSearchParams(
         code: "invalid-transition",
         description: t.dashboard.feedback.invalidTransition.description,
         title: t.dashboard.feedback.invalidTransition.title,
+        tone: "warning",
+      };
+    case "booking-locked":
+      return {
+        code: "booking-locked",
+        description: t.dashboard.feedback.bookingLocked.description,
+        title: t.dashboard.feedback.bookingLocked.title,
         tone: "warning",
       };
     case "invalid-input":

@@ -89,20 +89,27 @@ model RestaurantMenuItem {
 }
 
 model Guest {
-  id         String    @id @default(cuid())
-  firstName  String
-  lastName   String
-  email      String
-  phone      String?
-  notes      String?
-  street     String?
-  postalCode String?
-  city       String?
-  country    String?
-  locale     String    @default("de")
-  bookings   Booking[]
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id                     String           @id @default(cuid())
+  firstName              String
+  lastName               String
+  email                  String
+  phone                  String?
+  notes                  String?
+  street                 String?
+  postalCode             String?
+  city                   String?
+  country                String?
+  locale                 String           @default("de")
+  isForeignGuest         Boolean          @default(false)
+  dateOfBirth            DateTime?        @db.Date
+  nationality            String?
+  passportNumber         String?
+  passportIssuingCountry String?
+  passportExpiryDate     DateTime?        @db.Date
+  bookings               Booking[]
+  changeLogs             GuestChangeLog[]
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
 
   @@index([email])
 }
@@ -150,33 +157,37 @@ model Room {
 }
 
 model Booking {
-  id                        String          @id @default(cuid())
+  id                        String                  @id @default(cuid())
   guestId                   String
   roomId                    String
-  guest                     Guest           @relation(fields: [guestId], references: [id], onDelete: Cascade)
-  room                      Room            @relation(fields: [roomId], references: [id], onDelete: Restrict)
+  guest                     Guest                   @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  room                      Room                    @relation(fields: [roomId], references: [id], onDelete: Restrict)
+  guestChangeLogs           GuestChangeLog[]
+  bookingChangeLogs         BookingChangeLog[]
+  lifecycleEvents           BookingLifecycleEvent[]
+  assignedRoomNumber        String?
   checkIn                   DateTime
   checkOut                  DateTime
-  guests                    Int             @default(1)
+  guests                    Int                     @default(1)
   nights                    Int
-  basePricePerNight         Decimal         @db.Decimal(10, 2)
-  baseTotal                 Decimal         @db.Decimal(10, 2)
-  mealPlan                  BookingMealPlan @default(BREAKFAST)
-  mealPlanPricePerGuest     Decimal         @default(0) @db.Decimal(10, 2)
-  mealPlanTotal             Decimal         @default(0) @db.Decimal(10, 2)
-  extraBeds                 Int             @default(0)
-  extraBedPricePerNight     Decimal         @default(0) @db.Decimal(10, 2)
-  extraBedTotal             Decimal         @default(0) @db.Decimal(10, 2)
-  dogCount                  Int             @default(0)
-  dogFeePerNight            Decimal         @default(15) @db.Decimal(10, 2)
-  dogFeeTotal               Decimal         @default(0) @db.Decimal(10, 2)
-  bicycleReserved           Boolean         @default(false)
+  basePricePerNight         Decimal                 @db.Decimal(10, 2)
+  baseTotal                 Decimal                 @db.Decimal(10, 2)
+  mealPlan                  BookingMealPlan         @default(BREAKFAST)
+  mealPlanPricePerGuest     Decimal                 @default(0) @db.Decimal(10, 2)
+  mealPlanTotal             Decimal                 @default(0) @db.Decimal(10, 2)
+  extraBeds                 Int                     @default(0)
+  extraBedPricePerNight     Decimal                 @default(0) @db.Decimal(10, 2)
+  extraBedTotal             Decimal                 @default(0) @db.Decimal(10, 2)
+  dogCount                  Int                     @default(0)
+  dogFeePerNight            Decimal                 @default(15) @db.Decimal(10, 2)
+  dogFeeTotal               Decimal                 @default(0) @db.Decimal(10, 2)
+  bicycleReserved           Boolean                 @default(false)
   restaurantReservationTime String?
-  totalAmount               Decimal         @db.Decimal(10, 2)
-  breakfastIncluded         Boolean         @default(true)
+  totalAmount               Decimal                 @db.Decimal(10, 2)
+  breakfastIncluded         Boolean                 @default(true)
   notes                     String?
-  status                    BookingStatus   @default(PENDING)
-  source                    BookingSource   @default(WEB)
+  status                    BookingStatus           @default(PENDING)
+  source                    BookingSource           @default(WEB)
   adminNotes                String?
   cancellationReason        String?
   confirmedAt               DateTime?
@@ -184,15 +195,56 @@ model Booking {
   checkedInAt               DateTime?
   checkedOutAt              DateTime?
   autoCompletedAt           DateTime?
-  locale                    String          @default("de")
-  createdAt                 DateTime        @default(now())
-  updatedAt                 DateTime        @updatedAt
+  locale                    String                  @default("de")
+  createdAt                 DateTime                @default(now())
+  updatedAt                 DateTime                @updatedAt
 
   @@index([roomId, checkIn, checkOut])
   @@index([guestId, createdAt])
+  @@index([assignedRoomNumber, checkIn, checkOut])
   @@index([status, checkIn, checkOut])
   @@index([status, checkOut])
   @@index([source, createdAt])
+}
+
+model GuestChangeLog {
+  id        String   @id @default(cuid())
+  bookingId String
+  guestId   String
+  changedBy String
+  changes   Json
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  guest     Guest    @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([bookingId, createdAt])
+  @@index([guestId, createdAt])
+}
+
+model BookingChangeLog {
+  id        String   @id @default(cuid())
+  bookingId String
+  changedBy String
+  changes   Json
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([bookingId, createdAt])
+}
+
+model BookingLifecycleEvent {
+  id         String                    @id @default(cuid())
+  bookingId  String
+  eventType  BookingLifecycleEventType
+  fromStatus BookingStatus?
+  toStatus   BookingStatus?
+  actorType  BookingLifecycleActorType
+  actorName  String?
+  details    Json?
+  booking    Booking                   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  createdAt  DateTime                  @default(now())
+
+  @@index([bookingId, createdAt])
 }
 
 enum RoomType {
@@ -221,4 +273,17 @@ enum BookingSource {
   PHONE
   EMAIL
   WALK_IN
+}
+
+enum BookingLifecycleEventType {
+  CREATED
+  STATUS_CHANGED
+  CANCELLED
+  AUTO_STATUS_CHANGED
+}
+
+enum BookingLifecycleActorType {
+  GUEST
+  ADMIN
+  SYSTEM
 }

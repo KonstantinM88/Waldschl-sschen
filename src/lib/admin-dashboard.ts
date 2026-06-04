@@ -538,90 +538,7 @@ export async function getRecentBookings(
           },
         },
         {
-          guest: {
-            is: {
-              OR: [
-                {
-                  firstName: {
-                    contains: trimmedQuery,
-                    mode: "insensitive",
-                  },
-                },
-                {
-                  lastName: {
-                    contains: trimmedQuery,
-                    mode: "insensitive",
-                  },
-                },
-                {
-                  email: {
-                    contains: trimmedQuery,
-                    mode: "insensitive",
-                  },
-                },
-              ],
-            },
-          },
-        },
-        {
-          room: {
-            is: {
-              OR: [
-                {
-                  titleDe: {
-                    contains: trimmedQuery,
-                    mode: "insensitive",
-                  },
-                },
-                {
-                  titleEn: {
-                    contains: trimmedQuery,
-                    mode: "insensitive",
-                  },
-                },
-                {
-                  titleRu: {
-                    contains: trimmedQuery,
-                    mode: "insensitive",
-                  },
-                },
-              ],
-            },
-          },
-        },
-      ],
-    });
-  }
-
-  return prisma.booking.findMany({
-    where: filters.length ? { AND: filters } : undefined,
-    orderBy: { createdAt: "desc" },
-    take: limit,
-    include: {
-      guest: true,
-      room: true,
-    },
-  });
-}
-
-function getBookingWhereInput(
-  query: string,
-  status: BookingStatus | "all"
-): Prisma.BookingWhereInput | undefined {
-  const trimmedQuery = normalizeAdminSearchQuery(query);
-  const filters: Prisma.BookingWhereInput[] = [];
-
-  if (status !== "all") {
-    filters.push({
-      status,
-    });
-  }
-
-  if (trimmedQuery) {
-    filters.push({
-      OR: [
-        {
-          id: {
+          assignedRoomNumber: {
             contains: trimmedQuery,
             mode: "insensitive",
           },
@@ -670,6 +587,113 @@ function getBookingWhereInput(
                 },
                 {
                   titleRu: {
+                    contains: trimmedQuery,
+                    mode: "insensitive",
+                  },
+                },
+                {
+                  roomNumber: {
+                    contains: trimmedQuery,
+                    mode: "insensitive",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    });
+  }
+
+  return prisma.booking.findMany({
+    where: filters.length ? { AND: filters } : undefined,
+    orderBy: { createdAt: "desc" },
+    take: limit,
+    include: {
+      guest: true,
+      room: true,
+    },
+  });
+}
+
+function getBookingWhereInput(
+  query: string,
+  status: BookingStatus | "all"
+): Prisma.BookingWhereInput | undefined {
+  const trimmedQuery = normalizeAdminSearchQuery(query);
+  const filters: Prisma.BookingWhereInput[] = [];
+
+  if (status !== "all") {
+    filters.push({
+      status,
+    });
+  }
+
+  if (trimmedQuery) {
+    filters.push({
+      OR: [
+        {
+          id: {
+            contains: trimmedQuery,
+            mode: "insensitive",
+          },
+        },
+        {
+          assignedRoomNumber: {
+            contains: trimmedQuery,
+            mode: "insensitive",
+          },
+        },
+        {
+          guest: {
+            is: {
+              OR: [
+                {
+                  firstName: {
+                    contains: trimmedQuery,
+                    mode: "insensitive",
+                  },
+                },
+                {
+                  lastName: {
+                    contains: trimmedQuery,
+                    mode: "insensitive",
+                  },
+                },
+                {
+                  email: {
+                    contains: trimmedQuery,
+                    mode: "insensitive",
+                  },
+                },
+              ],
+            },
+          },
+        },
+        {
+          room: {
+            is: {
+              OR: [
+                {
+                  titleDe: {
+                    contains: trimmedQuery,
+                    mode: "insensitive",
+                  },
+                },
+                {
+                  titleEn: {
+                    contains: trimmedQuery,
+                    mode: "insensitive",
+                  },
+                },
+                {
+                  titleRu: {
+                    contains: trimmedQuery,
+                    mode: "insensitive",
+                  },
+                },
+                {
+                  roomNumber: {
                     contains: trimmedQuery,
                     mode: "insensitive",
                   },
@@ -947,6 +971,21 @@ export async function getAdminBookingById(id: string) {
     },
     include: {
       guest: true,
+      guestChangeLogs: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+      bookingChangeLogs: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+      lifecycleEvents: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
       room: true,
     },
   });

@@ -53,3 +53,5 @@ export const HOTEL_CHECK_IN_TIME = "15:00";
 export const HOTEL_CHECK_OUT_TIME = "12:00";
 export const HOTEL_BOOKING_MIN_LEAD_HOURS = 2;
 export const HOTEL_SAME_DAY_BOOKING_CUTOFF_TIME = "13:00";
+export const HOTEL_ROOM_NUMBER_PATTERN = /^\d{3}$/;
+export const HOTEL_ROOM_NUMBER_INPUT_PATTERN = "[0-9]{3}";

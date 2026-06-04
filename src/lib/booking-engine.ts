@@ -1,6 +1,8 @@
 import { differenceInCalendarDays } from "date-fns";
 import { z } from "zod";
 import {
+  BookingLifecycleActorType,
+  BookingLifecycleEventType,
   BookingMealPlan,
   BookingStatus,
   Prisma,
@@ -11,6 +13,7 @@ import {
   assertBookableCheckInDateInput,
   parseHotelDateInput,
 } from "@/lib/booking-dates";
+import { buildBookingLifecycleEventData } from "@/lib/booking-lifecycle-events";
 import {
   type AvailableRoom,
   type AvailableMealPlanOption,
@@ -603,6 +606,18 @@ export async function createBooking(input: z.infer<typeof createBookingSchema>) 
         guest: true,
         room: true,
       },
+    });
+
+    await transactionClient.bookingLifecycleEvent.create({
+      data: buildBookingLifecycleEventData({
+        bookingId: booking.id,
+        eventType: BookingLifecycleEventType.CREATED,
+        actorType: BookingLifecycleActorType.GUEST,
+        toStatus: booking.status,
+        details: {
+          source: "WEB",
+        },
+      }),
     });
 
     return {

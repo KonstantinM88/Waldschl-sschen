@@ -15,6 +15,7 @@ import AdminSubmitButton from "@/components/admin/AdminSubmitButton";
 import { createAdminBookingAction } from "@/app/admin/booking-actions";
 import type { AdminRoomOption } from "@/lib/admin-booking-views";
 import type { AdminLocale } from "@/lib/admin-i18n";
+import { HOTEL_ROOM_NUMBER_INPUT_PATTERN } from "@/lib/booking-shared";
 
 type MealPlan = "ROOM_ONLY" | "BREAKFAST" | "HALF_BOARD";
 type BookingSource = "ADMIN" | "PHONE" | "EMAIL" | "WALK_IN";
@@ -35,6 +36,8 @@ export interface AdminBookingFormLabels {
   sectionGuest: string;
   sectionInternal: string;
   room: string;
+  assignedRoomNumber: string;
+  assignedRoomNumberHint: string;
   checkIn: string;
   checkOut: string;
   guests: string;
@@ -222,6 +225,19 @@ export default function AdminBookingCreateForm({
                     </option>
                   ))}
                 </select>
+              </label>
+
+              <label className={fieldClass}>
+                <span className={labelClass}>{labels.assignedRoomNumber}</span>
+                <input
+                  type="text"
+                  name="assignedRoomNumber"
+                  inputMode="numeric"
+                  pattern={HOTEL_ROOM_NUMBER_INPUT_PATTERN}
+                  maxLength={3}
+                  placeholder={labels.assignedRoomNumberHint}
+                  className={inputClass}
+                />
               </label>
 
               <label className={fieldClass}>

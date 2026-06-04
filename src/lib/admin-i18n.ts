@@ -155,6 +155,16 @@ const adminDictionaries = {
           title: "Sammelaktion abgeschlossen",
           description: "Die markierten Eintrage wurden erfolgreich aktualisiert.",
         },
+        receiptSent: {
+          title: "Buchungsbeleg gesendet",
+          description:
+            "Der deutsche Buchungsbeleg wurde an die E-Mail-Adresse des Gastes gesendet.",
+        },
+        receiptEmailFailed: {
+          title: "E-Mail nicht gesendet",
+          description:
+            "Der Buchungsbeleg konnte nicht gesendet werden. Prufen Sie die Resend-Konfiguration und versuchen Sie es erneut.",
+        },
         selectionRequired: {
           title: "Keine Auswahl getroffen",
           description: "Bitte markieren Sie mindestens einen Eintrag fur die Aktion.",
@@ -163,6 +173,11 @@ const adminDictionaries = {
           title: "Statuswechsel nicht moglich",
           description:
             "Dieser Statuswechsel ist aus dem aktuellen Zustand nicht erlaubt.",
+        },
+        bookingLocked: {
+          title: "Buchung kann nicht bearbeitet werden",
+          description:
+            "Aufenthalt und Leistungen konnen fur abgeschlossene oder stornierte Buchungen nicht geandert werden.",
         },
         invalidInput: {
           title: "Eingabe unvollstandig",
@@ -278,6 +293,7 @@ const adminDictionaries = {
           fields: {
             bookingId: "Buchungs-ID",
             room: "Zimmer",
+            assignedRoomNumber: "Zugewiesene Zimmernummer",
             stay: "Aufenthalt",
             guests: "Gaste",
             nights: "Nachte",
@@ -300,7 +316,7 @@ const adminDictionaries = {
             updated: "Aktualisiert",
           },
           filters: {
-            searchPlaceholder: "Gast, E-Mail, Buchungs-ID oder Zimmer",
+            searchPlaceholder: "Gast, E-Mail, Buchungs-ID oder Zimmernummer",
             statusLabel: "Status",
             allStatuses: "Alle Status",
           },
@@ -317,6 +333,88 @@ const adminDictionaries = {
             cancel: "Stornieren",
             adminNotes: "Interne Notiz",
             adminNotesHint: "Nur intern sichtbar, nicht fur den Gast.",
+            assignedRoomNumberHint: "Optional, genau drei Ziffern.",
+            printReceipt: "Beleg drucken",
+            sendReceipt: "Beleg per E-Mail senden",
+            sendingReceipt: "Beleg wird gesendet...",
+            stayServicesTitle: "Aufenthalt und Leistungen bearbeiten",
+            stayServicesDescription:
+              "Zeitraum, Verpflegung und Zusatzleistungen anpassen. Bei einer Datumsanderung wird die Verfugbarkeit vor dem Speichern gepruft.",
+            stayServicesLocked:
+              "Aufenthalt und Leistungen sind fur diesen Buchungsstatus gesperrt.",
+            stayServicesPricingHint:
+              "Zusatzliche Nachte verwenden die in der Buchung gespeicherten Preise. Ein neu gewahlter Verpflegungsplan verwendet den aktuell konfigurierten Preis.",
+            checkedInDateHint:
+              "Nach dem Check-in kann nur das Abreisedatum geandert werden.",
+            bookingChangeHistoryTitle: "Buchungsanderungen",
+            bookingChangeHistoryDescription:
+              "Chronologische Historie der geanderten Aufenthaltsdaten, Leistungen und Betrage.",
+            bookingChangeHistoryEmpty:
+              "Aufenthalt und Leistungen wurden noch nicht manuell geandert.",
+            lifecycleHistoryTitle: "Statusverlauf",
+            lifecycleHistoryDescription:
+              "Vollstandige Chronologie von Erstellung, Bestatigung, Check-in, Stornierung, Check-out und automatischen Statuswechseln.",
+            lifecycleHistoryEmpty: "Es wurden noch keine Statusereignisse erfasst.",
+            lifecycleEventLabels: {
+              CREATED: "Buchung erstellt",
+              STATUS_CHANGED: "Status geandert",
+              CANCELLED: "Buchung storniert",
+              AUTO_STATUS_CHANGED: "Automatische Statusanderung",
+            },
+            lifecycleActorLabels: {
+              GUEST: "Gast",
+              ADMIN: "Administrator",
+              SYSTEM: "System",
+            },
+            statusFrom: "Vorheriger Status",
+            statusTo: "Neuer Status",
+            guestDataTitle: "Gastdaten bearbeiten",
+            guestDataDescription:
+              "Kontakt-, Adress- und Sprachdaten des Gastes. Jede tatsachliche Anderung wird protokolliert.",
+            passportDataTitle: "Passdaten fur auslandische Gaste",
+            passportDataDescription:
+              "Optional bei der Anreise erfassen. Die Passnummer wird im Anderungsprotokoll maskiert.",
+            changeHistoryTitle: "Anderungsprotokoll",
+            changeHistoryDescription:
+              "Chronologische Historie der von Administratoren geanderten Gastdaten.",
+            changeHistoryEmpty: "Die Gastdaten wurden noch nicht manuell geandert.",
+            changedBy: "Geandert von",
+            previousValue: "Vorher",
+            nextValue: "Neu",
+            emptyValue: "Nicht angegeben",
+            bookingFields: {
+              checkIn: "Anreise",
+              checkOut: "Abreise",
+              nights: "Nachte",
+              mealPlan: "Verpflegung",
+              mealPlanPricePerGuest: "Verpflegung pro Gast/Nacht",
+              mealPlanTotal: "Verpflegung gesamt",
+              dogCount: "Hunde",
+              dogFeeTotal: "Hundezuschlag",
+              bicycleReserved: "Fahrrad reserviert",
+              restaurantReservationTime: "Restaurant",
+              baseTotal: "Basisbetrag",
+              extraBedTotal: "Zusatzbetten gesamt",
+              totalAmount: "Gesamt",
+            },
+            guestFields: {
+              firstName: "Vorname",
+              lastName: "Nachname",
+              email: "E-Mail",
+              phone: "Telefon",
+              street: "Strasse und Hausnummer",
+              postalCode: "PLZ",
+              city: "Ort",
+              country: "Land",
+              locale: "Sprache",
+              notes: "Gastnotiz",
+              isForeignGuest: "Auslandischer Gast",
+              dateOfBirth: "Geburtsdatum",
+              nationality: "Staatsangehorigkeit",
+              passportNumber: "Passnummer",
+              passportIssuingCountry: "Ausstellungsland",
+              passportExpiryDate: "Gultig bis",
+            },
           },
         },
         calendar: {
@@ -357,6 +455,8 @@ const adminDictionaries = {
             sectionGuest: "Gastdaten",
             sectionInternal: "Intern",
             room: "Zimmer",
+            assignedRoomNumber: "Zugewiesene Zimmernummer",
+            assignedRoomNumberHint: "z. B. 204",
             checkIn: "Anreise",
             checkOut: "Abreise",
             guests: "Gaste",
@@ -802,6 +902,16 @@ const adminDictionaries = {
           title: "Массовое действие выполнено",
           description: "Выбранные записи успешно обновлены.",
         },
+        receiptSent: {
+          title: "Квитанция отправлена",
+          description:
+            "Немецкий документ бронирования отправлен на e-mail гостя.",
+        },
+        receiptEmailFailed: {
+          title: "Письмо не отправлено",
+          description:
+            "Не удалось отправить документ бронирования. Проверьте настройку Resend и повторите попытку.",
+        },
         selectionRequired: {
           title: "Ничего не выбрано",
           description: "Выберите хотя бы одну запись для выполнения действия.",
@@ -809,6 +919,11 @@ const adminDictionaries = {
         invalidTransition: {
           title: "Смена статуса невозможна",
           description: "Из текущего состояния такой переход не допускается.",
+        },
+        bookingLocked: {
+          title: "Редактирование брони недоступно",
+          description:
+            "Проживание и услуги нельзя менять для завершённой или отменённой брони.",
         },
         invalidInput: {
           title: "Неполные данные",
@@ -923,6 +1038,7 @@ const adminDictionaries = {
           fields: {
             bookingId: "ID бронирования",
             room: "Номер",
+            assignedRoomNumber: "Назначенный номер комнаты",
             stay: "Период",
             guests: "Гости",
             nights: "Ночей",
@@ -945,7 +1061,7 @@ const adminDictionaries = {
             updated: "Обновлено",
           },
           filters: {
-            searchPlaceholder: "Гость, email, ID брони или номер",
+            searchPlaceholder: "Гость, email, ID брони или номер комнаты",
             statusLabel: "Статус",
             allStatuses: "Все статусы",
           },
@@ -962,6 +1078,88 @@ const adminDictionaries = {
             cancel: "Отменить",
             adminNotes: "Внутренняя заметка",
             adminNotesHint: "Видна только персоналу, не гостю.",
+            assignedRoomNumberHint: "Необязательно, ровно три цифры.",
+            printReceipt: "Распечатать квитанцию",
+            sendReceipt: "Отправить квитанцию на e-mail",
+            sendingReceipt: "Отправка квитанции...",
+            stayServicesTitle: "Редактирование проживания и услуг",
+            stayServicesDescription:
+              "Изменение периода, питания и дополнительных услуг. При изменении дат свободные места проверяются перед сохранением.",
+            stayServicesLocked:
+              "Проживание и услуги заблокированы для текущего статуса бронирования.",
+            stayServicesPricingHint:
+              "Дополнительные ночи рассчитываются по сохранённым в брони тарифам. При выборе другого питания применяется его текущая настроенная цена.",
+            checkedInDateHint:
+              "После заселения можно изменить только дату выезда.",
+            bookingChangeHistoryTitle: "Изменения бронирования",
+            bookingChangeHistoryDescription:
+              "Хронология изменений периода проживания, услуг и итоговых сумм.",
+            bookingChangeHistoryEmpty:
+              "Проживание и услуги ещё не изменялись вручную.",
+            lifecycleHistoryTitle: "Хронология статусов",
+            lifecycleHistoryDescription:
+              "Полная история создания, подтверждения, заселения, отмены, выезда и автоматических изменений статуса.",
+            lifecycleHistoryEmpty: "События изменения статуса ещё не записывались.",
+            lifecycleEventLabels: {
+              CREATED: "Бронирование создано",
+              STATUS_CHANGED: "Статус изменён",
+              CANCELLED: "Бронирование отменено",
+              AUTO_STATUS_CHANGED: "Автоматическое изменение статуса",
+            },
+            lifecycleActorLabels: {
+              GUEST: "Клиент",
+              ADMIN: "Администратор",
+              SYSTEM: "Система",
+            },
+            statusFrom: "Предыдущий статус",
+            statusTo: "Новый статус",
+            guestDataTitle: "Редактирование данных гостя",
+            guestDataDescription:
+              "Контактные, адресные данные и язык гостя. Каждое фактическое изменение записывается в журнал.",
+            passportDataTitle: "Паспортные данные иностранного гостя",
+            passportDataDescription:
+              "Заполняются администратором при заезде при необходимости. Номер паспорта маскируется в журнале изменений.",
+            changeHistoryTitle: "Журнал изменений",
+            changeHistoryDescription:
+              "Хронология изменений данных гостя, выполненных администраторами.",
+            changeHistoryEmpty: "Данные гостя ещё не изменялись вручную.",
+            changedBy: "Изменил",
+            previousValue: "Было",
+            nextValue: "Стало",
+            emptyValue: "Не указано",
+            bookingFields: {
+              checkIn: "Заезд",
+              checkOut: "Выезд",
+              nights: "Ночей",
+              mealPlan: "Питание",
+              mealPlanPricePerGuest: "Питание за гостя/ночь",
+              mealPlanTotal: "Питание всего",
+              dogCount: "Собаки",
+              dogFeeTotal: "Доплата за собак",
+              bicycleReserved: "Велосипед зарезервирован",
+              restaurantReservationTime: "Ресторан",
+              baseTotal: "Базовая сумма",
+              extraBedTotal: "Доп. кровати всего",
+              totalAmount: "Итого",
+            },
+            guestFields: {
+              firstName: "Имя",
+              lastName: "Фамилия",
+              email: "E-Mail",
+              phone: "Телефон",
+              street: "Улица и номер дома",
+              postalCode: "Индекс",
+              city: "Город",
+              country: "Страна",
+              locale: "Язык",
+              notes: "Заметка о госте",
+              isForeignGuest: "Иностранный гость",
+              dateOfBirth: "Дата рождения",
+              nationality: "Гражданство",
+              passportNumber: "Номер паспорта",
+              passportIssuingCountry: "Страна выдачи",
+              passportExpiryDate: "Действителен до",
+            },
           },
         },
         calendar: {
@@ -1002,6 +1200,8 @@ const adminDictionaries = {
             sectionGuest: "Данные гостя",
             sectionInternal: "Внутреннее",
             room: "Номер",
+            assignedRoomNumber: "Назначенный номер комнаты",
+            assignedRoomNumberHint: "например 204",
             checkIn: "Заезд",
             checkOut: "Выезд",
             guests: "Гостей",
