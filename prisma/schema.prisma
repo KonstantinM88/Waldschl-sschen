@@ -195,6 +195,9 @@ model Booking {
   checkedInAt               DateTime?
   checkedOutAt              DateTime?
   autoCompletedAt           DateTime?
+  termsAcceptedAt           DateTime?
+  termsVersion              String?
+  emailVerifiedAt           DateTime?
   locale                    String                  @default("de")
   createdAt                 DateTime                @default(now())
   updatedAt                 DateTime                @updatedAt
@@ -205,6 +208,25 @@ model Booking {
   @@index([status, checkIn, checkOut])
   @@index([status, checkOut])
   @@index([source, createdAt])
+}
+
+model BookingEmailVerification {
+  id              String    @id @default(cuid())
+  email           String
+  codeHash        String
+  payload         Json
+  locale          String    @default("de")
+  termsAcceptedAt DateTime
+  termsVersion    String
+  expiresAt       DateTime
+  consumedAt      DateTime?
+  attempts        Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([email, createdAt])
+  @@index([expiresAt])
+  @@index([consumedAt, expiresAt])
 }
 
 model GuestChangeLog {

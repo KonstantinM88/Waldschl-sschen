@@ -86,6 +86,8 @@
   `/admin`.
 - `booking-*` - availability, booking creation, date parsing, shared types,
   navigation и server action бронирования.
+- `booking-terms.ts` - немецкие Buchungsbedingungen для публичного checkout;
+  менять вместе с `BOOKING_TERMS_VERSION`.
 - `booking-lifecycle.ts` - admin lifecycle бронирований: допустимые переходы
   статусов, ручное создание брони, auto-sweep прошедших броней, календарь и
   аналитика.
@@ -125,6 +127,9 @@
 - `RestaurantMenuCategory` и `RestaurantMenuItem` - ресторанное меню,
   price variants, изображения и видео.
 - `Guest`, `Room`, `Booking` - бронирование номеров.
+- `BookingEmailVerification` - короткоживущие pending-заявки публичного
+  бронирования с JSON payload, хешем шестизначного e-mail кода, сроком действия,
+  счетчиком попыток и версией принятых условий.
 - `GuestChangeLog` - append-only журнал ручных изменений данных гостя из
   admin-страницы бронирования.
 - `BookingChangeLog` - append-only журнал изменений периода проживания, услуг
@@ -154,6 +159,10 @@
 - `Booking` также хранит lifecycle/admin-поля: `source`, `adminNotes`,
   `cancellationReason`, `confirmedAt`, `cancelledAt`, `checkedInAt`,
   `checkedOutAt`, `autoCompletedAt`.
+- Для публичных WEB-бронирований `Booking` сохраняет `termsAcceptedAt`,
+  `termsVersion` и `emailVerifiedAt`. Эти поля заполняются только после
+  принятия Buchungsbedingungen и подтверждения e-mail кода; ручные/admin-брони
+  могут иметь `null`.
 - `Booking.assignedRoomNumber` хранит опциональное назначение физического
   номера для конкретной брони. Значение admin-only, состоит ровно из трех цифр,
   проверяется UI/server schema/PostgreSQL CHECK и не показывается в публичном
@@ -196,14 +205,21 @@
   паспорта не дублируется в audit JSON: в журнале он маскируется до последних
   четырех символов. При смене языка синхронизируется `Booking.locale`, чтобы
   последующие письма использовали новый язык.
+- Публичный checkout не создает `Booking` сразу. Первый submit требует
+  принятия Buchungsbedingungen, валидирует данные и доступность, создает
+  `BookingEmailVerification` на 15 минут и отправляет гостю шестизначный код.
+  Второй submit проверяет код, помечает pending-заявку использованной и только
+  затем создает `Booking`; финальная `createBooking` повторно проверяет
+  доступность на сервере.
 - Booking emails отправляются через `src/lib/email.ts` и
-  `src/lib/email-templates.ts`: guest received, hotel notification, guest
-  confirmed, guest cancelled. `src/lib/booking-receipt.ts` формирует немецкий
+  `src/lib/email-templates.ts`: verification code, guest received, hotel
+  notification, guest confirmed, guest cancelled. `src/lib/booking-receipt.ts`
+  формирует немецкий
   `Buchungsbeleg` для печатной admin-страницы и ручной отправки гостю. Документ
   отражает текущие сохраненные суммы брони, но явно не является подтверждением
-  оплаты или счетом, так как payment/VAT-модель в проекте отсутствует. Email
-  delivery fail-safe: ошибки Resend или отсутствие `RESEND_API_KEY` не должны
-  откатывать уже сохраненную бронь.
+  оплаты или счетом, так как payment/VAT-модель в проекте отсутствует. После
+  уже сохраненной брони guest/hotel notification остаются fail-safe, но отправка
+  verification code является обязательным шагом public checkout.
 - Admin lifecycle переходы держать в `BOOKING_STATUS_TRANSITIONS` внутри
   `src/lib/booking-lifecycle.ts`; UI не должен предлагать переходы, которые
   сервер запрещает.
@@ -263,10 +279,13 @@
 - `ADMIN_SESSION_SECRET`
 - `CRON_SECRET` - опционально для внешнего планировщика auto-sweep
   `/api/admin/cron`; без него cron route отключен.
-- `RESEND_API_KEY` - опционально для отправки booking email через Resend REST;
-  если отсутствует, письма пропускаются без ошибки для брони.
+- `RESEND_API_KEY` - для production public checkout обязателен, потому что
+  клиент завершает онлайн-бронирование только после e-mail кода. После уже
+  сохраненной брони обычные booking emails остаются fail-safe: ошибки Resend не
+  откатывают данные.
 - `RESEND_FROM` - отправитель booking email; домен должен быть
-  подтвержден в Resend.
+  подтвержден в Resend. Для public checkout нужен корректный отправитель, иначе
+  код подтверждения не дойдет клиенту.
 - `BOOKING_NOTIFY_EMAIL` - опциональный адрес отеля для уведомлений о новых
   бронированиях; fallback берется из `siteConfig.email`.
 - `FFMPEG_PATH` - опционально, если bundled ffmpeg не подходит.
@@ -319,6 +338,7 @@
 
 | Дата | Изменение | Контекст |
 | --- | --- | --- |
+| 2026-06-05 | Добавлен двухшаговый public checkout с Buchungsbedingungen и e-mail кодом. | Миграция `20260605100000_booking_email_verification` добавляет `BookingEmailVerification` и поля `Booking.termsAcceptedAt`, `termsVersion`, `emailVerifiedAt`. `src/lib/booking-terms.ts` хранит немецкие Buchungsbedingungen версии `2026-06-05`, адаптированные под прямое бронирование отеля. `BookingCheckoutForm` показывает условия, требует checkbox принятия, затем отправляет шестизначный код; после отправки кода данные формы блокируются, а бронь создается только после подтверждения. `submitHotelBookingAction` разделена на `request-code` и `confirm-code`: первый шаг валидирует данные/доступность и отправляет код через Resend, второй проверяет срок/попытки/хеш и создает `Booking` с повторной проверкой доступности. Выполнены `prisma format`, `npm run db:generate`, `npm run lint`, `npm run build`, `prisma migrate deploy`, `prisma migrate status`, DB/template smoke без реальной отправки e-mail и HTTP smoke checkout-страницы. |
 | 2026-06-04 | Добавлены печать и e-mail отправка немецкого документа бронирования. | В деталях `/admin/bookings/[id]` появились кнопки печати и отправки гостю. Защищенный маршрут `/admin/bookings/[id]/receipt` формирует A4-представление `Buchungsbeleg` с гостем, периодом, статусом, сохраненными тарифными строками, услугами и итогом; `src/lib/booking-receipt.ts` использует те же данные для HTML/text письма через существующий fail-safe Resend flow. Документ явно помечен как не являющийся подтверждением оплаты или счетом, поскольку payment/VAT-модель пока отсутствует. Проверено через `npm run lint`, `npm run build`, pure template smoke и авторизованный HTTP smoke печатного маршрута. |
 | 2026-06-04 | Добавлена полная хронология lifecycle бронирования. | Миграция `20260604230000_booking_lifecycle_events` добавляет `BookingLifecycleEvent`, типы событий/авторов и backfill существующих броней по `createdAt`, lifecycle timestamps, текущему статусу и причине отмены. Новые публичные и ручные брони, одиночные/массовые admin-переходы, отмена и auto-sweep теперь атомарно записывают создание или переход статуса с автором и причиной отмены. На `/admin/bookings/[id]` добавлен отдельный блок «Хронология статусов» с событиями создания, подтверждения, заселения, отмены, выезда и no-show. Выполнены `prisma format`, `npm run db:generate`, `npm run lint`, `npm run build`, `prisma migrate deploy`, `prisma migrate status`, backfill-smoke и lifecycle-smoke публичного/ручного создания и автоматического выезда. |
 | 2026-06-04 | Добавлено редактирование периода проживания и услуг бронирования. | Миграция `20260604210000_booking_change_log` добавляет append-only `BookingChangeLog`. На `/admin/bookings/[id]` появилась свернутая форма изменения дат, питания, собак, велосипеда и ресторана с автоматическим пересчетом сумм и отдельным журналом «было / стало». Перенос и продление проверяют свободную емкость для каждой ночи, исключают текущую бронь и запрещают конфликт назначенного физического номера; для `CHECKED_IN` дата заезда заблокирована, завершенные/отмененные брони не редактируются. Такая же per-night проверка доступности и проверка назначенного номера применяются при ручном создании брони. Выполнены `prisma format`, `npm run db:generate`, `npm run lint`, `npm run build`, `prisma migrate deploy`, `prisma migrate status` и DB smoke-сценарии продления, переноса, добавления/удаления услуг, пересчета, конфликтов, блокировки статуса и audit log. |

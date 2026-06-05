@@ -30,6 +30,7 @@ import {
   submitHotelBookingAction,
   type SubmitHotelBookingState,
 } from "@/lib/booking-actions";
+import { BOOKING_TERMS_DE, BOOKING_TERMS_VERSION } from "@/lib/booking-terms";
 
 interface BookingCheckoutFormProps {
   backToSearchHref: string;
@@ -96,9 +97,28 @@ const copy = {
     successBadge: "Reservierung erfasst",
     successTitle: "Vielen Dank für Ihre Anfrage",
     successText:
-      "Ihre Reservierung wurde gespeichert und erscheint bereits in der Verwaltung. Unser Team meldet sich zur Bestätigung bei Ihnen.",
+      "Ihre E-Mail-Adresse wurde bestätigt. Die Reservierung wurde gespeichert und erscheint bereits in der Verwaltung. Unser Team meldet sich zur Bestätigung bei Ihnen.",
     bookingNumber: "Buchungsnummer",
     selectedTime: "Reservierte Zeit",
+    termsTitle: "Buchungsbedingungen",
+    termsDescription:
+      "Bitte lesen Sie die Buchungsbedingungen, bevor Sie den Bestätigungscode anfordern.",
+    termsShow: "Buchungsbedingungen anzeigen",
+    termsHideHint: "Version",
+    termsAccept:
+      "Ich habe die Buchungsbedingungen gelesen und akzeptiert.",
+    sendCode: "Code per E-Mail senden",
+    sendingCode: "Code wird gesendet...",
+    codeTitle: "E-Mail bestätigen",
+    codeDescription: (email: string) =>
+      `Wir haben einen sechsstelligen Code an ${email} gesendet. Bitte geben Sie ihn ein, um die Buchung abzuschließen.`,
+    codeLabel: "Bestätigungscode",
+    codePlaceholder: "123456",
+    confirmCode: "Buchung bestätigen",
+    confirmingCode: "Code wird geprüft...",
+    codeExpires: "Der Code ist 15 Minuten gültig.",
+    fieldsLocked:
+      "Die Buchungsdaten sind für diese Code-Prüfung fixiert. Wenn Sie etwas ändern möchten, starten Sie die Anfrage bitte erneut.",
   },
   en: {
     badge: "Guest details",
@@ -152,9 +172,28 @@ const copy = {
     successBadge: "Reservation captured",
     successTitle: "Thank you for your request",
     successText:
-      "Your reservation has been saved and is already visible in the admin area. Our team will contact you to confirm it.",
+      "Your email address has been confirmed. The reservation has been saved and is already visible in the admin area. Our team will contact you to confirm it.",
     bookingNumber: "Booking number",
     selectedTime: "Reserved time",
+    termsTitle: "Booking conditions",
+    termsDescription:
+      "Please read the booking conditions before requesting the confirmation code.",
+    termsShow: "Show booking conditions",
+    termsHideHint: "Version",
+    termsAccept:
+      "I have read and accept the booking conditions.",
+    sendCode: "Send code by email",
+    sendingCode: "Sending code...",
+    codeTitle: "Confirm email",
+    codeDescription: (email: string) =>
+      `We have sent a six-digit code to ${email}. Please enter it to complete the booking.`,
+    codeLabel: "Confirmation code",
+    codePlaceholder: "123456",
+    confirmCode: "Confirm booking",
+    confirmingCode: "Checking code...",
+    codeExpires: "The code is valid for 15 minutes.",
+    fieldsLocked:
+      "The booking details are fixed for this code check. To change anything, please start the request again.",
   },
   ru: {
     badge: "Данные гостя",
@@ -208,9 +247,28 @@ const copy = {
     successBadge: "Бронь записана",
     successTitle: "Спасибо за вашу заявку",
     successText:
-      "Бронирование сохранено и уже видно в админке. Наша команда свяжется с вами для подтверждения.",
+      "Ваш e-mail подтверждён. Бронирование сохранено и уже видно в админке. Наша команда свяжется с вами для подтверждения.",
     bookingNumber: "Номер брони",
     selectedTime: "Выбранное время",
+    termsTitle: "Условия бронирования",
+    termsDescription:
+      "Ознакомьтесь с условиями бронирования перед отправкой кода подтверждения.",
+    termsShow: "Показать условия бронирования",
+    termsHideHint: "Версия",
+    termsAccept:
+      "Я прочитал(а) и принимаю условия бронирования.",
+    sendCode: "Отправить код на e-mail",
+    sendingCode: "Отправляем код...",
+    codeTitle: "Подтверждение e-mail",
+    codeDescription: (email: string) =>
+      `Мы отправили шестизначный код на ${email}. Введите его, чтобы завершить бронирование.`,
+    codeLabel: "Код подтверждения",
+    codePlaceholder: "123456",
+    confirmCode: "Подтвердить бронь",
+    confirmingCode: "Проверяем код...",
+    codeExpires: "Код действует 15 минут.",
+    fieldsLocked:
+      "Данные бронирования зафиксированы для этой проверки кода. Если нужно что-то изменить, начните заявку заново.",
   },
 } as const;
 
@@ -269,6 +327,7 @@ export default function BookingCheckoutForm({
   const [selectedMealPlan, setSelectedMealPlan] = useState<BookingMealPlan>(
     room.defaultMealPlan
   );
+  const isAwaitingCode = state.status === "code-sent";
 
   const selectedMealOption = useMemo(
     () =>
@@ -367,6 +426,14 @@ export default function BookingCheckoutForm({
       <input type="hidden" name="guests" value={guests} />
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="dogCount" value={dogSelected ? 1 : 0} />
+      <input
+        type="hidden"
+        name="intent"
+        value={isAwaitingCode ? "confirm-code" : "request-code"}
+      />
+      {isAwaitingCode && state.verificationId ? (
+        <input type="hidden" name="verificationId" value={state.verificationId} />
+      ) : null}
 
       <section className="mt-6 rounded-[1.35rem] border border-[#eadfcf] bg-[#fcfaf6] px-4 py-4">
         <div className="text-[0.66rem] font-medium uppercase tracking-[0.18em] text-[#9c7b4b]">
@@ -423,6 +490,7 @@ export default function BookingCheckoutForm({
                   value={option.value}
                   checked={selectedMealPlan === option.value}
                   onChange={() => setSelectedMealPlan(option.value)}
+                  disabled={isAwaitingCode}
                   className="mt-1 h-4 w-4 border-[#ccb28b] text-[#b4884c] focus:ring-[#d8bd84]"
                 />
                 <span className="min-w-0">
@@ -452,6 +520,7 @@ export default function BookingCheckoutForm({
               type="checkbox"
               checked={dogSelected}
               onChange={(event) => setDogSelected(event.target.checked)}
+              disabled={isAwaitingCode}
               className="mt-1 h-4 w-4 rounded border-[#ccb28b] text-[#b4884c] focus:ring-[#d8bd84]"
             />
             <div className="min-w-0">
@@ -468,6 +537,7 @@ export default function BookingCheckoutForm({
               name="bicycleReserved"
               checked={bikeSelected}
               onChange={(event) => setBikeSelected(event.target.checked)}
+              disabled={isAwaitingCode}
               className="mt-1 h-4 w-4 rounded border-[#ccb28b] text-[#b4884c] focus:ring-[#d8bd84]"
             />
             <div className="inline-flex items-center gap-2 text-sm font-medium text-[#201b17]">
@@ -486,6 +556,7 @@ export default function BookingCheckoutForm({
                 name="restaurantReservationTime"
                 value={restaurantTime}
                 onChange={(event) => setRestaurantTime(event.target.value)}
+                disabled={isAwaitingCode}
                 className="mt-3 w-full rounded-[1rem] border border-[#e1d5c5] bg-white px-4 py-3 text-sm text-[#201b17] outline-none"
               >
                 <option value="">{t.restaurantPlaceholder}</option>
@@ -514,6 +585,7 @@ export default function BookingCheckoutForm({
             <input
               name="firstName"
               required
+              readOnly={isAwaitingCode}
               autoComplete="given-name"
               className="mt-3 w-full bg-transparent text-sm text-[#201b17] outline-none"
             />
@@ -527,6 +599,7 @@ export default function BookingCheckoutForm({
             <input
               name="lastName"
               required
+              readOnly={isAwaitingCode}
               autoComplete="family-name"
               className="mt-3 w-full bg-transparent text-sm text-[#201b17] outline-none"
             />
@@ -541,6 +614,7 @@ export default function BookingCheckoutForm({
               name="email"
               type="email"
               required
+              readOnly={isAwaitingCode}
               autoComplete="email"
               className="mt-3 w-full bg-transparent text-sm text-[#201b17] outline-none"
             />
@@ -553,6 +627,7 @@ export default function BookingCheckoutForm({
             </span>
             <input
               name="phone"
+              readOnly={isAwaitingCode}
               autoComplete="tel"
               className="mt-3 w-full bg-transparent text-sm text-[#201b17] outline-none"
             />
@@ -575,6 +650,7 @@ export default function BookingCheckoutForm({
             <input
               name="street"
               required
+              readOnly={isAwaitingCode}
               autoComplete="street-address"
               className="mt-3 w-full bg-transparent text-sm text-[#201b17] outline-none"
             />
@@ -588,6 +664,7 @@ export default function BookingCheckoutForm({
             <input
               name="postalCode"
               required
+              readOnly={isAwaitingCode}
               autoComplete="postal-code"
               className="mt-3 w-full bg-transparent text-sm text-[#201b17] outline-none"
             />
@@ -601,6 +678,7 @@ export default function BookingCheckoutForm({
             <input
               name="city"
               required
+              readOnly={isAwaitingCode}
               autoComplete="address-level2"
               className="mt-3 w-full bg-transparent text-sm text-[#201b17] outline-none"
             />
@@ -614,6 +692,7 @@ export default function BookingCheckoutForm({
             <input
               name="country"
               required
+              readOnly={isAwaitingCode}
               defaultValue={locale === "de" ? "Deutschland" : ""}
               autoComplete="country-name"
               className="mt-3 w-full bg-transparent text-sm text-[#201b17] outline-none"
@@ -629,11 +708,100 @@ export default function BookingCheckoutForm({
           <textarea
             name="notes"
             rows={4}
+            readOnly={isAwaitingCode}
             placeholder={t.notesPlaceholder}
             className="mt-3 w-full resize-none bg-transparent text-sm leading-relaxed text-[#201b17] outline-none"
           />
         </label>
       </section>
+
+      <section className="mt-6 rounded-[1.35rem] border border-[#eadfcf] bg-[#fcfaf6] px-4 py-4 sm:px-5">
+        <div className="text-[0.66rem] font-medium uppercase tracking-[0.18em] text-[#9c7b4b]">
+          {t.termsTitle}
+        </div>
+        <p className="mt-2 text-xs font-light leading-relaxed text-[#6c6459]">
+          {t.termsDescription}
+        </p>
+
+        <details className="group/terms mt-4 rounded-[1.15rem] border border-[#dfd4c2] bg-white">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-[0.68rem] font-medium uppercase tracking-[0.14em] text-[#5d564c] [&::-webkit-details-marker]:hidden">
+            <span>{t.termsShow}</span>
+            <span className="text-[#9c7b4b]">
+              {t.termsHideHint} {BOOKING_TERMS_VERSION}
+            </span>
+          </summary>
+          <div className="max-h-[24rem] overflow-y-auto border-t border-[#eadfcf] px-4 py-4 text-sm leading-relaxed text-[#4f483f]">
+            <h3 className="font-[var(--font-display)] text-[1.7rem] leading-none text-[#201b17]">
+              {BOOKING_TERMS_DE.title}
+            </h3>
+            <p className="mt-3 text-sm font-light leading-relaxed text-[#5d564c]">
+              {BOOKING_TERMS_DE.intro}
+            </p>
+            <div className="mt-5 space-y-5">
+              {BOOKING_TERMS_DE.sections.map((section) => (
+                <section key={section.title}>
+                  <h4 className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9c7b4b]">
+                    {section.title}
+                  </h4>
+                  <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm font-light leading-relaxed">
+                    {section.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ol>
+                </section>
+              ))}
+            </div>
+          </div>
+        </details>
+
+        <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-[1.15rem] border border-[#dfd4c2] bg-white px-4 py-3 text-sm text-[#3a342c]">
+          <input
+            key={isAwaitingCode ? "terms-locked" : "terms-editable"}
+            type="checkbox"
+            name="termsAccepted"
+            required={!isAwaitingCode}
+            disabled={isAwaitingCode}
+            defaultChecked={isAwaitingCode}
+            className="mt-1 h-4 w-4 rounded border-[#ccb28b] text-[#b4884c] focus:ring-[#d8bd84]"
+          />
+          <span>{t.termsAccept}</span>
+        </label>
+      </section>
+
+      {isAwaitingCode ? (
+        <section className="mt-6 rounded-[1.35rem] border border-[#c9a96e] bg-[#fff8ec] px-4 py-4 sm:px-5">
+          <div className="text-[0.66rem] font-medium uppercase tracking-[0.18em] text-[#9c7b4b]">
+            {t.codeTitle}
+          </div>
+          <p className="mt-2 text-sm font-light leading-relaxed text-[#5d564c]">
+            {t.codeDescription(state.maskedEmail ?? t.email)}
+          </p>
+          <p className="mt-2 text-xs font-light leading-relaxed text-[#7b7368]">
+            {t.codeExpires} {t.fieldsLocked}
+          </p>
+          {state.errorMessage ? (
+            <div className="mt-4 rounded-[1rem] border border-[#f0cfc7] bg-[#fff3ef] px-4 py-3 text-sm font-light text-[#8f4337]">
+              {state.errorMessage}
+            </div>
+          ) : null}
+          <label className="mt-4 block rounded-[1.15rem] border border-[#dfd4c2] bg-white px-4 py-3">
+            <span className="text-[0.64rem] font-medium uppercase tracking-[0.16em] text-[#9e927f]">
+              {t.codeLabel}
+            </span>
+            <input
+              name="verificationCode"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              pattern="[0-9]{6}"
+              maxLength={6}
+              required
+              placeholder={t.codePlaceholder}
+              className="mt-3 w-full bg-transparent text-lg tracking-[0.24em] text-[#201b17] outline-none"
+            />
+          </label>
+        </section>
+      ) : null}
 
       <section className="mt-6 rounded-[1.35rem] border border-[#eadfcf] bg-[linear-gradient(145deg,rgba(250,247,241,0.98),rgba(255,255,255,0.96))] px-4 py-4 sm:px-5">
         <div className="flex items-center gap-2 text-[0.66rem] font-medium uppercase tracking-[0.18em] text-[#9c7b4b]">
@@ -716,7 +884,10 @@ export default function BookingCheckoutForm({
         >
           {t.changeSelection}
         </Link>
-        <SubmitButton idleLabel={t.submit} pendingLabel={t.submitting} />
+        <SubmitButton
+          idleLabel={isAwaitingCode ? t.confirmCode : t.sendCode}
+          pendingLabel={isAwaitingCode ? t.confirmingCode : t.sendingCode}
+        />
       </div>
 
       <p className="mt-4 text-xs font-light leading-relaxed text-[#7b7368]">

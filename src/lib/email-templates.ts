@@ -21,6 +21,13 @@ export interface BookingEmailData {
   cancellationReason?: string | null;
 }
 
+export interface BookingVerificationEmailData {
+  code: string;
+  firstName: string;
+  lastName: string;
+  expiresInMinutes: number;
+}
+
 function formatCurrency(value: number, locale: BookingLocale) {
   const intlLocale =
     locale === "ru" ? "ru-RU" : locale === "en" ? "en-GB" : "de-DE";
@@ -210,6 +217,58 @@ export function buildGuestCancelledEmail(data: BookingEmailData, locale: Booking
     t.footer
   );
   return { subject: `${t.cancelledTitle} · ${data.bookingId}`, html };
+}
+
+export function buildBookingVerificationEmail(
+  data: BookingVerificationEmailData,
+  locale: BookingLocale
+) {
+  const name = `${data.firstName} ${data.lastName}`.trim();
+  const t = {
+    de: {
+      title: "Buchung per E-Mail bestätigen",
+      intro: `Liebe/r ${name}, bitte bestätigen Sie Ihre E-Mail-Adresse, damit wir Ihre Buchungsanfrage abschließen können.`,
+      codeLabel: "Ihr Bestätigungscode",
+      expires: `Der Code ist ${data.expiresInMinutes} Minuten gültig.`,
+      note:
+        "Falls Sie diese Buchung nicht angefragt haben, können Sie diese E-Mail ignorieren.",
+      subject: "Bestätigungscode für Ihre Buchung",
+      footer: copy.de.footer,
+    },
+    en: {
+      title: "Confirm booking by email",
+      intro: `Dear ${name}, please confirm your email address so we can complete your booking request.`,
+      codeLabel: "Your confirmation code",
+      expires: `The code is valid for ${data.expiresInMinutes} minutes.`,
+      note:
+        "If you did not request this booking, you can ignore this email.",
+      subject: "Confirmation code for your booking",
+      footer: copy.en.footer,
+    },
+    ru: {
+      title: "Подтверждение бронирования по e-mail",
+      intro: `Уважаемый(ая) ${name}, подтвердите ваш e-mail, чтобы мы могли завершить заявку на бронирование.`,
+      codeLabel: "Ваш код подтверждения",
+      expires: `Код действует ${data.expiresInMinutes} минут.`,
+      note:
+        "Если вы не отправляли заявку на бронирование, просто проигнорируйте это письмо.",
+      subject: "Код подтверждения бронирования",
+      footer: copy.ru.footer,
+    },
+  }[locale];
+  const codeBlock = `<tr><td style="padding:16px 0 18px">
+<div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${GOLD};margin-bottom:10px">${t.codeLabel}</div>
+<div style="display:inline-block;padding:14px 18px;border:1px solid #e2d7c8;border-radius:14px;background:${CREAM};font-size:28px;letter-spacing:8px;font-weight:bold;color:${INK}">${data.code}</div>
+<div style="margin-top:12px;font-size:13px;color:#7b7368">${t.expires}</div>
+</td></tr>`;
+  const note = `<tr><td style="padding-top:4px;font-size:13px;line-height:1.6;color:#7b7368">${t.note}</td></tr>`;
+  const html = shell(t.title, intro(t.intro) + codeBlock + note, t.footer);
+
+  return {
+    subject: t.subject,
+    html,
+    text: `${t.title}\n\n${t.intro}\n\n${t.codeLabel}: ${data.code}\n${t.expires}\n\n${t.note}`,
+  };
 }
 
 /**

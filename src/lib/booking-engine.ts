@@ -52,7 +52,12 @@ const createBookingSchema = z.object({
   city: z.string().trim().min(1).max(120),
   country: z.string().trim().min(1).max(120),
   notes: z.string().trim().max(2000).optional(),
+  termsAcceptedAt: z.date().optional(),
+  termsVersion: z.string().trim().max(40).optional(),
+  emailVerifiedAt: z.date().optional(),
 });
+
+export type CreateBookingInput = z.infer<typeof createBookingSchema>;
 
 const ROOM_TYPE_LABELS: Record<RoomType, Record<BookingLocale, string>> = {
   SINGLE: {
@@ -146,6 +151,8 @@ type ReservedRoomCount = {
     _all: number;
   };
 };
+
+type BookingCreationClient = typeof prisma;
 
 function toBookingLocale(locale?: string | null): BookingLocale {
   return locale === "en" || locale === "ru" ? locale : "de";
@@ -503,62 +510,102 @@ export async function getAvailableRooms(
     .filter((room): room is AvailableRoom => Boolean(room && room.availableCount > 0));
 }
 
-export async function createBooking(input: z.infer<typeof createBookingSchema>) {
+async function prepareBookingCreation(
+  input: CreateBookingInput,
+  client: BookingCreationClient
+) {
   const validated = createBookingSchema.parse(input);
   const checkIn = parseBookingDate(validated.checkIn);
   const checkOut = parseBookingDate(validated.checkOut);
   const nights = assertDateRange(checkIn, checkOut);
   assertBookableCheckInDateInput(validated.checkIn);
 
+  await ensureDefaultRooms(client);
+
+  const room = await client.room.findUnique({
+    where: {
+      id: validated.roomId,
+    },
+  });
+
+  if (!room || !room.isActive) {
+    throw new Error("Selected room is not available.");
+  }
+
+  if (!canHostGuestCount(room, validated.guests)) {
+    throw new Error("Guest count exceeds room capacity.");
+  }
+
+  const overlappingBookings = await client.booking.count({
+    where: {
+      roomId: room.id,
+      status: {
+        in: [...ACTIVE_BOOKING_STATUSES],
+      },
+      checkIn: {
+        lt: checkOut,
+      },
+      checkOut: {
+        gt: checkIn,
+      },
+    },
+  });
+
+  if (overlappingBookings >= room.inventory) {
+    throw new Error("Room inventory is sold out for the selected dates.");
+  }
+
+  const rate = calculateRoomRate(room, validated.guests, validated.mealPlan);
+  const basePricePerNight = rate.occupancyBasePrice;
+  const baseTotal = basePricePerNight.mul(nights);
+  const mealPlanTotal = rate.mealPlanTotalPerNight.mul(nights);
+  const extraBedTotal = rate.extraBedTotalPerNight.mul(nights);
+  const dogFeePerNight = new Prisma.Decimal(DOG_FEE_PER_NIGHT);
+  const dogFeeTotal = dogFeePerNight.mul(validated.dogCount).mul(nights);
+  const totalAmount = baseTotal
+    .add(mealPlanTotal)
+    .add(extraBedTotal)
+    .add(dogFeeTotal);
+
+  return {
+    basePricePerNight,
+    baseTotal,
+    checkIn,
+    checkOut,
+    dogFeePerNight,
+    dogFeeTotal,
+    extraBedTotal,
+    mealPlanTotal,
+    nights,
+    rate,
+    room,
+    totalAmount,
+    validated,
+  };
+}
+
+export async function validateBookingRequest(input: CreateBookingInput) {
+  await prepareBookingCreation(input, prisma);
+}
+
+export async function createBooking(input: CreateBookingInput) {
   return prisma.$transaction(async (tx) => {
     const transactionClient = tx as unknown as typeof prisma;
-
-    await ensureDefaultRooms(transactionClient);
-
-    const room = await transactionClient.room.findUnique({
-      where: {
-        id: validated.roomId,
-      },
-    });
-
-    if (!room || !room.isActive) {
-      throw new Error("Selected room is not available.");
-    }
-
-    if (!canHostGuestCount(room, validated.guests)) {
-      throw new Error("Guest count exceeds room capacity.");
-    }
-
-    const overlappingBookings = await transactionClient.booking.count({
-      where: {
-        roomId: room.id,
-        status: {
-          in: [...ACTIVE_BOOKING_STATUSES],
-        },
-        checkIn: {
-          lt: checkOut,
-        },
-        checkOut: {
-          gt: checkIn,
-        },
-      },
-    });
-
-    if (overlappingBookings >= room.inventory) {
-      throw new Error("Room inventory is sold out for the selected dates.");
-    }
-
-    const rate = calculateRoomRate(room, validated.guests, validated.mealPlan);
-    const basePricePerNight = rate.occupancyBasePrice;
-    const baseTotal = basePricePerNight.mul(nights);
-    const mealPlanTotal = rate.mealPlanTotalPerNight.mul(nights);
-    const extraBedTotal = rate.extraBedTotalPerNight.mul(nights);
-    const dogFeePerNight = new Prisma.Decimal(DOG_FEE_PER_NIGHT);
-    const dogFeeTotal = dogFeePerNight.mul(validated.dogCount).mul(nights);
-    const totalAmount = baseTotal
-      .add(mealPlanTotal)
-      .add(extraBedTotal)
-      .add(dogFeeTotal);
+    const {
+      basePricePerNight,
+      baseTotal,
+      checkIn,
+      checkOut,
+      dogFeePerNight,
+      dogFeeTotal,
+      extraBedTotal,
+      mealPlanTotal,
+      nights,
+      rate,
+      room,
+      totalAmount,
+      validated,
+    } = await prepareBookingCreation(input, transactionClient);
 
     const guest = await transactionClient.guest.create({
       data: {
@@ -600,6 +647,9 @@ export async function createBooking(input: z.infer<typeof createBookingSchema>) 
         totalAmount,
         breakfastIncluded: validated.mealPlan !== BookingMealPlan.ROOM_ONLY,
         notes: validated.notes || null,
+        termsAcceptedAt: validated.termsAcceptedAt ?? null,
+        termsVersion: validated.termsVersion ?? null,
+        emailVerifiedAt: validated.emailVerifiedAt ?? null,
         locale: validated.locale,
       },
       include: {
